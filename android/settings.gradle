@@ -1,0 +1,3 @@
+rootProject.name = 'nxtv2'
+
+include ':app'

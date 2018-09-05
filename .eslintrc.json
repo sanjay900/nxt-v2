@@ -1,0 +1,14 @@
+{
+    "parser": "babel-eslint",
+    "plugins": [
+        "react",
+        "react-native",
+        "flowtype"
+    ],
+    "extends": [
+        "eslint:recommended",
+        "plugin:react/recommended",
+        "plugin:flowtype/recommended",
+        "plugin:react-native/all"
+    ]
+}

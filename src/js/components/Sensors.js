@@ -2,17 +2,17 @@ import {Component} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import React from "react";
 
-export default class RemoteControl extends Component {
+export default class Sensors extends Component {
     constructor(props) {
         super(props);
-        this.state = {page: 'second'};
+        this.state = {};
     }
 
     render() {
         return (
             <View style={styles.container}>
                 <Text style={styles.welcome}>
-                    Welcome to React Nasdative
+                    Welcome to React Native
                 </Text>
             </View>
         );

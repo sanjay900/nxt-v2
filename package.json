@@ -8,21 +8,36 @@
     "react-devtools": "adb reverse tcp:8097 tcp:8097 && react-devtools &"
   },
   "dependencies": {
+    "@remobile/react-native-toast": "^1.0.7",
+    "enumify": "^1.0.4",
     "react": "16.4.1",
+    "react-joystick": "^1.0.3",
     "react-native": "0.56.0",
+    "react-native-bluetooth-serial": "https://github.com/sanjay900/react-native-bluetooth-serial",
     "react-native-cli": "^2.0.1",
+    "react-native-easy-toast": "^1.1.0",
     "react-native-elements": "^0.19.1",
+    "react-native-gesture-handler": "^1.0.7",
     "react-native-router-flux": "^4.0.1",
     "react-native-tabs": "^1.0.9",
+    "react-native-toast": "^1.0.1",
     "react-native-vector-icons": "^5.0.0",
     "react-redux": "^5.0.7",
-    "redux": "^4.0.0"
+    "redux": "^4.0.0",
+    "redux-logger": "^3.0.6",
+    "redux-thunk": "^2.3.0"
   },
   "devDependencies": {
-    "@types/react": "^16.4.13",
     "@types/react-native": "^0.56.15",
+    "babel-eslint": "^9.0.0",
     "babel-jest": "23.4.2",
     "babel-preset-react-native": "5.0.2",
+    "eslint": "^5.5.0",
+    "eslint-plugin-flowtype": "^2.50.0",
+    "eslint-plugin-flowtype-errors": "^3.6.0",
+    "eslint-plugin-react": "^7.11.1",
+    "eslint-plugin-react-native": "^3.2.1",
+    "flow-bin": "^0.80.0",
     "jest": "23.5.0",
     "react-devtools": "^3.3.2",
     "react-test-renderer": "16.4.1"

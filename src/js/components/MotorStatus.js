@@ -2,10 +2,10 @@ import {Component} from "react";
 import {StyleSheet, Text, View} from "react-native";
 import React from "react";
 
-export default class PlayTones extends Component {
+export default class MotorStatus extends Component {
     constructor(props) {
         super(props);
-        this.state = {page: 'second'};
+        this.state = {};
     }
 
     render() {

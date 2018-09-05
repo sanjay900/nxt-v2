@@ -3,6 +3,11 @@ package com.nxtv2;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.remobile.toast.RCTToastPackage;
+import com.remobile.toast.RCTToastPackage;
+import com.rusel.RCTBluetoothSerial.RCTBluetoothSerialPackage;
+import com.oblador.vectoricons.VectorIconsPackage;
+import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
 import com.facebook.react.shell.MainReactPackage;
@@ -22,7 +27,12 @@ public class MainApplication extends Application implements ReactApplication {
     @Override
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
-          new MainReactPackage()
+          new MainReactPackage(),
+            new RCTToastPackage(),
+            new RCTToastPackage(),
+            new RCTBluetoothSerialPackage(),
+            new VectorIconsPackage(),
+            new RNGestureHandlerPackage()
       );
     }
 

@@ -1,3 +1,13 @@
 rootProject.name = 'nxtv2'
+include ':react-native-toast'
+project(':react-native-toast').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-toast/android')
+include ':@remobile_react-native-toast'
+project(':@remobile_react-native-toast').projectDir = new File(rootProject.projectDir, '../node_modules/@remobile/react-native-toast/android')
+include ':react-native-bluetooth-serial'
+project(':react-native-bluetooth-serial').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-bluetooth-serial/android')
+include ':react-native-vector-icons'
+project(':react-native-vector-icons').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-vector-icons/android')
+include ':react-native-gesture-handler'
+project(':react-native-gesture-handler').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-gesture-handler/android')
 
 include ':app'

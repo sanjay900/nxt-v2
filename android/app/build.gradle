@@ -137,7 +137,6 @@ android {
 }
 
 dependencies {
-    compile project(':react-native-toast')
     compile project(':@remobile_react-native-toast')
     compile project(':react-native-bluetooth-serial')
     compile project(':react-native-vector-icons')

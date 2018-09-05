@@ -1,9 +1,9 @@
 // @flow
 import { StyleSheet, View, Animated } from "react-native";
 import React from "react";
-import Icon from "react-native-vector-icons/FontAwesome5"
+import Icon from "react-native-vector-icons/FontAwesome5";
 import BluetoothSerial from "react-native-bluetooth-serial";
-import Toast from '@remobile/react-native-toast'
+import Toast from '@remobile/react-native-toast';
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const Colours = {
@@ -40,18 +40,18 @@ export default class StatusButton extends React.Component<Props, State> {
                     duration: 500
                 }),
             ])
-        ).start()
+        ).start();
     }
     componentDidMount() {
-        BluetoothSerial.on('bluetoothEnabled', () => Toast.showShortBottom('Bluetooth enabled'))
-        BluetoothSerial.on('bluetoothDisabled', () => Toast.showShortBottom('Bluetooth disabled'))
-        BluetoothSerial.on('error', (err) =>  Toast.showShortBottom(`Error with bluetooth device: ${err.message}`))
+        BluetoothSerial.on('bluetoothEnabled', () => Toast.showShortBottom('Bluetooth enabled'));
+        BluetoothSerial.on('bluetoothDisabled', () => Toast.showShortBottom('Bluetooth disabled'));
+        BluetoothSerial.on('error', (err) =>  Toast.showShortBottom(`Error with bluetooth device: ${err.message}`));
         BluetoothSerial.on('connectionLost', () => {
             if (this.state.device) {
-                Toast.showShortBottom(`Connection to device ${this.state.device.name} has been lost`)
+                Toast.showShortBottom(`Connection to device ${this.state.device.name} has been lost`);
             }
-            this.setState({ status: "DISCONNECTED" })
-        })
+            this.setState({ status: "DISCONNECTED" });
+        });
     }
     render() {
 
@@ -66,9 +66,9 @@ export default class StatusButton extends React.Component<Props, State> {
     }
 
     getStyle() {
-        let style: any = { color: Colours[this.state.status.toLowerCase()] }
+        let style: any = { color: Colours[this.state.status.toLowerCase()] };
         if (this.state.status === "CONNECTING") {
-            style.opacity = this.state.opacity
+            style.opacity = this.state.opacity;
         }
         return style;
     }

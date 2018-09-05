@@ -1,6 +1,6 @@
 import {StyleSheet, Text, View} from "react-native";
 import React from "react";
-import Icon from "react-native-vector-icons/FontAwesome5"
+import Icon from "react-native-vector-icons/FontAwesome5";
 
 export default class TabIcon extends React.Component {
     render() {

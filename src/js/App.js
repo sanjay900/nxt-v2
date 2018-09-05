@@ -9,20 +9,13 @@ import SensorStatus from "./components/Sensors";
 import MotorStatus from "./components/MotorStatus";
 import StatusButton from "./components/StatusButton";
 import Settings from "./components/Settings";
-export default class App extends Component {
-    constructor(props) {
-        super(props);
-        this.state = {};
-    }
-
-    render() {
-        const createRightButton = function () {
-            return (
-                <StatusButton />
-            );
-        };
-        return (
-            <Router right={createRightButton}>
+import { Provider } from 'react-redux';
+import { PropTypes } from 'prop-types';
+import { Store } from 'redux';
+const App = (props) => {
+    return (
+        <Provider store={props.store}>
+            <Router right={() => <StatusButton />}>
                 <Stack key="root" tabs={true}>
                     <Scene key="remote-control" component={RemoteControl} title="Remote Control" icon={TabIcon} iconName="gamepad" />
                     <Scene key="about-device" component={AboutDevice} title="About Device" icon={TabIcon} iconName="info-circle" />
@@ -32,6 +25,12 @@ export default class App extends Component {
                     <Scene key="settings" component={Settings} title="Settings" icon={TabIcon} iconName="cog" />
                 </Stack>
             </Router>
-        );
-    }
-}
+        </Provider>
+    );
+};
+
+App.propTypes = {
+    store: PropTypes.instanceOf(Store)
+};
+
+export default App;

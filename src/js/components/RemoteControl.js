@@ -1,34 +1,39 @@
-import { Component } from "react";
-import { PanResponder, StyleSheet, Text, View } from "react-native";
+import { StyleSheet, View, Text, Button } from "react-native";
+import PropTypes from 'prop-types';
 import React from "react";
 import Joystick from "./Joystick";
-
-export default class RemoteControl extends Component {
-    constructor(props) {
-        super(props);
-        this.state = { left: { x: 0, y: 0 }, right: { x: 0, y: 0 } };
-    }
-
-
-    render() {
+const RemoteControl = ({ onSwapModeClick, isJoystick }) => {
+    if (!isJoystick) {
         return (
             <View style={styles.container}>
-                <Joystick dx={true} onMove={this.updateLeft.bind(this)} />
-                <Joystick dy={true} onMove={this.updateRight.bind(this)} />
+                <View style={styles.joyContainer}>
+                    <Joystick dx={true} color="black" />
+                    <Joystick dy={true} color="black" />
+                </View>
+                <Button onPress={onSwapModeClick} title="Swap to Tilt Controls" />
             </View>
         );
     }
-    updateLeft(evt) {
-        this.setState(() => { return { left: evt } })
-    }
-    updateRight(evt) {
-        this.setState(() => { return { right: evt } })
-    }
-}
+return (
+    <View style={styles.container}>
+        <Text>Test</Text>
+        <Button onPress={onSwapModeClick} title="Swap to Joystick Controls" />
+    </View>
+);
+};
+
+RemoteControl.propTypes = {
+    onSwapModeClick: PropTypes.bool.isRequired,
+    isJoystick: PropTypes.bool.isRequired,
+};
 
 const styles = StyleSheet.create({
     container: {
+        flex: 1
+    }, joyContainer: {
         flex: 1,
         flexDirection: 'row'
     }
 });
+
+export default RemoteControl;

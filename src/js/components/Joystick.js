@@ -1,34 +1,33 @@
 // @flow
 import React, { Component } from "react";
 import { StyleSheet, View } from "react-native";
+import type { Joystick as JoystickEvent, Action } from "../actions/types";
 import { PanGestureHandler, State, PanGestureHandlerGestureEvent, PanGestureHandlerStateChangeEvent } from "react-native-gesture-handler";
+import { connect } from "react-redux";
 
-let CIRCLE_SIZE = 80;
-let MAX = 70;
-type JoystickState = {
+const CIRCLE_SIZE = 80;
+const MAX = 70;
+const BACK_SIZE_LOCKED = CIRCLE_SIZE / 2;
+const BACK_SIZE = CIRCLE_SIZE + MAX;
+type JoystickState = JoystickEvent & {
     width: number,
     height: number,
-    tapped: boolean,
-    x: number,
-    y: number,
     centerX: number,
     centerY: number
 }
-type Position = {
-    x: number,
-    y: number
-}
 type Props = {
-    dx: number,
-    dy: number,
+    lockX: boolean,
+    lockY: boolean,
     color: string,
-    onMove: (Position)=>{}
+    name: string,
+    dispatch: (action: Action) => {},
+    onStateChange: (JoystickEvent) => {}
 }
-export default class Joystick extends Component<Props, JoystickState> {
+class Joystick extends Component<Props, JoystickState> {
 
     constructor(props: Props) {
         super(props);
-        this.state = { width: 0, height: 0, tapped: false, x: 0, y: 0, centerX: 0, centerY: 0 };
+        this.state = { width: 0, height: 0, tapped: false, x: 0, y: 0, centerX: 0, centerY: 0, name: props.name };
     }
     render() {
         return (
@@ -45,8 +44,10 @@ export default class Joystick extends Component<Props, JoystickState> {
     startStop(event: PanGestureHandlerStateChangeEvent) {
         if (event.nativeEvent.state == State.BEGAN) {
             this.setState(() => { return { tapped: true }; });
+            this.props.dispatch({ type: "JOYSTICK_TOUCH", joystick: this.props.name });
         } else if (event.nativeEvent.state == State.END || event.nativeEvent.state == State.FAILED) {
             this.setState(() => { return { tapped: false, x: 0, y: 0 }; });
+            this.props.dispatch({ type: "JOYSTICK_RELEASE", joystick: this.props.name });
         }
     }
     onMove(event: PanGestureHandlerGestureEvent) {
@@ -55,18 +56,18 @@ export default class Joystick extends Component<Props, JoystickState> {
         let diffY = absoluteY - this.state.centerY;
         diffX = Math.max(-MAX, Math.min(MAX, diffX));
         diffY = Math.max(-MAX, Math.min(MAX, diffY));
-        if (!this.props.dx) {
+        if (this.props.lockX) {
             diffX = 0;
         }
-        if (!this.props.dy) {
+        if (this.props.lockY) {
             diffY = 0;
         }
         this.setState(() => { return { x: diffX, y: diffY }; });
-        this.props.onMove({x: diffX / MAX, y: diffY / MAX});
+        this.props.dispatch({ type: "JOYSTICK_MOVE", event: { x: diffX / MAX, y: diffY / MAX, name: this.props.name, tapped: true } });
     }
     getBackStyle() {
-        let x = this.props.dx ? CIRCLE_SIZE + MAX : CIRCLE_SIZE / 2;
-        let y = this.props.dy ? CIRCLE_SIZE + MAX : CIRCLE_SIZE / 2;
+        let x = this.props.lockX ? BACK_SIZE_LOCKED : BACK_SIZE;
+        let y = this.props.lockY ? BACK_SIZE_LOCKED : BACK_SIZE;
         return {
             backgroundColor: this.props.color,
             opacity: this.state.tapped ? 0.5 : 0.1,
@@ -94,7 +95,7 @@ export default class Joystick extends Component<Props, JoystickState> {
         });
     }
 }
-
+export default connect()(Joystick);
 const styles = StyleSheet.create({
     circle: {
         borderRadius: CIRCLE_SIZE / 2,

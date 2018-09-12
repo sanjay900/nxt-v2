@@ -1,6 +1,5 @@
-import {Component} from "react";
+import React, {Component} from "react";
 import {StyleSheet, Text, View} from "react-native";
-import React from "react";
 
 export default class PlayTones extends Component {
 

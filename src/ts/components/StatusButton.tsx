@@ -71,7 +71,9 @@ class StatusButton extends React.Component<Props, StatusState> {
 
     getStyle() {
         let style: any = {color: Colours[ConnectionStatus[this.props.status].toLowerCase()]};
-        style.opacity = this.state.opacity;
+        if (this.props.status === ConnectionStatus.CONNECTING) {
+            style.opacity = this.state.opacity;
+        }
         return style;
     }
 }

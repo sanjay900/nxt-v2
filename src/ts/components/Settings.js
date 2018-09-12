@@ -1,4 +1,4 @@
-import { StyleSheet, Picker, View, Text } from "react-native";
+import { Picker, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import { connectToDevice } from "../actions/bluetooth-actions";
 import { connect } from "react-redux";

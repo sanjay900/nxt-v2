@@ -1,6 +1,5 @@
-import {createAction, createStandardAction} from "typesafe-actions";
-import {ConnectionStatus, Joystick} from "./types";
-import {Device} from "react-native-bluetooth-serial";
+import {createAction} from "typesafe-actions";
+import {Joystick} from "./types";
 
 export const joystickMove = createAction("joystickMove", resolve => {
     return (event: Joystick) => resolve(event);

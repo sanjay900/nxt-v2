@@ -1,51 +1,62 @@
 var __extends = (this && this.__extends) || (function () {
     var extendStatics = function (d, b) {
         extendStatics = Object.setPrototypeOf ||
-            ({ __proto__: [] } instanceof Array && function (d, b) { d.__proto__ = b; }) ||
-            function (d, b) { for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p]; };
+            ({__proto__: []} instanceof Array && function (d, b) {
+                d.__proto__ = b;
+            }) ||
+            function (d, b) {
+                for (var p in b) if (b.hasOwnProperty(p)) d[p] = b[p];
+            };
         return extendStatics(d, b);
     }
     return function (d, b) {
         extendStatics(d, b);
-        function __() { this.constructor = d; }
+
+        function __() {
+            this.constructor = d;
+        }
+
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
 // @flow
-import React, { Component } from "react";
-import { StyleSheet, View } from "react-native";
-import { PanGestureHandler, State } from "react-native-gesture-handler";
-import { connect } from "react-redux";
-import { joystickMove, joystickRelease, joystickTouch } from "../actions/joystick-actions";
+import React, {Component} from "react";
+import {StyleSheet, View} from "react-native";
+import {PanGestureHandler, State} from "react-native-gesture-handler";
+import {connect} from "react-redux";
+import {joystickMove, joystickRelease, joystickTouch} from "../actions/joystick-actions";
+
 var CIRCLE_SIZE = 80;
 var MAX = 70;
 var BACK_SIZE_LOCKED = CIRCLE_SIZE / 2;
 var BACK_SIZE = CIRCLE_SIZE + MAX;
 var Joystick = /** @class */ (function (_super) {
     __extends(Joystick, _super);
+
     function Joystick(props) {
         var _this = _super.call(this, props) || this;
-        _this.state = { width: 0, height: 0, tapped: false, x: 0, y: 0, centerX: 0, centerY: 0, name: props.name };
+        _this.state = {width: 0, height: 0, tapped: false, x: 0, y: 0, centerX: 0, centerY: 0, name: props.name};
         return _this;
     }
+
     Joystick.prototype.render = function () {
         return (<View style={styles.container} onLayout={this.onPageLayout.bind(this)}>
-                <View style={[styles.circle, this.getBackStyle()]}/>
-                <PanGestureHandler onGestureEvent={this.onMove.bind(this)} onHandlerStateChange={this.startStop.bind(this)}>
-                    <View style={[styles.circle, this.getStyle()]}/>
-                </PanGestureHandler>
-            </View>);
+            <View style={[styles.circle, this.getBackStyle()]}/>
+            <PanGestureHandler onGestureEvent={this.onMove.bind(this)} onHandlerStateChange={this.startStop.bind(this)}>
+                <View style={[styles.circle, this.getStyle()]}/>
+            </PanGestureHandler>
+        </View>);
     };
     Joystick.prototype.startStop = function (event) {
         if (event.nativeEvent.state == State.BEGAN) {
             this.setState(function () {
-                return { tapped: true };
+                return {tapped: true};
             });
             this.props.dispatch(joystickTouch(this.props.name));
         }
         else if (event.nativeEvent.state == State.END || event.nativeEvent.state == State.FAILED) {
             this.setState(function () {
-                return { tapped: false, x: 0, y: 0 };
+                return {tapped: false, x: 0, y: 0};
             });
             this.props.dispatch(joystickRelease(this.props.name));
         }
@@ -63,9 +74,9 @@ var Joystick = /** @class */ (function (_super) {
             diffY = 0;
         }
         this.setState(function () {
-            return { x: diffX, y: diffY };
+            return {x: diffX, y: diffY};
         });
-        this.props.dispatch(joystickMove({ x: diffX / MAX, y: diffY / MAX, name: this.props.name, tapped: true }));
+        this.props.dispatch(joystickMove({x: diffX / MAX, y: diffY / MAX, name: this.props.name, tapped: true}));
     };
     Joystick.prototype.getBackStyle = function () {
         var x = this.props.lockX ? BACK_SIZE_LOCKED : BACK_SIZE;
@@ -92,7 +103,7 @@ var Joystick = /** @class */ (function (_super) {
     Joystick.prototype.onPageLayout = function (event) {
         var _a = event.nativeEvent.layout, width = _a.width, height = _a.height, x = _a.x, y = _a.y;
         this.setState(function () {
-            return { width: width, height: height, centerX: x + width / 2, centerY: y + height / 2 + CIRCLE_SIZE };
+            return {width: width, height: height, centerX: x + width / 2, centerY: y + height / 2 + CIRCLE_SIZE};
         });
     };
     return Joystick;

@@ -1,5 +1,5 @@
 // @flow
-import { StyleSheet, View, Text, Button } from "react-native";
+import { Button, StyleSheet, Text, View } from "react-native";
 import React from "react";
 import Joystick from "./Joystick";
 import { connect } from 'react-redux';

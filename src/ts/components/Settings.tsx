@@ -1,17 +1,18 @@
-import { StyleSheet, Picker, View, Text } from "react-native";
+import {Picker, StyleSheet, Text, View} from "react-native";
 import React from "react";
-import { connectToDevice } from "../actions/bluetooth-actions";
-import { connect } from "react-redux";
+import {connectToDevice} from "../actions/bluetooth-actions";
+import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import {State} from "../actions/types";
+
 type Props = {
-    connectToDevice: (device:Device)=>void,
+    connectToDevice: (device: Device) => void,
     device?: Device,
     list: Device[]
 }
 const Settings: React.SFC<Props> = (props) => {
-    const { list, device, connectToDevice } = props;
-    let devices = list.map(device => <Picker.Item key={device.id} label={device.name} value={device} />);
+    const {list, device, connectToDevice} = props;
+    let devices = list.map(device => <Picker.Item key={device.id} label={device.name} value={device}/>);
     return (
         <View style={styles.container}>
             <Text style={styles.label}>NXT Bluetooth Device</Text>

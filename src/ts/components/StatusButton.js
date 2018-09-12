@@ -65,7 +65,9 @@ var StatusButton = /** @class */ (function (_super) {
     };
     StatusButton.prototype.getStyle = function () {
         var style = { color: Colours[ConnectionStatus[this.props.status].toLowerCase()] };
-        style.opacity = this.state.opacity;
+        if (this.props.status === ConnectionStatus.CONNECTING) {
+            style.opacity = this.state.opacity;
+        }
         return style;
     };
     return StatusButton;

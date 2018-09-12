@@ -12,7 +12,7 @@ import Settings from "./components/Settings";
 import { Provider } from 'react-redux';
 var App = function (props) {
     return (<Provider store={props.store}>
-            <Router right={function () { return <StatusButton />; }}>
+            <Router right={function () { return <StatusButton />; }}> 
                 <Stack key="root" tabs={true}>
                     <Scene key="remote-control" component={RemoteControl} title="Remote Control" icon={TabIcon} iconName="gamepad"/>
                     <Scene key="about-device" component={AboutDevice} title="About Device" icon={TabIcon} iconName="info-circle"/>

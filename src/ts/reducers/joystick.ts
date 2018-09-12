@@ -1,7 +1,7 @@
-import {BluetoothState, ConnectionStatus, JoystickState} from "../actions/types";
-import Toast from '@remobile/react-native-toast';
+import {JoystickState} from "../actions/types";
 import * as joystickActions from '../actions/joystick-actions';
 import {ActionType, getType} from "typesafe-actions";
+
 export type JoystickAction = ActionType<typeof joystickActions>;
 
 const initialState: JoystickState = {

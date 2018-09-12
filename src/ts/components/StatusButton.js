@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 // @flow
-import { StyleSheet, View, Animated } from "react-native";
+import { Animated, StyleSheet, View } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { ConnectionStatus } from "../actions/types";
@@ -30,30 +30,42 @@ var StatusButton = /** @class */ (function (_super) {
         _this.state = {
             opacity: new Animated.Value(1)
         };
-        Animated.loop(Animated.sequence([
-            Animated.timing(_this.state.opacity, {
+        _this.startAnimation();
+        return _this;
+    }
+    StatusButton.prototype.startAnimation = function () {
+        this._animation = Animated.loop(Animated.sequence([
+            Animated.timing(this.state.opacity, {
                 toValue: 0,
                 duration: 500
             }),
-            Animated.timing(_this.state.opacity, {
+            Animated.timing(this.state.opacity, {
                 toValue: 1,
                 duration: 500
             }),
-        ])).start();
-        return _this;
-    }
+        ]));
+        this._animation.start();
+    };
+    StatusButton.prototype.componentWillReceiveProps = function (nextProps) {
+        if (this.props.status != nextProps.status) {
+            if (nextProps.status == ConnectionStatus.CONNECTING) {
+                this.startAnimation();
+            }
+            else {
+                this._animation.stop();
+                this.setState({ opacity: new Animated.Value(1) });
+            }
+        }
+    };
     StatusButton.prototype.render = function () {
         /** some styling **/
         return (<View style={styles.container}>
                 <AnimatedIcon name="bluetooth" style={this.getStyle()} size={30}/>
-
             </View>);
     };
     StatusButton.prototype.getStyle = function () {
         var style = { color: Colours[ConnectionStatus[this.props.status].toLowerCase()] };
-        if (this.props.status === ConnectionStatus.CONNECTING) {
-            style.opacity = this.state.opacity;
-        }
+        style.opacity = this.state.opacity;
         return style;
     };
     return StatusButton;

@@ -8,9 +8,15 @@
     "react-devtools": "adb reverse tcp:8097 tcp:8097 && react-devtools &"
   },
   "dependencies": {
+    "@babel/core": "^7.0.1",
     "@remobile/react-native-toast": "https://github.com/sanjay900/react-native-toast",
+    "@types/node": "^10.9.4",
+    "@types/react-native-vector-icons": "^4.6.3",
+    "@types/redux-thunk": "^2.1.0",
+    "babel-plugin-flow-to-typescript": "^0.2.0",
     "enumify": "^1.0.4",
     "eslint-plugin-flowtype": "^2.50.0",
+    "global": "^4.3.2",
     "react": "16.4.1",
     "react-joystick": "^1.0.3",
     "react-native": "0.56.0",
@@ -24,9 +30,15 @@
     "react-redux": "^5.0.7",
     "redux": "^4.0.0",
     "redux-logger": "^3.0.6",
-    "redux-thunk": "^2.3.0"
+    "redux-observable": "^1.0.0",
+    "redux-thunk": "^2.3.0",
+    "rxjs": "^6.3.2",
+    "typesafe-actions": "^2.0.4"
   },
   "devDependencies": {
+    "@types/react": "^16.4.14",
+    "@types/react-native": "^0.56.18",
+    "@types/react-redux": "^6.0.8",
     "babel-eslint": "8",
     "babel-jest": "23.4.2",
     "babel-plugin-flow-react-proptypes": "^24.1.2",
@@ -44,7 +56,9 @@
     "metro-react-native-babel-preset": "^0.45.0",
     "prettier-eslint": "^8.8.2",
     "react-devtools": "^3.3.2",
-    "react-test-renderer": "16.4.1"
+    "react-native-typescript-transformer": "^1.2.10",
+    "react-test-renderer": "16.4.1",
+    "typescript": "^3.0.3"
   },
   "jest": {
     "preset": "react-native"

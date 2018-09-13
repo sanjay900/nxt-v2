@@ -1,0 +1,23 @@
+export var SystemCommandResponse;
+(function (SystemCommandResponse) {
+    SystemCommandResponse[SystemCommandResponse["SUCCESS"] = 0] = "SUCCESS";
+    SystemCommandResponse[SystemCommandResponse["NO_MORE_HANDLES"] = 129] = "NO_MORE_HANDLES";
+    SystemCommandResponse[SystemCommandResponse["NO_SPACE"] = 130] = "NO_SPACE";
+    SystemCommandResponse[SystemCommandResponse["NO_MORE_FILES"] = 131] = "NO_MORE_FILES";
+    SystemCommandResponse[SystemCommandResponse["END_OF_FILE_EXPECTED"] = 132] = "END_OF_FILE_EXPECTED";
+    SystemCommandResponse[SystemCommandResponse["END_OF_FILE_REACHED"] = 133] = "END_OF_FILE_REACHED";
+    SystemCommandResponse[SystemCommandResponse["NOT_LINEAR_FILE"] = 134] = "NOT_LINEAR_FILE";
+    SystemCommandResponse[SystemCommandResponse["FILE_NOT_FOUND"] = 135] = "FILE_NOT_FOUND";
+    SystemCommandResponse[SystemCommandResponse["HANDLE_ALREADY_CLOSED"] = 136] = "HANDLE_ALREADY_CLOSED";
+    SystemCommandResponse[SystemCommandResponse["NO_LINEAR_SPACE_AVAILABLE"] = 137] = "NO_LINEAR_SPACE_AVAILABLE";
+    SystemCommandResponse[SystemCommandResponse["UNDEFINED_ERROR"] = 138] = "UNDEFINED_ERROR";
+    SystemCommandResponse[SystemCommandResponse["FILE_IS_BUSY"] = 139] = "FILE_IS_BUSY";
+    SystemCommandResponse[SystemCommandResponse["NO_WRITE_BUFFERS"] = 140] = "NO_WRITE_BUFFERS";
+    SystemCommandResponse[SystemCommandResponse["APPEND_NOT_POSSIBLE"] = 141] = "APPEND_NOT_POSSIBLE";
+    SystemCommandResponse[SystemCommandResponse["FILE_IS_FULL"] = 142] = "FILE_IS_FULL";
+    SystemCommandResponse[SystemCommandResponse["FILE_ALREADY_EXISTS"] = 143] = "FILE_ALREADY_EXISTS";
+    SystemCommandResponse[SystemCommandResponse["MODULE_NOT_FOUND"] = 144] = "MODULE_NOT_FOUND";
+    SystemCommandResponse[SystemCommandResponse["MODULE_OUT_OF_BOUNDS"] = 145] = "MODULE_OUT_OF_BOUNDS";
+    SystemCommandResponse[SystemCommandResponse["ILLEGAL_FILE_NAME"] = 146] = "ILLEGAL_FILE_NAME";
+    SystemCommandResponse[SystemCommandResponse["ILLEGAL_FILE_HANDLE"] = 147] = "ILLEGAL_FILE_HANDLE";
+})(SystemCommandResponse || (SystemCommandResponse = {}));

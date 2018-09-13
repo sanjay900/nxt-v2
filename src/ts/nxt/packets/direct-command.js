@@ -1,0 +1,22 @@
+export var DirectCommand;
+(function (DirectCommand) {
+    DirectCommand[DirectCommand["START_PROGRAM"] = 0] = "START_PROGRAM";
+    DirectCommand[DirectCommand["STOP_PROGRAM"] = 1] = "STOP_PROGRAM";
+    DirectCommand[DirectCommand["PLAY_SOUND_FILE"] = 2] = "PLAY_SOUND_FILE";
+    DirectCommand[DirectCommand["PLAY_TONE"] = 3] = "PLAY_TONE";
+    DirectCommand[DirectCommand["SET_OUTPUT_STATE"] = 4] = "SET_OUTPUT_STATE";
+    DirectCommand[DirectCommand["SET_INPUT_MODE"] = 5] = "SET_INPUT_MODE";
+    DirectCommand[DirectCommand["GET_OUTPUT_STATE"] = 6] = "GET_OUTPUT_STATE";
+    DirectCommand[DirectCommand["GET_INPUT_VALUES"] = 7] = "GET_INPUT_VALUES";
+    DirectCommand[DirectCommand["RESET_INPUT_SCALED_VALUE"] = 8] = "RESET_INPUT_SCALED_VALUE";
+    DirectCommand[DirectCommand["MESSAGE_WRITE"] = 9] = "MESSAGE_WRITE";
+    DirectCommand[DirectCommand["RESET_MOTOR_POSITION"] = 10] = "RESET_MOTOR_POSITION";
+    DirectCommand[DirectCommand["GET_BATTERY_LEVEL"] = 11] = "GET_BATTERY_LEVEL";
+    DirectCommand[DirectCommand["STOP_SOUND_PLAYBACK"] = 12] = "STOP_SOUND_PLAYBACK";
+    DirectCommand[DirectCommand["KEEP_ALIVE"] = 13] = "KEEP_ALIVE";
+    DirectCommand[DirectCommand["LS_GET_STATUS"] = 14] = "LS_GET_STATUS";
+    DirectCommand[DirectCommand["LS_WRITE"] = 15] = "LS_WRITE";
+    DirectCommand[DirectCommand["LS_READ"] = 16] = "LS_READ";
+    DirectCommand[DirectCommand["GET_CURRENT_PROGRAM_NAME"] = 17] = "GET_CURRENT_PROGRAM_NAME";
+    DirectCommand[DirectCommand["MESSAGE_READ"] = 19] = "MESSAGE_READ";
+})(DirectCommand || (DirectCommand = {}));

@@ -5,6 +5,9 @@ import Icon from "react-native-vector-icons/FontAwesome5";
 import {ConnectionStatus, State} from "../actions/types";
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
+import Toast from "@remobile/react-native-toast";
+import {writePacket} from "../actions/bluetooth-actions";
+import {GetDeviceInfo} from "../nxt/packets/system/get-device-info";
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const Colours: { [key: string]: string } = {
@@ -18,6 +21,8 @@ type StatusState = {
 type Props = {
     status: ConnectionStatus,
     device?: Device,
+    lastMessage?: string,
+    writePacket: Function
 }
 
 class StatusButton extends React.Component<Props, StatusState> {
@@ -56,6 +61,12 @@ class StatusButton extends React.Component<Props, StatusState> {
                 this.setState({opacity: new Animated.Value(1)});
             }
         }
+        if (nextProps.lastMessage && this.props.lastMessage != nextProps.lastMessage) {
+            Toast.showShortBottom(`Message from bluetooth device: ${nextProps.lastMessage}`);
+        }
+        if (nextProps.status == ConnectionStatus.CONNECTED) {
+            this.props.writePacket();
+        }
     }
 
     render() {
@@ -81,10 +92,17 @@ class StatusButton extends React.Component<Props, StatusState> {
 const mapStateToProps = (state: State) => {
     return {
         status: state.bluetooth.status,
-        device: state.bluetooth.device
+        device: state.bluetooth.device,
+        lastMessage: state.bluetooth.lastMessage
     };
 };
-export default connect(mapStateToProps)(StatusButton);
+
+const mapPropsToDispatch = (dispatch: Function) => {
+    return {
+        writePacket: ()=>dispatch(writePacket.request(GetDeviceInfo.createPacket()))
+    }
+};
+export default connect(mapStateToProps, mapPropsToDispatch)(StatusButton);
 const styles = StyleSheet.create({
     container: {
         flex: 1,

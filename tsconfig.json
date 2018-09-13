@@ -3,6 +3,9 @@
     "target": "es5",
     "module": "es6",
     "lib": ["es2017", "dom"],
+    "downlevelIteration": true,
+    //TODO: rewrite things so that we dont have to do this.
+    "strictPropertyInitialization": false,
     "moduleResolution": "node",
     "jsx": "react-native",
     "strict": true,

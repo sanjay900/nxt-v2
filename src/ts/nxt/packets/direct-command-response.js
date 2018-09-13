@@ -1,0 +1,21 @@
+export var DirectCommandResponse;
+(function (DirectCommandResponse) {
+    DirectCommandResponse[DirectCommandResponse["SUCCESS"] = 0] = "SUCCESS";
+    DirectCommandResponse[DirectCommandResponse["PENDING"] = 32] = "PENDING";
+    DirectCommandResponse[DirectCommandResponse["QUEUE_EMPTY"] = 64] = "QUEUE_EMPTY";
+    DirectCommandResponse[DirectCommandResponse["REQUEST_FAILED"] = 189] = "REQUEST_FAILED";
+    DirectCommandResponse[DirectCommandResponse["UNKNOWN_OP_CODE"] = 190] = "UNKNOWN_OP_CODE";
+    DirectCommandResponse[DirectCommandResponse["INSANE_PACKET"] = 191] = "INSANE_PACKET";
+    DirectCommandResponse[DirectCommandResponse["OUT_OF_RANGE"] = 192] = "OUT_OF_RANGE";
+    DirectCommandResponse[DirectCommandResponse["COMMUNATION_ERROR"] = 221] = "COMMUNATION_ERROR";
+    DirectCommandResponse[DirectCommandResponse["BUFFER_OUT_OF_MEMORY"] = 222] = "BUFFER_OUT_OF_MEMORY";
+    DirectCommandResponse[DirectCommandResponse["INVALID_CHANNEL_CONNECTION"] = 223] = "INVALID_CHANNEL_CONNECTION";
+    DirectCommandResponse[DirectCommandResponse["BUSY_CHANNEL_CONNECTION"] = 224] = "BUSY_CHANNEL_CONNECTION";
+    DirectCommandResponse[DirectCommandResponse["NO_ACTIVE_PROGRAM"] = 236] = "NO_ACTIVE_PROGRAM";
+    DirectCommandResponse[DirectCommandResponse["ILLEGAL_SIZE"] = 237] = "ILLEGAL_SIZE";
+    DirectCommandResponse[DirectCommandResponse["ILLEGAL_MAILBOX_QUEUE"] = 238] = "ILLEGAL_MAILBOX_QUEUE";
+    DirectCommandResponse[DirectCommandResponse["INVALID_FIELD_OF_STRUCTUR"] = 239] = "INVALID_FIELD_OF_STRUCTUR";
+    DirectCommandResponse[DirectCommandResponse["BAD_INPUT_OUTPUT"] = 240] = "BAD_INPUT_OUTPUT";
+    DirectCommandResponse[DirectCommandResponse["OUT_OF_MEMORY"] = 251] = "OUT_OF_MEMORY";
+    DirectCommandResponse[DirectCommandResponse["BAD_ARGUMENTS"] = 255] = "BAD_ARGUMENTS";
+})(DirectCommandResponse || (DirectCommandResponse = {}));

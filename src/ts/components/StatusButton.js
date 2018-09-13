@@ -63,7 +63,7 @@ var StatusButton = /** @class */ (function (_super) {
         if (nextProps.lastMessage && this.props.lastMessage != nextProps.lastMessage) {
             Toast.showShortBottom("Message from bluetooth device: " + nextProps.lastMessage);
         }
-        if (nextProps.status == ConnectionStatus.CONNECTED) {
+        if (this.props.status != nextProps.status && nextProps.status == ConnectionStatus.CONNECTED) {
             this.props.fetchDeviceInfo();
         }
     };
@@ -92,9 +92,9 @@ var mapStateToProps = function (state) {
 var mapPropsToDispatch = function (dispatch) {
     return {
         fetchDeviceInfo: function () {
+            dispatch(writePacket.request(GetBatteryLevel.createPacket()));
             dispatch(writePacket.request(GetDeviceInfo.createPacket()));
             dispatch(writePacket.request(GetFirmwareVersion.createPacket()));
-            dispatch(writePacket.request(GetBatteryLevel.createPacket()));
         }
     };
 };

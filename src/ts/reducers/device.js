@@ -79,36 +79,32 @@ export var device = function (state, action) {
     if (state === void 0) { state = initialState; }
     switch (action.type) {
         case getType(deviceActions.readPacket):
-            return __assign({}, state, processPacket(action.payload.packet));
+            return __assign({}, state, processPacket(action.payload.packet, state));
         case getType(deviceActions.writePacket.failure):
             return __assign({}, state, { lastMessage: action.payload.message });
+        case getType(deviceActions.writePacket.request):
+            return __assign({}, state);
         case getType(deviceActions.setName):
-            return __assign({}, state, { info: {
-                    deviceName: action.payload
-                } });
+            return __assign({}, state, { info: __assign({}, state.info, { deviceName: action.payload }) });
     }
     return state;
 };
-function processPacket(packet) {
+function processPacket(packet, state) {
     switch (packet.id) {
         case SystemCommand.GET_DEVICE_INFO:
             var _a = packet, deviceName = _a.name, btAddress = _a.btAddress, btSignalStrength = _a.btSignalStrength, freeSpace = _a.freeSpace;
             return {
-                info: { deviceName: deviceName, btSignalStrength: btSignalStrength, btAddress: btAddress, freeSpace: freeSpace }
+                info: __assign({}, state.info, { deviceName: deviceName, btSignalStrength: btSignalStrength, btAddress: btAddress, freeSpace: freeSpace })
             };
         case SystemCommand.GET_FIRMWARE_VERSION:
             var _b = packet, firmware = _b.firmwareVersion, protocol = _b.protocolVersion;
             return {
-                info: {
-                    version: { firmware: firmware, protocol: protocol }
-                }
+                info: __assign({}, state.info, { version: { firmware: firmware, protocol: protocol } })
             };
         case DirectCommand.GET_BATTERY_LEVEL:
             var voltage = packet.voltage;
             return {
-                info: {
-                    batteryVoltage: voltage
-                }
+                info: __assign({}, state.info, { batteryVoltage: voltage })
             };
     }
     return {};

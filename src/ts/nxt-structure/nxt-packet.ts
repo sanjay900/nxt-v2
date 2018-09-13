@@ -1,17 +1,3 @@
-import {Packet} from "./packets/packet";
-
-
-/**
- * This provide handles communication with a NXT device, and provides helper methods for uploading files and NXT I/O.
- */
-export class NxtPacketProvider {
-    writePacket(expectResponse: boolean, ...packets: Packet[]) {
-        for (let packet of packets) {
-            // this.bluetooth.write(new Uint8Array(packet.writePacket(expectResponse)));
-        }
-    }
-}
-
 export enum TelegramType {
     DIRECT_COMMAND_RESPONSE = 0x00,
     SYSTEM_COMMAND_RESPONSE = 0x01,

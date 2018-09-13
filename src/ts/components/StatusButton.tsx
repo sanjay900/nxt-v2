@@ -66,7 +66,7 @@ class StatusButton extends React.Component<Props, StatusState> {
         if (nextProps.lastMessage && this.props.lastMessage != nextProps.lastMessage) {
             Toast.showShortBottom(`Message from bluetooth device: ${nextProps.lastMessage}`);
         }
-        if (nextProps.status == ConnectionStatus.CONNECTED) {
+        if (this.props.status != nextProps.status && nextProps.status == ConnectionStatus.CONNECTED) {
             this.props.fetchDeviceInfo();
         }
     }
@@ -102,9 +102,9 @@ const mapStateToProps = (state: State) => {
 const mapPropsToDispatch = (dispatch: Function) => {
     return {
         fetchDeviceInfo: ()=>{
+            dispatch(writePacket.request(GetBatteryLevel.createPacket()));
             dispatch(writePacket.request(GetDeviceInfo.createPacket()));
             dispatch(writePacket.request(GetFirmwareVersion.createPacket()));
-            dispatch(writePacket.request(GetBatteryLevel.createPacket()));
         }
     }
 };

@@ -37,7 +37,9 @@ export function initEvents(store) {
     setInterval(function () {
         BluetoothSerial.readFromDevice().then(function (data) {
             if (data.length != 0) {
-                buffer.push.apply(buffer, __spread(Array.from(new Buffer(data))));
+                buffer.push.apply(buffer, __spread(Array.from(new Buffer(data, 'base64'))));
+            }
+            if (buffer.length > 0) {
                 var len = buffer[0] | buffer[1] << 8;
                 while (buffer.length >= len + 2) {
                     buffer.splice(0, 2);
@@ -51,7 +53,6 @@ export function initEvents(store) {
 function parsePacket(data, store) {
     var telegramType = data.shift();
     if (telegramType == TelegramType.REPLY) {
-        data.shift();
         //Look up this packet, and construct it from the available data.
         var packet = PacketFactory.readPacket(data);
         if (packet) {

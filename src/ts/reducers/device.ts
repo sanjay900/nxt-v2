@@ -15,6 +15,7 @@ import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
 import {DirectCommand} from "../nxt-structure/packets/direct-command";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
+import {State} from "../store";
 
 export type DeviceAction = ActionType<typeof deviceActions>;
 
@@ -143,12 +144,15 @@ const initialState: DeviceState = {
 export const device = (state: DeviceState = initialState, action: DeviceAction) => {
     switch (action.type) {
         case getType(deviceActions.readPacket):
-            return {...state, ...processPacket(action.payload.packet)};
+            return {...state, ...processPacket(action.payload.packet, state)};
         case getType(deviceActions.writePacket.failure):
             return {...state, lastMessage: action.payload.message};
+        case getType(deviceActions.writePacket.request):
+            return {...state};
         case getType(deviceActions.setName):
             return {
                 ...state, info: {
+                    ...state.info,
                     deviceName: action.payload
                 }
             }
@@ -156,18 +160,19 @@ export const device = (state: DeviceState = initialState, action: DeviceAction) 
     return state;
 };
 
-function processPacket(packet: Packet): any {
+function processPacket(packet: Packet, state: DeviceState): any {
     switch (packet.id) {
         case SystemCommand.GET_DEVICE_INFO:
             let {name: deviceName, btAddress, btSignalStrength, freeSpace} = packet as GetDeviceInfo;
             return {
-                info: {deviceName, btSignalStrength, btAddress, freeSpace}
+                info: {...state.info, deviceName, btSignalStrength, btAddress, freeSpace}
             };
 
         case SystemCommand.GET_FIRMWARE_VERSION:
             let {firmwareVersion: firmware, protocolVersion: protocol} = packet as GetFirmwareVersion;
             return {
                 info: {
+                    ...state.info,
                     version: {firmware, protocol}
                 }
             };
@@ -176,6 +181,7 @@ function processPacket(packet: Packet): any {
             let {voltage} = packet as GetBatteryLevel;
             return {
                 info: {
+                    ...state.info,
                     batteryVoltage: voltage
                 }
             };

@@ -8,7 +8,7 @@ var AboutDevice = function (_a) {
     var deviceInfo = _a.deviceInfo, setName = _a.setName;
     return (<View style={styles.container}>
             <FormLabel>Device Name</FormLabel>
-            <FormInput value={deviceInfo.info.deviceName} onChangeText={setName}/>
+            <FormInput value={deviceInfo.info.deviceName} onChangeText={setName} containerStyle={styles.input}/>
             <FormLabel>Device Bluetooth Address</FormLabel>
             <Text style={styles.margin}>{deviceInfo.info.btAddress}</Text>
             <FormLabel>Device Firmware Version</FormLabel>
@@ -41,6 +41,11 @@ var styles = StyleSheet.create({
         flexDirection: 'row'
     }, margin: {
         marginLeft: 20,
+    }, input: {
+        marginLeft: 20,
+        backgroundColor: "lightgray",
+        borderColor: "gray",
+        borderWidth: 1
     }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(AboutDevice);

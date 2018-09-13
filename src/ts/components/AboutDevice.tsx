@@ -16,7 +16,7 @@ const AboutDevice: React.SFC<Props> = ({deviceInfo, setName}: Props) => {
     return (
         <View style={styles.container}>
             <FormLabel>Device Name</FormLabel>
-            <FormInput value={deviceInfo.info.deviceName} onChangeText={setName}/>
+            <FormInput value={deviceInfo.info.deviceName} onChangeText={setName} containerStyle={styles.input}/>
             <FormLabel>Device Bluetooth Address</FormLabel>
             <Text style={styles.margin}>{deviceInfo.info.btAddress}</Text>
             <FormLabel>Device Firmware Version</FormLabel>
@@ -50,6 +50,11 @@ const styles = StyleSheet.create({
         flexDirection: 'row'
     }, margin: {
         marginLeft: 20,
+    }, input: {
+        marginLeft: 20,
+        backgroundColor: "lightgray",
+        borderColor: "gray",
+        borderWidth: 1
     }
 });
 

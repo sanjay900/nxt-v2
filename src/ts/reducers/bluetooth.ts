@@ -1,9 +1,17 @@
-import {BluetoothState, ConnectionStatus} from "../actions/types";
 import * as bluetoothActions from '../actions/bluetooth-actions';
 import {ActionType, getType} from "typesafe-actions";
+import {Device} from "react-native-bluetooth-serial";
 
 export type BluetoothAction = ActionType<typeof bluetoothActions>;
 
+export enum ConnectionStatus { CONNECTING, CONNECTED, DISCONNECTED }
+
+export type BluetoothState = {
+    device?: Device,
+    list: Device[],
+    status: ConnectionStatus,
+    lastMessage?: string
+}
 const initialState: BluetoothState = {
     list: [],
     status: ConnectionStatus.DISCONNECTED
@@ -25,11 +33,6 @@ export const bluetooth = (state: BluetoothState = initialState, action: Bluetoot
             return {...state, status: ConnectionStatus.DISCONNECTED, lastMessage: action.payload.message};
         case getType(bluetoothActions.disconnect):
             return {...state, status: ConnectionStatus.DISCONNECTED, lastMessage: "Connection lost"};
-        case getType(bluetoothActions.readPacket):
-            console.error(action.payload);
-            return {...state};
-        case getType(bluetoothActions.writePacket.failure):
-            return {...state, lastMessage: action.payload.message};
     }
     return state;
 };

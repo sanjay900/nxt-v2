@@ -1,11 +1,12 @@
 //TODO: handle bluetooth events and converting them to actions
 import BluetoothSerial from "react-native-bluetooth-serial";
 import {Store} from "redux";
-import {disconnect, readPacket} from "./actions/bluetooth-actions";
-import {TelegramType} from "./nxt/nxt-packet";
-import {Packet} from "./nxt/packets/packet";
-import {PacketFactory} from "./nxt/packets/packet-factory";
+import {disconnect} from "./actions/bluetooth-actions";
+import {TelegramType} from "./nxt-structure/nxt-packet";
+import {Packet} from "./nxt-structure/packets/packet";
+import {PacketFactory} from "./nxt-structure/packets/packet-factory";
 import {Buffer} from "buffer";
+import {readPacket} from "./actions/device-actions";
 
 let buffer: number[] = [];
 export function initEvents(store: Store) {

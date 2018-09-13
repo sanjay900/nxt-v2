@@ -9,9 +9,14 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { ConnectionStatus } from "../actions/types";
 import * as bluetoothActions from '../actions/bluetooth-actions';
 import { getType } from "typesafe-actions";
+export var ConnectionStatus;
+(function (ConnectionStatus) {
+    ConnectionStatus[ConnectionStatus["CONNECTING"] = 0] = "CONNECTING";
+    ConnectionStatus[ConnectionStatus["CONNECTED"] = 1] = "CONNECTED";
+    ConnectionStatus[ConnectionStatus["DISCONNECTED"] = 2] = "DISCONNECTED";
+})(ConnectionStatus || (ConnectionStatus = {}));
 var initialState = {
     list: [],
     status: ConnectionStatus.DISCONNECTED
@@ -33,11 +38,6 @@ export var bluetooth = function (state, action) {
             return __assign({}, state, { status: ConnectionStatus.DISCONNECTED, lastMessage: action.payload.message });
         case getType(bluetoothActions.disconnect):
             return __assign({}, state, { status: ConnectionStatus.DISCONNECTED, lastMessage: "Connection lost" });
-        case getType(bluetoothActions.readPacket):
-            console.error(action.payload);
-            return __assign({}, state);
-        case getType(bluetoothActions.writePacket.failure):
-            return __assign({}, state, { lastMessage: action.payload.message });
     }
     return state;
 };

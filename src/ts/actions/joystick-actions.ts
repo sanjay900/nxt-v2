@@ -1,5 +1,5 @@
 import {createAction} from "typesafe-actions";
-import {Joystick} from "./types";
+import {Joystick} from "../reducers/joystick";
 
 export const joystickMove = createAction("joystickMove", resolve => {
     return (event: Joystick) => resolve(event);

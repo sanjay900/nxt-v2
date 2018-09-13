@@ -1,10 +1,10 @@
-// @flow
 import {Button, StyleSheet, Text, View} from "react-native";
 import React from "react";
 import Joystick from "./Joystick";
 import {connect} from 'react-redux';
-import {Mode, State} from "../actions/types";
+import {State} from "../store";
 import {toggle} from "../actions/core-actions";
+import {Mode} from "../reducers/joystick";
 
 type Props = {
     currentMode: Mode,

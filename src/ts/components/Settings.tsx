@@ -3,7 +3,7 @@ import React from "react";
 import {connectToDevice} from "../actions/bluetooth-actions";
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
-import {State} from "../actions/types";
+import {State} from "../store";
 
 type Props = {
     connectToDevice: (device: Device) => void,

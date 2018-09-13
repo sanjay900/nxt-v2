@@ -38,12 +38,12 @@ export class GetOutputState extends DirectPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    this.port = data.shift();
-    this.power = data.shift();
-    this.mode = data.shift();
-    this.regulationMode = data.shift();
-    this.turnRatio = data.shift();
-    this.runState = data.shift();
+    this.port = data.shift()!;
+    this.power = data.shift()!;
+    this.mode = data.shift()!;
+    this.regulationMode = data.shift()!;
+    this.turnRatio = data.shift()!;
+    this.runState = data.shift()!;
     this.tachoLimit = Packet.readLong(data);
     this.tachoCount = Packet.readLong(data);
     this.blockTachoCount = Packet.readLong(data);

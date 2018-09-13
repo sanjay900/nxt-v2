@@ -14,6 +14,7 @@ var __extends = (this && this.__extends) || (function () {
 import { SystemPacket } from "./system-packet";
 import { SystemCommand } from "../system-command";
 import { Packet } from "../packet";
+import 'mdn-polyfills/String.prototype.padEnd';
 var SetBrickName = /** @class */ (function (_super) {
     __extends(SetBrickName, _super);
     function SetBrickName() {

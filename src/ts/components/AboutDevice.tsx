@@ -1,34 +1,40 @@
-import React, {Component} from "react";
-import {StyleSheet, Text, View} from "react-native";
+import {Button, StyleSheet, Text, View} from "react-native";
+import React from "react";
+import {connect} from 'react-redux';
+import {State} from "../store";
+import {DeviceState} from "../reducers/device";
+import {setName} from "../actions/device-actions";
 
-export default class AboutDevice extends Component {
-
-    render() {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.welcome}>
-                    Welcome to React Native
-                </Text>
-            </View>
-        );
-    }
+type Props = {
+    deviceInfo: DeviceState,
+    setName: () => {}
 }
 
+const AboutDevice: React.SFC<Props> = ({deviceInfo, setName}: Props) => {
+    return (
+        <View style={styles.container}>
+            <Text>{deviceInfo.info.deviceName}</Text>
+            <Button onPress={setName} title="Set name"/>
+        </View>
+    );
+};
+const mapStateToProps = (state: State) => {
+    return {
+        deviceInfo: state.device
+    };
+};
+const mapDispatchToProps = (dispatch: Function) => {
+    return {
+        setName: () => dispatch(setName("Test Dev"))
+    };
+};
 const styles = StyleSheet.create({
     container: {
+        flex: 1
+    }, joyContainer: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
-    },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10,
-    },
-    instructions: {
-        textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5,
-    },
+        flexDirection: 'row'
+    }
 });
+
+export default connect(mapStateToProps, mapDispatchToProps)(AboutDevice);

@@ -11,15 +11,16 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-// @flow
 import { Animated, StyleSheet, View } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import { ConnectionStatus } from "../actions/types";
 import { connect } from "react-redux";
 import Toast from "@remobile/react-native-toast";
-import { writePacket } from "../actions/bluetooth-actions";
-import { GetDeviceInfo } from "../nxt/packets/system/get-device-info";
+import { writePacket } from "../actions/device-actions";
+import { GetDeviceInfo } from "../nxt-structure/packets/system/get-device-info";
+import { ConnectionStatus } from "../reducers/bluetooth";
+import { GetFirmwareVersion } from "../nxt-structure/packets/system/get-firmware-version";
+import { GetBatteryLevel } from "../nxt-structure/packets/direct/get-battery-level";
 var AnimatedIcon = Animated.createAnimatedComponent(Icon);
 var Colours = {
     connecting: "black",
@@ -63,7 +64,7 @@ var StatusButton = /** @class */ (function (_super) {
             Toast.showShortBottom("Message from bluetooth device: " + nextProps.lastMessage);
         }
         if (nextProps.status == ConnectionStatus.CONNECTED) {
-            this.props.writePacket();
+            this.props.fetchDeviceInfo();
         }
     };
     StatusButton.prototype.render = function () {
@@ -90,7 +91,11 @@ var mapStateToProps = function (state) {
 };
 var mapPropsToDispatch = function (dispatch) {
     return {
-        writePacket: function () { return dispatch(writePacket.request(GetDeviceInfo.createPacket())); }
+        fetchDeviceInfo: function () {
+            dispatch(writePacket.request(GetDeviceInfo.createPacket()));
+            dispatch(writePacket.request(GetFirmwareVersion.createPacket()));
+            dispatch(writePacket.request(GetBatteryLevel.createPacket()));
+        }
     };
 };
 export default connect(mapStateToProps, mapPropsToDispatch)(StatusButton);

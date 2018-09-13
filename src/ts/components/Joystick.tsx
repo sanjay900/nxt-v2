@@ -1,7 +1,6 @@
-// @flow
 import React, {Component} from "react";
 import {StyleSheet, View} from "react-native";
-import {Joystick as JoystickEvent} from "../actions/types";
+import {Joystick as JoystickEvent} from "../reducers/joystick";
 import {
     PanGestureHandler,
     PanGestureHandlerGestureEvent,

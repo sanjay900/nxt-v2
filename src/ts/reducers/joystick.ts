@@ -1,9 +1,18 @@
-import {JoystickState} from "../actions/types";
 import * as joystickActions from '../actions/joystick-actions';
 import {ActionType, getType} from "typesafe-actions";
 
 export type JoystickAction = ActionType<typeof joystickActions>;
 
+export type JoystickState = {
+    steering: Joystick,
+    drive: Joystick
+}
+export type Joystick = {
+    x: number,
+    y: number,
+    tapped: boolean,
+    name: string
+}
 const initialState: JoystickState = {
     steering: {
         x: 0,
@@ -30,3 +39,5 @@ export const joystick = (state: JoystickState = initialState, action: JoystickAc
     }
     return state;
 };
+
+export enum Mode { JOYSTICK, TILT }

@@ -2,6 +2,7 @@ import {DirectCommandResponse} from "./direct-command-response";
 import {SystemCommandResponse} from "./system-command-response";
 import {SystemCommand} from "./system-command";
 import {DirectCommand} from "./direct-command";
+import 'mdn-polyfills/String.prototype.padEnd';
 
 export abstract class Packet {
     static FILE_NAME_LENGTH: number = 20;

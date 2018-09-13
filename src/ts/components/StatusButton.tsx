@@ -1,13 +1,15 @@
-// @flow
 import {Animated, StyleSheet, View} from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import {ConnectionStatus, State} from "../actions/types";
+import {State} from "../store";
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import Toast from "@remobile/react-native-toast";
-import {writePacket} from "../actions/bluetooth-actions";
-import {GetDeviceInfo} from "../nxt/packets/system/get-device-info";
+import {writePacket} from "../actions/device-actions";
+import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
+import {ConnectionStatus} from "../reducers/bluetooth";
+import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
+import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const Colours: { [key: string]: string } = {
@@ -22,7 +24,7 @@ type Props = {
     status: ConnectionStatus,
     device?: Device,
     lastMessage?: string,
-    writePacket: Function
+    fetchDeviceInfo: Function
 }
 
 class StatusButton extends React.Component<Props, StatusState> {
@@ -65,7 +67,7 @@ class StatusButton extends React.Component<Props, StatusState> {
             Toast.showShortBottom(`Message from bluetooth device: ${nextProps.lastMessage}`);
         }
         if (nextProps.status == ConnectionStatus.CONNECTED) {
-            this.props.writePacket();
+            this.props.fetchDeviceInfo();
         }
     }
 
@@ -99,7 +101,11 @@ const mapStateToProps = (state: State) => {
 
 const mapPropsToDispatch = (dispatch: Function) => {
     return {
-        writePacket: ()=>dispatch(writePacket.request(GetDeviceInfo.createPacket()))
+        fetchDeviceInfo: ()=>{
+            dispatch(writePacket.request(GetDeviceInfo.createPacket()));
+            dispatch(writePacket.request(GetFirmwareVersion.createPacket()));
+            dispatch(writePacket.request(GetBatteryLevel.createPacket()));
+        }
     }
 };
 export default connect(mapStateToProps, mapPropsToDispatch)(StatusButton);

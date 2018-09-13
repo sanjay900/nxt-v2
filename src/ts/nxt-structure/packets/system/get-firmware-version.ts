@@ -15,10 +15,10 @@ export class GetFirmwareVersion extends SystemPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    let protocolMinor: number = data.shift();
-    let protocolMajor: number = data.shift();
-    let firmwareMinor: number = data.shift();
-    let firmwareMajor: number = data.shift();
+    let protocolMinor: number = data.shift()!;
+    let protocolMajor: number = data.shift()!;
+    let firmwareMinor: number = data.shift()!;
+    let firmwareMajor: number = data.shift()!;
     this.protocolVersion = protocolMajor + "." + protocolMinor;
     this.firmwareVersion = firmwareMajor + "." + firmwareMinor;
   }

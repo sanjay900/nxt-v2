@@ -169,18 +169,9 @@ export enum InputSensorType {
 //
 // }
 
-export class SensorData {
-  port: number;
-  rawValue: number;
+export type SensorData = {
+  rawValue: number,
   scaledValue: number;
-  type: SensorType;
-
-  constructor(port: number, rawValue: number, scaledValue: number, type: SensorType) {
-    this.port = port;
-    this.rawValue = rawValue;
-    this.scaledValue = scaledValue;
-    this.type = type;
-  }
 }
 
 export enum SensorType {

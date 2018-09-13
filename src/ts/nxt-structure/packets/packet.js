@@ -18,6 +18,7 @@ var __spread = (this && this.__spread) || function () {
     for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
     return ar;
 };
+import 'mdn-polyfills/String.prototype.padEnd';
 var Packet = /** @class */ (function () {
     function Packet(_id) {
         this._id = _id;

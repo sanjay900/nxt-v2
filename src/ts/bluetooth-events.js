@@ -20,10 +20,11 @@ var __spread = (this && this.__spread) || function () {
 };
 //TODO: handle bluetooth events and converting them to actions
 import BluetoothSerial from "react-native-bluetooth-serial";
-import { disconnect, readPacket } from "./actions/bluetooth-actions";
-import { TelegramType } from "./nxt/nxt-packet";
-import { PacketFactory } from "./nxt/packets/packet-factory";
+import { disconnect } from "./actions/bluetooth-actions";
+import { TelegramType } from "./nxt-structure/nxt-packet";
+import { PacketFactory } from "./nxt-structure/packets/packet-factory";
 import { Buffer } from "buffer";
+import { readPacket } from "./actions/device-actions";
 var buffer = [];
 export function initEvents(store) {
     BluetoothSerial.on('bluetoothEnabled', function () {

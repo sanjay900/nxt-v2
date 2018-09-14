@@ -1,17 +1,26 @@
-import {Picker, StyleSheet, Text, View} from "react-native";
+import {Button, Picker, StyleSheet, Text, View} from "react-native";
 import React from "react";
-import {connectToDevice} from "../actions/bluetooth-actions";
+import {connectToDevice, disconnectFromDevice} from "../actions/bluetooth-actions";
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import {State} from "../store";
+import {ConnectionStatus} from "../reducers/bluetooth";
 
 type Props = {
     connectToDevice: (device: Device) => void,
     device?: Device,
-    list: Device[]
+    list: Device[],
+    status: ConnectionStatus,
+    disconnect: () => void,
 }
 const Settings: React.SFC<Props> = (props) => {
-    const {list, device, connectToDevice} = props;
+    const {list, device, connectToDevice, status, disconnect} = props;
+    let button;
+    if (status == ConnectionStatus.DISCONNECTED) {
+        button = <Button onPress={() => device && connectToDevice(device)} title={"Connect to device"}/>
+    } else {
+        button = <Button onPress={() => device && disconnect()} title={"Disconnect from device"}/>
+    }
     let devices = list.map(device => <Picker.Item key={device.id} label={device.name} value={device}/>);
     return (
         <View style={styles.container}>
@@ -22,17 +31,20 @@ const Settings: React.SFC<Props> = (props) => {
                 onValueChange={connectToDevice}>
                 {devices}
             </Picker>
+            {button}
         </View>
     );
 };
 const mapStateToProps = (state: State) => {
     return {
         list: state.bluetooth.list || [],
-        device: state.bluetooth.device
+        device: state.bluetooth.device,
+        status: state.bluetooth.status
     };
 };
 const mapDispatchToProps = (dispatch: Function) => ({
-    connectToDevice: (device: Device) => dispatch(connectToDevice.request(device))
+    connectToDevice: (device: Device) => dispatch(connectToDevice.request(device)),
+    disconnect: () => dispatch(disconnectFromDevice.request())
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Settings);
 const styles = StyleSheet.create({

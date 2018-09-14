@@ -6,5 +6,6 @@ export var changeStatus = createAction("changeStatus", function (resolve) {
     return function (status, message) { return resolve({ status: status, message: message }); };
 });
 export var disconnect = createAction("disconnect");
+export var disconnectFromDevice = createAsyncAction('disconnectRequest', 'disconnectResponse', 'disconnectFailure')();
 export var connectToDevice = createAsyncAction('connectToDeviceRequest', 'connectToDeviceResponse', 'connectToDeviceFailure')();
 export var listDevices = createAsyncAction('listDevicesRequest', 'listDevicesResponse', 'listDevicesFailure')();

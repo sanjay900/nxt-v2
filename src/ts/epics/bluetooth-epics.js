@@ -13,3 +13,8 @@ export var connectToDevice = function (action$) {
         return from(ReactNativeBluetoothSerial.connect(action.payload.id)).pipe(map(bluetoothActions.connectToDevice.success), catchError(function (err) { return of(bluetoothActions.connectToDevice.failure(err)); }));
     }));
 };
+export var disconnectFromDevice = function (action$) {
+    return action$.pipe(filter(isActionOf(bluetoothActions.disconnectFromDevice.request)), switchMap(function () {
+        return from(ReactNativeBluetoothSerial.disconnect()).pipe(map(bluetoothActions.disconnectFromDevice.success), catchError(function (err) { return of(bluetoothActions.disconnectFromDevice.failure(err)); }));
+    }));
+};

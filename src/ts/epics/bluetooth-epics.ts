@@ -29,3 +29,13 @@ export const connectToDevice: Epic<RootAction, RootAction, RootState> = (action$
             )
         )
     );
+export const disconnectFromDevice: Epic<RootAction, RootAction, RootState> = (action$) =>
+    action$.pipe(
+        filter(isActionOf(bluetoothActions.disconnectFromDevice.request)),
+        switchMap(() =>
+            from(ReactNativeBluetoothSerial.disconnect()).pipe(
+                map(bluetoothActions.disconnectFromDevice.success),
+                catchError(err => of(bluetoothActions.disconnectFromDevice.failure(err)))
+            )
+        )
+    );

@@ -13,9 +13,10 @@ import {Provider} from 'react-redux';
 import {Store} from 'redux';
 
 const App: React.SFC<{ store: Store }> = (props) => {
+    // @ts-ignore
     return (
         <Provider store={props.store}>
-            <Router right={() => <StatusButton/>}> 
+            <Router right={() => <StatusButton/>}>
                 <Stack key="root" tabs={true}>
                     <Scene key="remote-control" component={RemoteControl} title="Remote Control" icon={TabIcon}
                            iconName="gamepad"/>

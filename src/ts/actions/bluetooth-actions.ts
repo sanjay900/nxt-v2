@@ -11,6 +11,12 @@ export const changeStatus = createAction("changeStatus", resolve => {
 
 export const disconnect = createAction("disconnect");
 
+export const disconnectFromDevice = createAsyncAction(
+    'disconnectRequest',
+    'disconnectResponse',
+    'disconnectFailure'
+)<void, void, Error>();
+
 export const connectToDevice = createAsyncAction(
     'connectToDeviceRequest',
     'connectToDeviceResponse',

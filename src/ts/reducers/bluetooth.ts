@@ -30,9 +30,15 @@ export const bluetooth = (state: BluetoothState = initialState, action: Bluetoot
         case getType(bluetoothActions.connectToDevice.success):
             return {...state, status: ConnectionStatus.CONNECTED, lastMessage: "Connected to the NXT device"};
         case getType(bluetoothActions.connectToDevice.failure):
+        case getType(bluetoothActions.disconnectFromDevice.failure):
             return {...state, status: ConnectionStatus.DISCONNECTED, lastMessage: action.payload.message};
+        case getType(bluetoothActions.disconnectFromDevice.success):
+            return {...state, status: ConnectionStatus.DISCONNECTED, lastMessage: "Disconnected"};
         case getType(bluetoothActions.disconnect):
-            return {...state, status: ConnectionStatus.DISCONNECTED, lastMessage: "Connection lost"};
+            if (state.status != ConnectionStatus.DISCONNECTED) {
+                return {...state, status: ConnectionStatus.DISCONNECTED, lastMessage: "Connection lost"};
+            }
+            return state;
     }
     return state;
 };

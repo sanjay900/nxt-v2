@@ -1,4 +1,4 @@
-import { Button, StyleSheet, Text, View } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
 import React from "react";
 import Joystick from "./Joystick";
 import { connect } from 'react-redux';
@@ -16,7 +16,7 @@ var RemoteControl = function (_a) {
             </View>);
     }
     return (<View style={styles.container}>
-            <Text>{currentMode}</Text>
+            <View style={styles.button}/>
             <Button onPress={onSwapModeClick} title="Swap to Joystick Controls"/>
         </View>);
 };
@@ -32,10 +32,13 @@ var mapDispatchToProps = function (dispatch) {
 };
 var styles = StyleSheet.create({
     container: {
-        flex: 1
+        flex: 1,
+        flexDirection: 'column'
     }, joyContainer: {
         flex: 1,
         flexDirection: 'row'
+    }, button: {
+        flex: 1
     }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(RemoteControl);

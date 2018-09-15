@@ -27,7 +27,7 @@ type Props = {
     fetchDeviceInfo: Function
 }
 
-class StatusButton extends React.Component<Props, StatusState> {
+class StatusButtons extends React.Component<Props, StatusState> {
     private _animation!: Animated.CompositeAnimation;
 
     constructor(props: Props) {
@@ -108,7 +108,7 @@ const mapPropsToDispatch = (dispatch: Function) => {
         }
     }
 };
-export default connect(mapStateToProps, mapPropsToDispatch)(StatusButton);
+export default connect(mapStateToProps, mapPropsToDispatch)(StatusButtons);
 const styles = StyleSheet.create({
     container: {
         flex: 1,

@@ -1,8 +1,12 @@
 import React, {Component} from "react";
-import {Dimensions, StyleSheet, Text, TouchableHighlight, TouchableOpacity, View} from "react-native";
+import {Dimensions, StyleSheet, TouchableOpacity, View} from "react-native";
 import {ScrollView} from "react-native-gesture-handler";
+import {connect} from "react-redux";
+import {Dispatch} from "redux";
+import {writePacket} from "../actions/device-actions";
+import {PlayTone} from "../nxt-structure/packets/direct/play-tone";
 
-export default class PlayTones extends Component<{}, { calculatedKeyWidth: number }> {
+export default class PlayTones extends Component<{ playNote: (number) => {} }, { calculatedKeyWidth: number }> {
 
   constructor(props) {
     super(props);
@@ -47,25 +51,43 @@ export default class PlayTones extends Component<{}, { calculatedKeyWidth: numbe
       {whiteKeyId: 64}
     ];
     let keyboard = pianoKeys.map((fn) => {
-      return <TouchableOpacity key={fn.whiteKeyId} style={[styles.whiteKey,{touchAction: "none", height: Dimensions.get('window').height}]} onLayout={this.onLayout}><View/></TouchableOpacity>;
+      return <TouchableOpacity onPress={() => this.props.playNote(fn.whiteKeyId)}
+                               key={fn.whiteKeyId}
+                               style={[styles.whiteKey, {touchAction: "none", height: Dimensions.get('window').height}]}
+                               onLayout={this.onLayout}><View/></TouchableOpacity>;
     });
-    let keyboard2 = pianoKeys.map((fn,i) => {
+    let keyboard2 = pianoKeys.map((fn, i) => {
       if (fn.blackKeyId) {
         let w = this.state.calculatedKeyWidth;
-        return <TouchableOpacity activeOpacity={0.5} key={fn.whiteKeyId} style={[styles.blackKey, {left: i*w - w/4, width: w/2}]} ><View/></TouchableOpacity>;
+        return <TouchableOpacity onPress={() => this.props.playNote(fn.blackKeyId)} activeOpacity={0.5}
+                                 key={fn.whiteKeyId} style={[styles.blackKey, {
+          left: i * w - w / 4,
+          width: w / 2
+        }]}><View/></TouchableOpacity>;
       }
     });
+
     return (
-      <View style={{flow:1}}>
+      <View style={{flow: 1}}>
         <ScrollView horizontal={true}>
-        {keyboard}
-        {keyboard2}
+          {keyboard}
+          {keyboard2}
         </ScrollView>
       </View>
     );
   }
 }
 
+function propsToDispatch(dispatch: Dispatch) {
+  return {
+    playNote: (note: number) => {
+      let f: number = 27.5 * Math.pow(2, ((note + 21) / 12));
+      return dispatch(writePacket.request(PlayTone.createPacket(f, 1000)));
+    }
+  }
+}
+
+export default connect(null, propsToDispatch)(PlayTones);
 const styles = StyleSheet.create({
   container: {
     flexDirection: "row",
@@ -77,7 +99,7 @@ const styles = StyleSheet.create({
     borderColor: "gray",
     borderWidth: 1,
     width: 50
-},
+  },
   blackKey: {
     backgroundColor: "black",
     height: "50%",

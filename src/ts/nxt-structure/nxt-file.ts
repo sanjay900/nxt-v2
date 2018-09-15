@@ -1,12 +1,6 @@
 import {Subscription} from "rxjs";
-import {NxtPacketProvider} from "./nxt-packet";
-import {OpenWrite} from "./packets/system/open-write";
-import {Write} from "./packets/system/write";
-import {Close} from "./packets/system/close";
-import {StartProgram} from "./packets/direct/start-program";
 import {SystemCommandResponse} from "./packets/system-command-response";
 import {DirectCommandResponse} from "./packets/direct-command-response";
-import {SystemCommand} from "./packets/system-command";
 import {Utils} from "../utils/utils";
 
 export class NXTFile {
@@ -22,7 +16,8 @@ export class NXTFile {
   private data: number[] = [];
   private writeSubscription: Subscription;
 
-  constructor(public name: string, private nxt?: NxtPacketProvider, private file?: File) {}
+  constructor(public name: string) {
+  }
 
   get response(): DirectCommandResponse | SystemCommandResponse {
     return this._response;
@@ -31,6 +26,7 @@ export class NXTFile {
   set response(value: DirectCommandResponse | SystemCommandResponse) {
     this._response = value;
   }
+
   get status() {
     return this.state;
   }

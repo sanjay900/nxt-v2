@@ -63,7 +63,7 @@ export const writeFile: Epic<RootAction, RootAction, RootState> = (action$) => {
       }
     }),
     switchMap((packet: Write) => {
-      return write(packet);
+      return write(Close.createPacket(packet.file));
     }),
     switchMap((packet: Close) => {
       if (packet.file.autoStart) {

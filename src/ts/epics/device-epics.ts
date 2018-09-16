@@ -43,18 +43,10 @@ export const setName: Epic<RootAction, RootAction, RootState> = (action$) =>
 export const writeFile: Epic<RootAction, RootAction, RootState> = (action$) => {
   return action$.pipe(
     filter(isActionOf(deviceActions.writeFile.request)),
-    switchMap((action: { payload: NXTFile }) => {
-      return from(action.payload.readFile().then(()=>action.payload));
-    }),
-    switchMap((file: NXTFile) => {
-      return write(OpenWrite.createPacket(file));
-    }),
-    switchMap((packet: OpenWrite) => {
-      return packet.responseRecieved;
-    }),
-    switchMap((packet: OpenWrite) => {
-      return of(Write.createPacket(packet.file));
-    }),
+    switchMap(action => from(action.payload.readFile().then(()=>action.payload))),
+    switchMap((file: NXTFile) => write(OpenWrite.createPacket(file))),
+    switchMap((packet: OpenWrite) => packet.responseRecieved),
+    switchMap((packet: OpenWrite) => of(Write.createPacket(packet.file))),
     expand((packet: Write) => {
       if (packet.file.hasWritten()) {
         return empty();
@@ -62,14 +54,13 @@ export const writeFile: Epic<RootAction, RootAction, RootState> = (action$) => {
         return write(packet);
       }
     }),
-    switchMap((packet: Write) => {
-      return write(Close.createPacket(packet.file));
-    }),
+    switchMap((packet: Write) => write(Close.createPacket(packet.file))),
     switchMap((packet: Close) => {
       if (packet.file.autoStart) {
         return write(StartProgram.createPacket(packet.file.name));
       }
     }),
+    map(deviceActions.writeFile.success),
     catchError(err => of(deviceActions.writeFile.failure(err)))
   )
 };

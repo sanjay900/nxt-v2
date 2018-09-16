@@ -15,7 +15,7 @@ import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
 import {DirectCommand} from "../nxt-structure/packets/direct-command";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
-import {packetBuffer} from "../bluetooth-events";
+import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
 
 export type DeviceAction = ActionType<typeof deviceActions>;
 
@@ -144,28 +144,35 @@ const initialState: DeviceState = {
 export const device = (state: DeviceState = initialState, action: DeviceAction) => {
     switch (action.type) {
         case getType(deviceActions.readPacket):
-            return {...state, ...processPacket(action.payload.packet, state)};
+            return {...state, ...processIncomingPacket(action.payload.packet, state)};
+
         case getType(deviceActions.writeFile.failure):
-            console.error(JSON.stringify(action.payload));
             return {...state, lastMessage: action.payload.message};
-        case getType(deviceActions.writePacket.failure):
-            return {...state, lastMessage: action.payload.message};
+
         case getType(deviceActions.writePacket.request):
-            return {...state};
+            return {...state, ...processOutgoingPacket(action.payload, state)};
+
         case getType(deviceActions.writePacket.success):
             return {...state};
-        case getType(deviceActions.setName.request):
-            return {
-                ...state, info: {
-                    ...state.info,
-                    deviceName: action.payload
-                }
-            }
+
+        case getType(deviceActions.writePacket.failure):
+            return {...state, lastMessage: action.payload.message};
     }
     return state;
 };
 
-function processPacket(packet: Packet, state: DeviceState): any {
+function processOutgoingPacket(packet: Packet, state: DeviceState): any {
+    switch (packet.id) {
+        case SystemCommand.SET_BRICK_NAME:
+            let {name: deviceName} = packet as SetBrickName;
+            return {
+                info: {...state.info, deviceName}
+            };
+    }
+    return {};
+}
+
+function processIncomingPacket(packet: Packet, state: DeviceState): any {
     switch (packet.id) {
         case SystemCommand.GET_DEVICE_INFO:
             let {name: deviceName, btAddress, btSignalStrength, freeSpace} = packet as GetDeviceInfo;
@@ -191,7 +198,5 @@ function processPacket(packet: Packet, state: DeviceState): any {
                 }
             };
     }
-    return {
-        info: state.info
-    };
+    return {};
 }

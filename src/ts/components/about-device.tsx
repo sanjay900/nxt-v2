@@ -3,9 +3,10 @@ import React from "react";
 import {connect} from 'react-redux';
 import {State} from "../store";
 import {DeviceState} from "../reducers/device";
-import {setName} from "../actions/device-actions";
+import {writePacket} from "../actions/device-actions";
 import {FormInput, FormLabel, Text} from "react-native-elements";
 import * as Progress from 'react-native-progress';
+import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
 
 type Props = {
     deviceInfo: DeviceState,
@@ -22,13 +23,13 @@ const AboutDevice: React.SFC<Props> = ({deviceInfo, setName}: Props) => {
             <FormLabel>Device Firmware Version</FormLabel>
             <Text style={styles.margin}>{deviceInfo.info.version.firmware}</Text>
             <FormLabel>Battery Voltage</FormLabel>
-            <Text style={styles.margin}>{deviceInfo.info.batteryVoltage}/{9*1000}</Text>
-            <Progress.Bar progress={deviceInfo.info.batteryVoltage/(9*1000)} style={styles.margin}/>
+            <Text style={styles.margin}>{deviceInfo.info.batteryVoltage}/{9 * 1000}</Text>
+            <Progress.Bar progress={deviceInfo.info.batteryVoltage / (9 * 1000)} style={styles.margin}/>
             <FormLabel>Currently Executing Program</FormLabel>
             <Text style={styles.margin}>{deviceInfo.info.currentProgramName}</Text>
             <FormLabel>Free Space</FormLabel>
-            <Text style={styles.margin}>{deviceInfo.info.freeSpace}/{256*100000}</Text>
-            <Progress.Bar progress={deviceInfo.info.freeSpace/(256*100000)} style={styles.margin}/>
+            <Text style={styles.margin}>{deviceInfo.info.freeSpace}/{256 * 100000}</Text>
+            <Progress.Bar progress={deviceInfo.info.freeSpace / (256 * 100000)} style={styles.margin}/>
         </View>
     );
 };
@@ -39,7 +40,7 @@ const mapStateToProps = (state: State) => {
 };
 const mapDispatchToProps = (dispatch: Function) => {
     return {
-        setName: (name: string) => dispatch(setName(name))
+        setName: (name: string) => dispatch(writePacket.request(SetBrickName.createPacket(name)))
     };
 };
 const styles = StyleSheet.create({

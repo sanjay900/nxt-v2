@@ -26,9 +26,9 @@ type Props = {
   lockY?: boolean,
   color: string,
   name: string,
-  joystickTouch: (joystick) => {},
-  joystickRelease: (joystick) => {},
-  joystickMove: (event) => {},
+  joystickTouch: (joystick: string) => {},
+  joystickRelease: (joystick: string) => {},
+  joystickMove: (event: JoystickEvent) => {},
 }
 
 class Joystick extends Component<Props, JoystickState> {
@@ -117,8 +117,8 @@ class Joystick extends Component<Props, JoystickState> {
 
 function propsToDispatch(dispatch: Dispatch) {
   return {
-    joystickTouch: (joystick) => dispatch(joystickTouch(joystick)),
-    joystickRelease: (joystick) => dispatch(joystickRelease(joystick)),
+    joystickTouch: (joystick: string) => dispatch(joystickTouch(joystick)),
+    joystickRelease: (joystick: string) => dispatch(joystickRelease(joystick)),
     joystickMove: (event: JoystickEvent) => dispatch(joystickMove(event)),
   }
 }

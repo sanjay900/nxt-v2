@@ -79,22 +79,29 @@ export var device = function (state, action) {
     if (state === void 0) { state = initialState; }
     switch (action.type) {
         case getType(deviceActions.readPacket):
-            return __assign({}, state, processPacket(action.payload.packet, state));
+            return __assign({}, state, processIncomingPacket(action.payload.packet, state));
         case getType(deviceActions.writeFile.failure):
-            console.error(JSON.stringify(action.payload));
-            return __assign({}, state, { lastMessage: action.payload.message });
-        case getType(deviceActions.writePacket.failure):
             return __assign({}, state, { lastMessage: action.payload.message });
         case getType(deviceActions.writePacket.request):
-            return __assign({}, state);
+            return __assign({}, state, processOutgoingPacket(action.payload, state));
         case getType(deviceActions.writePacket.success):
             return __assign({}, state);
-        case getType(deviceActions.setName.request):
-            return __assign({}, state, { info: __assign({}, state.info, { deviceName: action.payload }) });
+        case getType(deviceActions.writePacket.failure):
+            return __assign({}, state, { lastMessage: action.payload.message });
     }
     return state;
 };
-function processPacket(packet, state) {
+function processOutgoingPacket(packet, state) {
+    switch (packet.id) {
+        case SystemCommand.SET_BRICK_NAME:
+            var deviceName = packet.name;
+            return {
+                info: __assign({}, state.info, { deviceName: deviceName })
+            };
+    }
+    return {};
+}
+function processIncomingPacket(packet, state) {
     switch (packet.id) {
         case SystemCommand.GET_DEVICE_INFO:
             var _a = packet, deviceName = _a.name, btAddress = _a.btAddress, btSignalStrength = _a.btSignalStrength, freeSpace = _a.freeSpace;
@@ -112,7 +119,5 @@ function processPacket(packet, state) {
                 info: __assign({}, state.info, { batteryVoltage: voltage })
             };
     }
-    return {
-        info: state.info
-    };
+    return {};
 }

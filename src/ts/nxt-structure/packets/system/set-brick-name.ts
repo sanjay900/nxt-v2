@@ -4,7 +4,7 @@ import {Packet} from "../packet";
 import 'mdn-polyfills/String.prototype.padEnd';
 
 export class SetBrickName extends SystemPacket {
-  private name: string;
+  public name: string;
 
   constructor() {
     super(SystemCommand.SET_BRICK_NAME);

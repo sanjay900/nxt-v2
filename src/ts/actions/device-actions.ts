@@ -9,12 +9,6 @@ export const readPacket = createAction("readPacket", resolve => {
     return (packet: Packet, type: DirectCommand | SystemCommand) => resolve({packet, type});
 });
 
-export const setName = createAsyncAction(
-  'setNameRequest',
-  'setNameResponse',
-  'setNameFailure'
-)<string, void, Error>();
-
 export const writePacket = createAsyncAction(
     'writePacketRequest',
     'writePacketResponse',

@@ -32,15 +32,10 @@ export const sendPacket: Epic<RootAction, RootAction, RootState> = (action$) =>
         map(deviceActions.writePacket.success),
         catchError(err => of(deviceActions.writePacket.failure(err)))
     );
-
-export const setName: Epic<RootAction, RootAction, RootState> = (action$) =>
-    action$.pipe(
-        filter(isActionOf(deviceActions.setName.request)),
-        switchMap(action => write(SetBrickName.createPacket(action.payload))),
-        map(deviceActions.setName.success),
-        catchError(err => of(deviceActions.setName.failure(err)))
-    );
 export const writeFile = (action$: ActionsObservable<RootAction>) => {
+    //Baiscally, we handle writing a file here. We send out a openwrite, wait for it to respond and then
+    //endlessly write (expand recursively calls itself) until we have written the whole file, where we break
+    //finish the file, and optionally start the file. We also capture all errors..
     return action$.pipe(
         filter(isActionOf(deviceActions.writeFile.request)),
         switchMap((action: { payload: NXTFile }) => write(OpenWrite.createPacket(action.payload))),

@@ -1,9 +1,10 @@
 import { StyleSheet, View } from "react-native";
 import React from "react";
 import { connect } from 'react-redux';
-import { setName } from "../actions/device-actions";
+import { writePacket } from "../actions/device-actions";
 import { FormInput, FormLabel, Text } from "react-native-elements";
 import * as Progress from 'react-native-progress';
+import { SetBrickName } from "../nxt-structure/packets/system/set-brick-name";
 var AboutDevice = function (_a) {
     var deviceInfo = _a.deviceInfo, setName = _a.setName;
     return (<View style={styles.container}>
@@ -30,7 +31,7 @@ var mapStateToProps = function (state) {
 };
 var mapDispatchToProps = function (dispatch) {
     return {
-        setName: function (name) { return dispatch(setName(name)); }
+        setName: function (name) { return dispatch(writePacket.request(SetBrickName.createPacket(name))); }
     };
 };
 var styles = StyleSheet.create({

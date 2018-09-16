@@ -43,18 +43,18 @@ type Props = {
 }
 
 const PlayTones: React.SFC<Props> = ({playNote}: Props) => {
-    let keyboard = pianoKeys.map((fn) => {
-        return <TouchableOpacity onPress={() => playNote(fn.whiteKeyId)}
-                                 key={fn.whiteKeyId}
+    let keyboard = pianoKeys.map((key) => {
+        return <TouchableOpacity onPress={() => playNote(key.whiteKeyId)}
+                                 key={key.whiteKeyId}
                                  style={[styles.whiteKey, {height: Dimensions.get('window').height}]}>
             <View/>
         </TouchableOpacity>;
     });
-    let keyboard2 = pianoKeys.map((fn, i) => {
-        if (fn.blackKeyId) {
-            return <TouchableOpacity onPress={() => playNote(fn.blackKeyId!)}
+    let keyboard2 = pianoKeys.map((key, i) => {
+        if (key.blackKeyId) {
+            return <TouchableOpacity onPress={() => playNote(key.blackKeyId!)}
                                      activeOpacity={0.5}
-                                     key={fn.whiteKeyId}
+                                     key={key.whiteKeyId}
                                      style={[styles.blackKey, {left: i * keyWidth - keyWidth / 4}]}>
                 <View/>
             </TouchableOpacity>;
@@ -74,8 +74,8 @@ const PlayTones: React.SFC<Props> = ({playNote}: Props) => {
 function propsToDispatch(dispatch: Dispatch): Props {
     return {
         playNote: (note: number) => {
-            let f: number = 27.5 * Math.pow(2, ((note + 21) / 12));
-            return dispatch(writePacket.request(PlayTone.createPacket(f, 100)));
+            let freq: number = 27.5 * Math.pow(2, ((note + 21) / 12));
+            return dispatch(writePacket.request(PlayTone.createPacket(freq, 100)));
         }
     }
 }

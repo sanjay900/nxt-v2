@@ -38,14 +38,14 @@ var pianoKeys = [
 ];
 var PlayTones = function (_a) {
     var playNote = _a.playNote;
-    var keyboard = pianoKeys.map(function (fn) {
-        return <TouchableOpacity onPress={function () { return playNote(fn.whiteKeyId); }} key={fn.whiteKeyId} style={[styles.whiteKey, { height: Dimensions.get('window').height }]}>
+    var keyboard = pianoKeys.map(function (key) {
+        return <TouchableOpacity onPress={function () { return playNote(key.whiteKeyId); }} key={key.whiteKeyId} style={[styles.whiteKey, { height: Dimensions.get('window').height }]}>
             <View />
         </TouchableOpacity>;
     });
-    var keyboard2 = pianoKeys.map(function (fn, i) {
-        if (fn.blackKeyId) {
-            return <TouchableOpacity onPress={function () { return playNote(fn.blackKeyId); }} activeOpacity={0.5} key={fn.whiteKeyId} style={[styles.blackKey, { left: i * keyWidth - keyWidth / 4 }]}>
+    var keyboard2 = pianoKeys.map(function (key, i) {
+        if (key.blackKeyId) {
+            return <TouchableOpacity onPress={function () { return playNote(key.blackKeyId); }} activeOpacity={0.5} key={key.whiteKeyId} style={[styles.blackKey, { left: i * keyWidth - keyWidth / 4 }]}>
                 <View />
             </TouchableOpacity>;
         }
@@ -60,8 +60,8 @@ var PlayTones = function (_a) {
 function propsToDispatch(dispatch) {
     return {
         playNote: function (note) {
-            var f = 27.5 * Math.pow(2, ((note + 21) / 12));
-            return dispatch(writePacket.request(PlayTone.createPacket(f, 100)));
+            var freq = 27.5 * Math.pow(2, ((note + 21) / 12));
+            return dispatch(writePacket.request(PlayTone.createPacket(freq, 100)));
         }
     };
 }

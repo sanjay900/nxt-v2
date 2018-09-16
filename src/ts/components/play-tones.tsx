@@ -71,7 +71,7 @@ const PlayTones: React.SFC<Props> = ({playNote}: Props) => {
     );
 };
 
-function propsToDispatch(dispatch: Dispatch) {
+function propsToDispatch(dispatch: Dispatch): Props {
     return {
         playNote: (note: number) => {
             let f: number = 27.5 * Math.pow(2, ((note + 21) / 12));

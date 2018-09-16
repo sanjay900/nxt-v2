@@ -1,4 +1,6 @@
 rootProject.name = 'nxtv2'
+include ':react-native-fs'
+project(':react-native-fs').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-fs/android')
 include ':@remobile_react-native-toast'
 project(':@remobile_react-native-toast').projectDir = new File(rootProject.projectDir, '../node_modules/@remobile/react-native-toast/android')
 include ':react-native-bluetooth-serial'

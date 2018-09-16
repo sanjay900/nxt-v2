@@ -1,21 +1,18 @@
 import {Epic} from "redux-observable";
 import {isActionOf} from "typesafe-actions";
 import {RootAction, RootState} from "../store";
-import {catchError, expand, filter, map, switchMap, tap} from "rxjs/operators";
+import {catchError, expand, filter, map, switchMap} from "rxjs/operators";
 import {from, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import {Buffer} from "buffer";
 
 import * as deviceActions from '../actions/device-actions';
-import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
 import {Packet} from "../nxt-structure/packets/packet";
 import {NXTFile} from "../nxt-structure/nxt-file";
-import {SystemCommandResponse} from "../nxt-structure/packets/system-command-response";
 import {Write} from "../nxt-structure/packets/system/write";
 import {Close} from "../nxt-structure/packets/system/close";
 import {OpenWrite} from "../nxt-structure/packets/system/open-write";
 import {StartProgram} from "../nxt-structure/packets/direct/start-program";
-import {pipe} from "rxjs/internal-compatibility";
 import empty from "rxjs/observable/empty";
 
 /**
@@ -47,7 +44,10 @@ export const writeFile: Epic<RootAction, RootAction, RootState> = (action$) => {
   return action$.pipe(
     filter(isActionOf(deviceActions.writeFile.request)),
     switchMap((action: { payload: NXTFile }) => {
-      return write(OpenWrite.createPacket(action.payload));
+      return from(action.payload.readFile().then(()=>action.payload));
+    }),
+    switchMap((file: NXTFile) => {
+      return write(OpenWrite.createPacket(file));
     }),
     switchMap((packet: OpenWrite) => {
       return packet.responseRecieved;
@@ -73,10 +73,3 @@ export const writeFile: Epic<RootAction, RootAction, RootState> = (action$) => {
     catchError(err => of(deviceActions.writeFile.failure(err)))
   )
 };
-// readFromFileSystem() {
-//   return this.file.readAsArrayBuffer(this.file.applicationDirectory, "www/assets/" + this.name).then(contents => {
-//     this.data = Array.from(new Uint8Array(contents));
-//     this.size = contents.byteLength;
-//   });
-// }
-//

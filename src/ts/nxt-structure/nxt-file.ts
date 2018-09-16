@@ -1,6 +1,9 @@
 import {SystemCommandResponse} from "./packets/system-command-response";
 import {DirectCommandResponse} from "./packets/direct-command-response";
 import {Utils} from "../utils/utils";
+import RNFS from "react-native-fs";
+import {Buffer} from "buffer";
+
 
 export class NXTFile {
   public static PACKET_SIZE: number = 64;
@@ -14,6 +17,12 @@ export class NXTFile {
   private data: number[] = [];
 
   constructor(public name: string) {
+  }
+
+  readFile() {
+    return RNFS.readFileAssets(name, "base64").then(data=>{
+      this.data = [...new Buffer(data,'base64')];
+    });
   }
 
   get response(): DirectCommandResponse | SystemCommandResponse {

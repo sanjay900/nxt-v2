@@ -73,18 +73,23 @@ var initialState = {
             leftPort: SingleOutputPort.A,
             rightPort: SingleOutputPort.C
         },
-    }
+    },
 };
 export var device = function (state, action) {
     if (state === void 0) { state = initialState; }
     switch (action.type) {
         case getType(deviceActions.readPacket):
             return __assign({}, state, processPacket(action.payload.packet, state));
+        case getType(deviceActions.writeFile.failure):
+            console.error(JSON.stringify(action.payload));
+            return __assign({}, state, { lastMessage: action.payload.message });
         case getType(deviceActions.writePacket.failure):
             return __assign({}, state, { lastMessage: action.payload.message });
         case getType(deviceActions.writePacket.request):
             return __assign({}, state);
-        case getType(deviceActions.setName):
+        case getType(deviceActions.writePacket.success):
+            return __assign({}, state);
+        case getType(deviceActions.setName.request):
             return __assign({}, state, { info: __assign({}, state.info, { deviceName: action.payload }) });
     }
     return state;
@@ -107,5 +112,7 @@ function processPacket(packet, state) {
                 info: __assign({}, state.info, { batteryVoltage: voltage })
             };
     }
-    return {};
+    return {
+        info: state.info
+    };
 }

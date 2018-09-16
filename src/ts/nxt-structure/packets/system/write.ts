@@ -19,11 +19,10 @@ export class Write extends SystemPacket {
   readPacket(data: number[]): void {
     super.readPacket(data);
     //TODO: we should technically handle this, but i also really do not care
-    let handle: number = data.shift();
+    let handle: number = data.shift()!;
     if (this.status != SystemCommandResponse.SUCCESS) {
       this.file.status = NXTFileState.ERROR;
     }
-    this.file.response = this.status;
   }
 
   protected writePacketData(expectResponse: boolean, data: number[]): void {

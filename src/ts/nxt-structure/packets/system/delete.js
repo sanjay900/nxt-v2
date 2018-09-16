@@ -28,8 +28,6 @@ var Delete = /** @class */ (function (_super) {
     };
     Delete.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
-        this.file = SystemPacket.filesByName[Packet.readAsciiz(data, Packet.FILE_NAME_LENGTH)];
-        this.file.response = this.status;
         if (this.status == SystemCommandResponse.SUCCESS) {
             this.file.status = NXTFileState.DELETED;
         }

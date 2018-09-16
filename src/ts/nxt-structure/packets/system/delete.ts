@@ -19,8 +19,6 @@ export class Delete extends SystemPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    this.file = SystemPacket.filesByName[Packet.readAsciiz(data, Packet.FILE_NAME_LENGTH)];
-    this.file.response = this.status;
     if (this.status == SystemCommandResponse.SUCCESS) {
       this.file.status = NXTFileState.DELETED;
     } else {

@@ -20,7 +20,6 @@ export class Read extends SystemPacket {
     super.readPacket(data);
     let length: number = Packet.readUWord(data);
     this.file.readData(data.splice(0, length));
-    this.file.response = this.status;
   }
 
   protected writePacketData(expectResponse: boolean, data: number[]): void {

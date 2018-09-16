@@ -4,7 +4,6 @@ import {Packet} from "../packet";
 import {NXTFile, NXTFileMode, NXTFileState} from "../../nxt-file";
 
 export class OpenRead extends SystemPacket {
-  private static lastFile: NXTFile;
   public file: NXTFile;
 
   constructor() {
@@ -19,17 +18,12 @@ export class OpenRead extends SystemPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    OpenRead.lastFile.handle = data.shift();
-    this.file = OpenRead.lastFile;
     this.file.size = Packet.readLong(data);
-    this.file.response = this.status;
-    SystemPacket.filesByHandle[this.file.handle] = this.file;
   }
 
   protected writePacketData(expectResponse: boolean, data: number[]): void {
     super.writePacketData(expectResponse, data);
     Packet.writeFileName(this.file.name, data);
-    OpenRead.lastFile = this.file;
     this.file.mode = NXTFileMode.READ;
     this.file.status = NXTFileState.OPENING;
   }

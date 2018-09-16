@@ -13,7 +13,7 @@ export const setName = createAsyncAction(
   'setNameRequest',
   'setNameResponse',
   'setNameFailure'
-)<String, void, Error>();
+)<string, void, Error>();
 
 export const writePacket = createAsyncAction(
     'writePacketRequest',

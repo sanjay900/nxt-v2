@@ -27,16 +27,11 @@ var OpenRead = /** @class */ (function (_super) {
     };
     OpenRead.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
-        OpenRead.lastFile.handle = data.shift();
-        this.file = OpenRead.lastFile;
         this.file.size = Packet.readLong(data);
-        this.file.response = this.status;
-        SystemPacket.filesByHandle[this.file.handle] = this.file;
     };
     OpenRead.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);
         Packet.writeFileName(this.file.name, data);
-        OpenRead.lastFile = this.file;
         this.file.mode = NXTFileMode.READ;
         this.file.status = NXTFileState.OPENING;
     };

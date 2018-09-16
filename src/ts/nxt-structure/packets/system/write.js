@@ -47,12 +47,11 @@ var Write = /** @class */ (function (_super) {
     };
     Write.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
+        //TODO: we should technically handle this, but i also really do not care
         var handle = data.shift();
-        this.file = SystemPacket.filesByHandle[handle];
         if (this.status != SystemCommandResponse.SUCCESS) {
             this.file.status = NXTFileState.ERROR;
         }
-        this.file.response = this.status;
     };
     Write.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);

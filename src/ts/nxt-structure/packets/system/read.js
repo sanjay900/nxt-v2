@@ -29,7 +29,6 @@ var Read = /** @class */ (function (_super) {
         _super.prototype.readPacket.call(this, data);
         var length = Packet.readUWord(data);
         this.file.readData(data.splice(0, length));
-        this.file.response = this.status;
     };
     Read.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);

@@ -27,8 +27,6 @@ var Close = /** @class */ (function (_super) {
     };
     Close.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
-        this.file = SystemPacket.filesByHandle[data.shift()];
-        this.file.response = this.status;
         if (this.status != SystemCommandResponse.SUCCESS) {
             this.file.status = NXTFileState.ERROR;
         }

@@ -19,9 +19,12 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 import 'mdn-polyfills/String.prototype.padEnd';
+import { Subject } from "rxjs/internal/Subject";
+import { packetBuffer } from "../../bluetooth-events";
 var Packet = /** @class */ (function () {
     function Packet(_id) {
         this._id = _id;
+        this.responseRecieved = new Subject();
     }
     Object.defineProperty(Packet.prototype, "id", {
         get: function () {
@@ -77,6 +80,7 @@ var Packet = /** @class */ (function () {
         var header = [];
         Packet.writeWord(data.length, header);
         data.unshift.apply(data, __spread(header));
+        packetBuffer.push(this);
         return new Uint8Array(data);
     };
     Packet.FILE_NAME_LENGTH = 20;

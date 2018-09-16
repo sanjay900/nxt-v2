@@ -18,28 +18,18 @@ var __spread = (this && this.__spread) || function () {
     for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
     return ar;
 };
-import { SystemCommandResponse } from "./packets/system-command-response";
-import { DirectCommandResponse } from "./packets/direct-command-response";
-import { Utils } from "../utils/utils";
 var NXTFile = /** @class */ (function () {
-    function NXTFile(name, nxt, file) {
+    function NXTFile(name, fileData) {
         this.name = name;
-        this.nxt = nxt;
-        this.file = file;
+        this.fileData = fileData;
         this.writtenBytes = 0;
         this.state = NXTFileState.OPENING;
         this.data = [];
+        if (fileData) {
+            this.data = fileData;
+            this.size = fileData.length;
+        }
     }
-    Object.defineProperty(NXTFile.prototype, "response", {
-        get: function () {
-            return this._response;
-        },
-        set: function (value) {
-            this._response = value;
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(NXTFile.prototype, "status", {
         get: function () {
             return this.state;
@@ -60,15 +50,6 @@ var NXTFile = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    Object.defineProperty(NXTFile.prototype, "formattedErrorMessage", {
-        get: function () {
-            if (!this.hasError())
-                return "No Error";
-            return Utils.formatTitle(DirectCommandResponse[this._response] || SystemCommandResponse[this._response]);
-        },
-        enumerable: true,
-        configurable: true
-    });
     NXTFile.prototype.hasError = function () {
         return this.state == NXTFileState.ERROR || this.state == NXTFileState.FILE_EXISTS;
     };
@@ -76,30 +57,9 @@ var NXTFile = /** @class */ (function () {
         var _a;
         (_a = this.data).push.apply(_a, __spread(number));
     };
-    // readFromFileSystem() {
-    //   return this.file.readAsArrayBuffer(this.file.applicationDirectory, "www/assets/" + this.name).then(contents => {
-    //     this.data = Array.from(new Uint8Array(contents));
-    //     this.size = contents.byteLength;
-    //   });
-    // }
-    //
-    // writeFileToDevice() {
-    //   let subscription: Subscription = this.nxt.packetEvent$
-    //     .filter(packet => packet.id == SystemCommand.OPEN_WRITE)
-    //     .filter((packet: OpenWrite) => packet.file == this)
-    //     .subscribe(packet => {
-    //       subscription.unsubscribe();
-    //       if (packet.status != SystemCommandResponse.SUCCESS) {
-    //         return;
-    //       }
-    //       this.writeSubscription = this.nxt.packetEvent$
-    //         .filter(packet => packet.id == SystemCommand.WRITE)
-    //         .filter((packet: Write) => packet.file == this)
-    //         .subscribe(this.write.bind(this));
-    //       this.write();
-    //     });
-    //   this.nxt.writePacket(true, OpenWrite.createPacket(this));
-    // }
+    NXTFile.prototype.hasWritten = function () {
+        return this.writtenBytes == this.size;
+    };
     NXTFile.prototype.nextChunk = function () {
         if (this.mode == NXTFileMode.READ)
             return [];

@@ -1,6 +1,6 @@
 import { Button, StyleSheet, View } from "react-native";
 import React from "react";
-import Joystick from "./Joystick";
+import Joystick from "./joystick";
 import { connect } from 'react-redux';
 import { toggle } from "../actions/core-actions";
 import { Mode } from "../reducers/joystick";

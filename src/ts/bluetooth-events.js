@@ -22,10 +22,12 @@ var __spread = (this && this.__spread) || function () {
 import BluetoothSerial from "react-native-bluetooth-serial";
 import { disconnect } from "./actions/bluetooth-actions";
 import { TelegramType } from "./nxt-structure/nxt-packet";
-import { PacketFactory } from "./nxt-structure/packets/packet-factory";
 import { Buffer } from "buffer";
 import { readPacket } from "./actions/device-actions";
+import { SystemCommandResponse } from "./nxt-structure/packets/system-command-response";
+import { DirectCommandResponse } from "./nxt-structure/packets/direct-command-response";
 var buffer = [];
+export var packetBuffer = [];
 export function initEvents(store) {
     BluetoothSerial.on('bluetoothEnabled', function () {
     });
@@ -53,11 +55,25 @@ export function initEvents(store) {
 function parsePacket(data, store) {
     var telegramType = data.shift();
     if (telegramType == TelegramType.REPLY) {
-        //Look up this packet, and construct it from the available data.
-        var packet = PacketFactory.readPacket(data);
-        if (packet) {
+        //What we do here, is since it is a reply, we look for the packet that is being replied to, and
+        //then update that packet with the response. We then check the status, and throw errors if required.
+        var messageType_1 = data.shift();
+        var packetIndex = packetBuffer.findIndex(function (p) { return p.id == messageType_1; });
+        if (packetIndex != -1) {
+            var packet = packetBuffer.splice(packetIndex, 1)[0];
+            packet.readPacket(data);
             store.dispatch(readPacket(packet, packet.id));
-            //Emit events inside the angular thread so things update correctly
+            if (packet.status != 0) {
+                if (SystemCommandResponse[packet.status]) {
+                    packet.responseRecieved.error(SystemCommandResponse[packet.status]);
+                }
+                else {
+                    packet.responseRecieved.error(DirectCommandResponse[packet.status]);
+                }
+            }
+            else {
+                packet.responseRecieved.next(packet);
+            }
         }
     }
 }

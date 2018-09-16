@@ -5,11 +5,12 @@ import {State} from "../store";
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import Toast from "@remobile/react-native-toast";
-import {writePacket} from "../actions/device-actions";
+import {writeFile, writePacket} from "../actions/device-actions";
 import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {ConnectionStatus} from "../reducers/bluetooth";
 import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
+import {NXTFile} from "../nxt-structure/nxt-file";
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const Colours: { [key: string]: string } = {
@@ -29,7 +30,6 @@ type Props = {
 
 class StatusButtons extends React.Component<Props, StatusState> {
     private _animation!: Animated.CompositeAnimation;
-
     constructor(props: Props) {
         super(props);
         this.state = {
@@ -66,9 +66,6 @@ class StatusButtons extends React.Component<Props, StatusState> {
         if (nextProps.lastMessage && this.props.lastMessage != nextProps.lastMessage) {
             Toast.showShortBottom(`Message from bluetooth device: ${nextProps.lastMessage}`);
         }
-        if (this.props.status != nextProps.status && nextProps.status == ConnectionStatus.CONNECTED) {
-            this.props.fetchDeviceInfo();
-        }
     }
 
     render() {
@@ -99,16 +96,7 @@ const mapStateToProps = (state: State) => {
     };
 };
 
-const mapPropsToDispatch = (dispatch: Function) => {
-    return {
-        fetchDeviceInfo: ()=>{
-            dispatch(writePacket.request(GetBatteryLevel.createPacket()));
-            dispatch(writePacket.request(GetDeviceInfo.createPacket()));
-            dispatch(writePacket.request(GetFirmwareVersion.createPacket()));
-        }
-    }
-};
-export default connect(mapStateToProps, mapPropsToDispatch)(StatusButtons);
+export default connect(mapStateToProps)(StatusButtons);
 const styles = StyleSheet.create({
     container: {
         flex: 1,

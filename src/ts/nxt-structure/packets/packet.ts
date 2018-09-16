@@ -4,80 +4,82 @@ import {SystemCommand} from "./system-command";
 import {DirectCommand} from "./direct-command";
 import 'mdn-polyfills/String.prototype.padEnd';
 import {Subject} from "rxjs/internal/Subject";
+import {packetBuffer} from "../../bluetooth-events";
 
 export abstract class Packet {
-  static FILE_NAME_LENGTH: number = 20;
-  static S_WORD_LENGTH: number = 20;
-  public status: DirectCommandResponse | SystemCommandResponse;
-  public responseRecieved: Subject<Packet> = new Subject<Packet>();
+    static FILE_NAME_LENGTH: number = 20;
+    static S_WORD_LENGTH: number = 20;
+    public status: DirectCommandResponse | SystemCommandResponse;
+    public responseRecieved: Subject<Packet> = new Subject<Packet>();
 
-  protected constructor(protected _id: SystemCommand | DirectCommand) {
-  }
-
-  get id(): SystemCommand | DirectCommand {
-    return this._id;
-  }
-
-  protected static readSWord(data: number[]): number {
-    return Packet.readUWord(data) - Packet.S_WORD_LENGTH;
-  }
-
-  protected static readUWord(data: number[]): number {
-    return data.shift()! | data.shift()! << 8;
-  }
-
-  protected static writeWord(short: number, data: number[]) {
-    data.push(short, short >> 8);
-  }
-
-  protected static writeLong(long: number, data: number[]) {
-    data.push(long, long >> 8, long >> 16, long >> 24);
-  }
-
-  protected static readLong(data: number[]): number {
-    return data.shift()! | data.shift()! << 8 | data.shift()! << 16 | data.shift()! << 24;
-  }
-
-  protected static writeBoolean(bool: boolean, data: number[]) {
-    data.push(bool ? 1 : 0);
-  }
-
-  protected static readBoolean(data: number[]): boolean {
-    return data.shift() == 1;
-  }
-
-  protected static readAsciiz(data: number[], size: number): string {
-    let message: string = "";
-    for (let i = 0; i < size; i++) {
-      message += String.fromCharCode(data.shift()!);
+    protected constructor(protected _id: SystemCommand | DirectCommand) {
     }
-    return message;
-  }
 
-  protected static writeAsciiz(message: string, data: number[]) {
-    for (let i = 0; i < message.length; i++) {
-      data.push(message.charCodeAt(i));
+    get id(): SystemCommand | DirectCommand {
+        return this._id;
     }
-    data.push(0);
-  }
 
-  protected static writeFileName(fileName: string, data: number[]) {
-    fileName.padEnd(Packet.FILE_NAME_LENGTH, '\0');
-    this.writeAsciiz(fileName, data);
-  }
+    protected static readSWord(data: number[]): number {
+        return Packet.readUWord(data) - Packet.S_WORD_LENGTH;
+    }
 
-  public readPacket(data: number[]) {
-    this.status = data.shift()!;
-  }
+    protected static readUWord(data: number[]): number {
+        return data.shift()! | data.shift()! << 8;
+    }
 
-  public writePacket(expectResponse: boolean): Uint8Array {
-    let data: number[] = [];
-    this.writePacketData(expectResponse, data);
-    let header: number[] = [];
-    Packet.writeWord(data.length, header);
-    data.unshift(...header);
-    return new Uint8Array(data);
-  }
+    protected static writeWord(short: number, data: number[]) {
+        data.push(short, short >> 8);
+    }
 
-  protected abstract writePacketData(expectResponse: boolean, data: number[]): void;
+    protected static writeLong(long: number, data: number[]) {
+        data.push(long, long >> 8, long >> 16, long >> 24);
+    }
+
+    protected static readLong(data: number[]): number {
+        return data.shift()! | data.shift()! << 8 | data.shift()! << 16 | data.shift()! << 24;
+    }
+
+    protected static writeBoolean(bool: boolean, data: number[]) {
+        data.push(bool ? 1 : 0);
+    }
+
+    protected static readBoolean(data: number[]): boolean {
+        return data.shift() == 1;
+    }
+
+    protected static readAsciiz(data: number[], size: number): string {
+        let message: string = "";
+        for (let i = 0; i < size; i++) {
+            message += String.fromCharCode(data.shift()!);
+        }
+        return message;
+    }
+
+    protected static writeAsciiz(message: string, data: number[]) {
+        for (let i = 0; i < message.length; i++) {
+            data.push(message.charCodeAt(i));
+        }
+        data.push(0);
+    }
+
+    protected static writeFileName(fileName: string, data: number[]) {
+        fileName.padEnd(Packet.FILE_NAME_LENGTH, '\0');
+        this.writeAsciiz(fileName, data);
+    }
+
+    public readPacket(data: number[]) {
+        this.status = data.shift()!;
+    }
+
+    public writePacket(expectResponse: boolean): Uint8Array {
+        let data: number[] = [];
+        this.writePacketData(expectResponse, data);
+        let header: number[] = [];
+        Packet.writeWord(data.length, header);
+        data.unshift(...header);
+        packetBuffer.push(this);
+        return new Uint8Array(data);
+    }
+
+    protected abstract writePacketData(expectResponse: boolean, data: number[]): void;
 }

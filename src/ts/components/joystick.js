@@ -29,24 +29,24 @@ var Joystick = /** @class */ (function (_super) {
     }
     Joystick.prototype.render = function () {
         return (<View style={styles.container} onLayout={this.onPageLayout.bind(this)}>
-                <View style={[styles.circle, this.getBackStyle()]}/>
-                <PanGestureHandler onGestureEvent={this.onMove.bind(this)} onHandlerStateChange={this.startStop.bind(this)}>
-                    <View style={[styles.circle, this.getStyle()]}/>
-                </PanGestureHandler>
-            </View>);
+        <View style={[styles.circle, this.getBackStyle()]}/>
+        <PanGestureHandler onGestureEvent={this.onMove.bind(this)} onHandlerStateChange={this.startStop.bind(this)}>
+          <View style={[styles.circle, this.getStyle()]}/>
+        </PanGestureHandler>
+      </View>);
     };
     Joystick.prototype.startStop = function (event) {
         if (event.nativeEvent.state == State.BEGAN) {
             this.setState(function () {
                 return { tapped: true };
             });
-            this.props.dispatch(joystickTouch(this.props.name));
+            this.props.joystickTouch(this.props.name);
         }
         else if (event.nativeEvent.state == State.END || event.nativeEvent.state == State.FAILED) {
             this.setState(function () {
                 return { tapped: false, x: 0, y: 0 };
             });
-            this.props.dispatch(joystickRelease(this.props.name));
+            this.props.joystickRelease(this.props.name);
         }
     };
     Joystick.prototype.onMove = function (event) {
@@ -64,7 +64,7 @@ var Joystick = /** @class */ (function (_super) {
         this.setState(function () {
             return { x: diffX, y: diffY };
         });
-        this.props.dispatch(joystickMove({ x: diffX / MAX, y: diffY / MAX, name: this.props.name, tapped: true }));
+        this.props.joystickMove({ x: diffX / MAX, y: diffY / MAX, name: this.props.name, tapped: true });
     };
     Joystick.prototype.getBackStyle = function () {
         var x = this.props.lockX ? BACK_SIZE_LOCKED : BACK_SIZE;
@@ -96,7 +96,14 @@ var Joystick = /** @class */ (function (_super) {
     };
     return Joystick;
 }(Component));
-export default connect()(Joystick);
+function propsToDispatch(dispatch) {
+    return {
+        joystickTouch: function (joystick) { return dispatch(joystickTouch(joystick)); },
+        joystickRelease: function (joystick) { return dispatch(joystickRelease(joystick)); },
+        joystickMove: function (event) { return dispatch(joystickMove(event)); },
+    };
+}
+export default connect(null, propsToDispatch)(Joystick);
 var styles = StyleSheet.create({
     circle: {
         borderRadius: CIRCLE_SIZE / 2,

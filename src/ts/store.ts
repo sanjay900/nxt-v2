@@ -1,7 +1,6 @@
 import {BluetoothAction, BluetoothState} from "./reducers/bluetooth";
 import {CoreAction, CoreState} from "./reducers/core";
 import {JoystickAction, JoystickState} from "./reducers/joystick";
-import {StateType} from "typesafe-actions";
 import {DeviceAction, DeviceState} from "./reducers/device";
 
 export type State = {
@@ -13,4 +12,4 @@ export type State = {
 
 
 export type RootAction = BluetoothAction | CoreAction | JoystickAction | DeviceAction;
-export type RootState = StateType<{ core: CoreState, bluetooth: BluetoothState, joystick: JoystickState, device: DeviceState }>
+export type RootState = { core: CoreState, bluetooth: BluetoothState, joystick: JoystickState, device: DeviceState }

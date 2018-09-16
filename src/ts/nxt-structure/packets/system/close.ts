@@ -18,8 +18,6 @@ export class Close extends SystemPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    this.file = SystemPacket.filesByHandle[data.shift()];
-    this.file.response = this.status;
     if (this.status != SystemCommandResponse.SUCCESS) {
       this.file.status = NXTFileState.ERROR;
     } else {

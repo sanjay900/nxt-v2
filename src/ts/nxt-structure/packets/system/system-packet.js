@@ -22,8 +22,6 @@ var SystemPacket = /** @class */ (function (_super) {
         data.push(expectResponse ? TelegramType.SYSTEM_COMMAND_RESPONSE : TelegramType.SYSTEM_COMMAND_NO_RESPONSE);
         data.push(this.id);
     };
-    SystemPacket.filesByHandle = new Map();
-    SystemPacket.filesByName = new Map();
     return SystemPacket;
 }(Packet));
 export { SystemPacket };

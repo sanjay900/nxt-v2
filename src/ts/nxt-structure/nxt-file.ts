@@ -1,11 +1,9 @@
-import {Subscription} from "rxjs";
 import {SystemCommandResponse} from "./packets/system-command-response";
 import {DirectCommandResponse} from "./packets/direct-command-response";
 import {Utils} from "../utils/utils";
 
 export class NXTFile {
   public static PACKET_SIZE: number = 64;
-  // public uploadStatus$: EventEmitter<NXTFileState> = new EventEmitter<NXTFileState>();
   public handle: number;
   private _response: DirectCommandResponse | SystemCommandResponse;
   private writtenBytes: number = 0;
@@ -14,7 +12,6 @@ export class NXTFile {
   public autoStart: boolean;
   private state: NXTFileState = NXTFileState.OPENING;
   private data: number[] = [];
-  private writeSubscription: Subscription;
 
   constructor(public name: string) {
   }
@@ -54,30 +51,9 @@ export class NXTFile {
     this.data.push(...number);
   }
 
-  // readFromFileSystem() {
-  //   return this.file.readAsArrayBuffer(this.file.applicationDirectory, "www/assets/" + this.name).then(contents => {
-  //     this.data = Array.from(new Uint8Array(contents));
-  //     this.size = contents.byteLength;
-  //   });
-  // }
-  //
-  // writeFileToDevice() {
-  //   let subscription: Subscription = this.nxt.packetEvent$
-  //     .filter(packet => packet.id == SystemCommand.OPEN_WRITE)
-  //     .filter((packet: OpenWrite) => packet.file == this)
-  //     .subscribe(packet => {
-  //       subscription.unsubscribe();
-  //       if (packet.status != SystemCommandResponse.SUCCESS) {
-  //         return;
-  //       }
-  //       this.writeSubscription = this.nxt.packetEvent$
-  //         .filter(packet => packet.id == SystemCommand.WRITE)
-  //         .filter((packet: Write) => packet.file == this)
-  //         .subscribe(this.write.bind(this));
-  //       this.write();
-  //     });
-  //   this.nxt.writePacket(true, OpenWrite.createPacket(this));
-  // }
+  hasWritten(): boolean {
+    return this.writtenBytes == this.size;
+  }
 
   nextChunk(): number[] {
     if (this.mode == NXTFileMode.READ) return [];
@@ -88,23 +64,6 @@ export class NXTFile {
     return ret;
   }
 
-  // private write() {
-  //   if (this.size == this.writtenBytes) {
-  //     this.writeSubscription.unsubscribe();
-  //     this.nxt.writePacket(true, Close.createPacket(this));
-  //     let subscription: Subscription = this.nxt.packetEvent$
-  //       .filter(packet => packet.id == SystemCommand.CLOSE)
-  //       .filter((packet: Close) => packet.file == this)
-  //       .subscribe(() => {
-  //         subscription.unsubscribe();
-  //         if (this.autoStart) {
-  //           this.nxt.writePacket(true, StartProgram.createPacket(this.name));
-  //         }
-  //       });
-  //     return;
-  //   }
-  //   this.nxt.writePacket(true, Write.createPacket(this));
-  // }
 }
 
 export enum NXTFileState {

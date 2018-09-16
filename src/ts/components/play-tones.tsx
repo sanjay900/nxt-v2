@@ -6,7 +6,7 @@ import {Dispatch} from "redux";
 import {writePacket} from "../actions/device-actions";
 import {PlayTone} from "../nxt-structure/packets/direct/play-tone";
 
-export default class PlayTones extends Component<{ playNote: (number) => {} }, { calculatedKeyWidth: number }> {
+class PlayTones extends Component<{ playNote: (number) => {} }, { calculatedKeyWidth: number }> {
 
   constructor(props) {
     super(props);

@@ -15,6 +15,8 @@ import { SystemCommand } from "../nxt-structure/packets/system-command";
 import { getType } from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
 import { DirectCommand } from "../nxt-structure/packets/direct-command";
+import { connectToDevice } from "../actions/bluetooth-actions";
+import { DirectCommandResponse } from "../nxt-structure/packets/direct-command-response";
 var initialSensor = {
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
@@ -50,7 +52,7 @@ var initialState = {
         version: {
             protocol: "0.0",
             firmware: "0.0"
-        }
+        },
     }, outputs: {
         A: __assign({}, initialOutput),
         B: __assign({}, initialOutput),
@@ -78,21 +80,26 @@ var initialState = {
 export var device = function (state, action) {
     if (state === void 0) { state = initialState; }
     switch (action.type) {
+        case getType(connectToDevice.success):
+            return __assign({}, state, { info: __assign({}, state.info, { programToUpload: undefined }) });
         case getType(deviceActions.readPacket):
             return __assign({}, state, processIncomingPacket(action.payload.packet, state));
         case getType(deviceActions.writeFileProgress):
-            console.log(action.payload.packet.file.name);
-            console.log(action.payload.packet.file.percentage);
             return __assign({}, state, { info: __assign({}, state.info, { currentFile: action.payload.packet.file }) });
         case getType(deviceActions.writeFile.failure):
-            console.error(action.payload);
             return __assign({}, state, { lastMessage: action.payload.message });
         case getType(deviceActions.writePacket.request):
             return __assign({}, state, processOutgoingPacket(action.payload, state));
         case getType(deviceActions.writePacket.success):
             return __assign({}, state);
         case getType(deviceActions.writePacket.failure):
-            return __assign({}, state, { lastMessage: action.payload.message });
+            //If a program fails to start, we should upload it, not report an error.
+            if (action.payload.packet.id == DirectCommand.START_PROGRAM &&
+                action.payload.packet.status == DirectCommandResponse.OUT_OF_RANGE) {
+                var start = action.payload.packet;
+                return __assign({}, state, { info: __assign({}, state.info, { programToUpload: start.programName }) });
+            }
+            return __assign({}, state, { lastMessage: action.payload.error.message });
     }
     return state;
 };

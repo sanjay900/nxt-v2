@@ -23,9 +23,9 @@ var Colours = {
     connected: "rgb(50,219,100)",
     disconnected: "rgb(245,61,61)"
 };
-var StatusButtons = /** @class */ (function (_super) {
-    __extends(StatusButtons, _super);
-    function StatusButtons(props) {
+var StatusButton = /** @class */ (function (_super) {
+    __extends(StatusButton, _super);
+    function StatusButton(props) {
         var _this = _super.call(this, props) || this;
         _this.state = {
             opacity: new Animated.Value(1)
@@ -33,7 +33,7 @@ var StatusButtons = /** @class */ (function (_super) {
         _this.startAnimation();
         return _this;
     }
-    StatusButtons.prototype.startAnimation = function () {
+    StatusButton.prototype.startAnimation = function () {
         this._animation = Animated.loop(Animated.sequence([
             Animated.timing(this.state.opacity, {
                 toValue: 0,
@@ -46,9 +46,9 @@ var StatusButtons = /** @class */ (function (_super) {
         ]));
         this._animation.start();
     };
-    StatusButtons.prototype.componentWillReceiveProps = function (nextProps) {
-        if (this.props.status != nextProps.status) {
-            if (nextProps.status == ConnectionStatus.CONNECTING) {
+    StatusButton.prototype.componentDidUpdate = function (prevProps) {
+        if (this.props.status != prevProps.status) {
+            if (this.props.status == ConnectionStatus.CONNECTING) {
                 this.startAnimation();
             }
             else {
@@ -56,24 +56,23 @@ var StatusButtons = /** @class */ (function (_super) {
                 this.setState({ opacity: new Animated.Value(1) });
             }
         }
-        if (nextProps.lastMessage && this.props.lastMessage != nextProps.lastMessage) {
-            Toast.showShortBottom("Message from bluetooth device: " + nextProps.lastMessage);
+        if (this.props.lastMessage && this.props.lastMessage != prevProps.lastMessage) {
+            Toast.showShortBottom("Message from bluetooth device: " + this.props.lastMessage);
         }
     };
-    StatusButtons.prototype.render = function () {
-        /** some styling **/
+    StatusButton.prototype.render = function () {
         return (<View style={styles.container}>
                 <AnimatedIcon name="bluetooth" style={this.getStyle()} size={30}/>
             </View>);
     };
-    StatusButtons.prototype.getStyle = function () {
+    StatusButton.prototype.getStyle = function () {
         var style = { color: Colours[ConnectionStatus[this.props.status].toLowerCase()] };
         if (this.props.status === ConnectionStatus.CONNECTING) {
             style.opacity = this.state.opacity;
         }
         return style;
     };
-    return StatusButtons;
+    return StatusButton;
 }(React.Component));
 var mapStateToProps = function (state) {
     return {
@@ -82,7 +81,7 @@ var mapStateToProps = function (state) {
         lastMessage: state.bluetooth.lastMessage
     };
 };
-export default connect(mapStateToProps)(StatusButtons);
+export default connect(mapStateToProps)(StatusButton);
 var styles = StyleSheet.create({
     container: {
         flex: 1,

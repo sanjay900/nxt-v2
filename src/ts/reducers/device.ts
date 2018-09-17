@@ -17,6 +17,10 @@ import {DirectCommand} from "../nxt-structure/packets/direct-command";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
 import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
 import {NXTFile} from "../nxt-structure/nxt-file";
+import {BluetoothAction} from "./bluetooth";
+import {connectToDevice} from "../actions/bluetooth-actions";
+import {StartProgram} from "../nxt-structure/packets/direct/start-program";
+import {DirectCommandResponse} from "../nxt-structure/packets/direct-command-response";
 
 export type DeviceAction = ActionType<typeof deviceActions>;
 
@@ -55,7 +59,8 @@ export type DeviceState = {
             protocol: string,
             firmware: string
         },
-        currentFile?: NXTFile
+        currentFile?: NXTFile,
+        programToUpload?: string
     },
     outputs: {
         A: SystemOutput,
@@ -118,7 +123,7 @@ const initialState: DeviceState = {
         version: {
             protocol: "0.0",
             firmware: "0.0"
-        }
+        },
     }, outputs: {
         A: {...initialOutput},
         B: {...initialOutput},
@@ -143,16 +148,19 @@ const initialState: DeviceState = {
         },
     },
 };
-export const device = (state: DeviceState = initialState, action: DeviceAction) => {
+export type PacketError = {
+    error: Error,
+    packet: Packet
+}
+export const device = (state: DeviceState = initialState, action: DeviceAction | BluetoothAction) => {
     switch (action.type) {
+        case getType(connectToDevice.success):
+            return {...state, info: {...state.info, programToUpload: undefined}};
         case getType(deviceActions.readPacket):
             return {...state, ...processIncomingPacket(action.payload.packet, state)};
         case getType(deviceActions.writeFileProgress):
-            console.log(action.payload.packet.file.name);
-            console.log(action.payload.packet.file.percentage);
             return {...state, info: {...state.info, currentFile: action.payload.packet.file}};
         case getType(deviceActions.writeFile.failure):
-            console.error(action.payload);
             return {...state, lastMessage: action.payload.message};
         case getType(deviceActions.writePacket.request):
             return {...state, ...processOutgoingPacket(action.payload, state)};
@@ -161,7 +169,16 @@ export const device = (state: DeviceState = initialState, action: DeviceAction) 
             return {...state};
 
         case getType(deviceActions.writePacket.failure):
-            return {...state, lastMessage: action.payload.message};
+            //If a program fails to start, we should upload it, not report an error.
+            if (action.payload.packet.id == DirectCommand.START_PROGRAM &&
+                action.payload.packet.status == DirectCommandResponse.OUT_OF_RANGE) {
+                let start: StartProgram = action.payload.packet as StartProgram;
+                return {
+                    ...state,
+                    info: {...state.info, programToUpload: start.programName}
+                };
+            }
+            return {...state, lastMessage: action.payload.error.message};
     }
     return state;
 };

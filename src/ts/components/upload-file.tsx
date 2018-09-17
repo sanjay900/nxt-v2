@@ -1,4 +1,4 @@
-import {StyleSheet, View} from "react-native";
+import {Button, StyleSheet, View} from "react-native";
 import React from "react";
 import {connect} from 'react-redux';
 import {State} from "../store";
@@ -6,6 +6,7 @@ import {DeviceState} from "../reducers/device";
 import {FormLabel, Text} from "react-native-elements";
 import * as Progress from 'react-native-progress';
 import {NXTFile} from "../nxt-structure/nxt-file";
+import {Actions} from "react-native-router-flux";
 
 type Props = {
     deviceInfo: DeviceState
@@ -24,6 +25,9 @@ const UploadFile: React.SFC<Props> = ({deviceInfo}: Props) => {
             <Text style={styles.margin}>{file.name}</Text>
             <FormLabel>Status</FormLabel>
             <Progress.Bar progress={file.percentage} style={styles.margin}/>
+            <Text style={styles.margin}>{file.hasWritten()?"Uploading File":"Upload Complete!"}</Text>
+            <View style={styles.container}/>
+            <Button title="Return" onPress={Actions.pop}/>
         </View>
     );
 };
@@ -35,17 +39,9 @@ const mapStateToProps = (state: State) => {
 const styles = StyleSheet.create({
     container: {
         flex: 1
-    }, joyContainer: {
-        flex: 1,
-        flexDirection: 'row'
     }, margin: {
         marginLeft: 20,
-    }, input: {
-        marginLeft: 20,
-        backgroundColor: "lightgray",
-        borderColor: "gray",
-        borderWidth: 1
-    }
+    },
 });
 
 export default connect(mapStateToProps)(UploadFile);

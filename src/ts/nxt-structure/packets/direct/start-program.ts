@@ -3,7 +3,7 @@ import {DirectCommand} from "../direct-command";
 import {DirectPacket} from "./direct-packet";
 
 export class StartProgram extends DirectPacket {
-  private programName: string;
+  public programName: string;
 
   constructor() {
     super(DirectCommand.START_PROGRAM);

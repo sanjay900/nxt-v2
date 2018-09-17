@@ -4,6 +4,7 @@ import {DirectCommand} from "../nxt-structure/packets/direct-command";
 import {SystemCommand} from "../nxt-structure/packets/system-command";
 import {NXTFile} from "../nxt-structure/nxt-file";
 import {Write} from "../nxt-structure/packets/system/write";
+import {PacketError} from "../reducers/device";
 
 
 export const readPacket = createAction("readPacket", resolve => {
@@ -14,7 +15,7 @@ export const writePacket = createAsyncAction(
     'writePacketRequest',
     'writePacketResponse',
     'writePacketFailure'
-)<Packet, void, Error>();
+)<Packet, void, PacketError>();
 
 export const writeFile = createAsyncAction(
   'writeFileRequest',

@@ -65,10 +65,10 @@ function parsePacket(data, store) {
             store.dispatch(readPacket(packet, packet.id));
             if (packet.status != 0) {
                 if (SystemCommandResponse[packet.status]) {
-                    packet.responseReceived.error(SystemCommandResponse[packet.status]);
+                    packet.responseReceived.error({ error: new Error(SystemCommandResponse[packet.status]), packet: packet });
                 }
                 else {
-                    packet.responseReceived.error(DirectCommandResponse[packet.status]);
+                    packet.responseReceived.error({ error: new Error(DirectCommandResponse[packet.status]), packet: packet });
                 }
             }
             else {

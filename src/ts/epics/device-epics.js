@@ -1,5 +1,5 @@
 import { isActionOf } from "typesafe-actions";
-import { catchError, expand, filter, map, share, switchMap } from "rxjs/operators";
+import { catchError, expand, filter, map, share, switchMap, tap } from "rxjs/operators";
 import { EMPTY, from, merge, of } from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import { Buffer } from "buffer";
@@ -9,6 +9,7 @@ import { Write } from "../nxt-structure/packets/system/write";
 import { Close } from "../nxt-structure/packets/system/close";
 import { OpenWrite } from "../nxt-structure/packets/system/open-write";
 import { StartProgram } from "../nxt-structure/packets/direct/start-program";
+import { Actions } from "react-native-router-flux";
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
  * @param {Packet} packet the packet to write
@@ -23,8 +24,9 @@ export var sendPacket = function (action$) {
 export var writeFile = function (action$) {
     //Baiscally, we handle writing a file here. We send out a openwrite, wait for it to respond and then
     //endlessly write (expand recursively calls itself) we then split into two branches and share the current result
-    //between them
-    var actions = action$.pipe(filter(isActionOf(deviceActions.writeFile.request)), switchMap(function (action) { return writePacket(OpenWrite.createPacket(action.payload)); }), switchMap(function (packet) { return packet.responseReceived; }), switchMap(function (packet) { return of(Write.createPacket(packet.file)); }), expand(function (packet) {
+    //between them.
+    //The tap opens the file upload dialog whenever we upload a file.
+    var actions = action$.pipe(filter(isActionOf(deviceActions.writeFile.request)), tap(function () { return Actions.push("status"); }), switchMap(function (action) { return writePacket(OpenWrite.createPacket(action.payload)); }), switchMap(function (packet) { return packet.responseReceived; }), switchMap(function (packet) { return of(Write.createPacket(packet.file)); }), expand(function (packet) {
         if (packet.file.hasWritten()) {
             return EMPTY;
         }

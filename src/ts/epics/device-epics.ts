@@ -14,6 +14,8 @@ import {Write} from "../nxt-structure/packets/system/write";
 import {Close} from "../nxt-structure/packets/system/close";
 import {OpenWrite} from "../nxt-structure/packets/system/open-write";
 import {StartProgram} from "../nxt-structure/packets/direct/start-program";
+import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
+import {PacketError} from "../reducers/device";
 import {Actions} from "react-native-router-flux";
 
 /**
@@ -31,14 +33,16 @@ export const sendPacket: Epic<RootAction, RootAction, RootState> = (action$) =>
         switchMap((action: { payload: Packet }) => writePacket(action.payload)),
         switchMap((action: Packet) => from(action.responseReceived)),
         map(deviceActions.writePacket.success),
-        catchError(err => of(deviceActions.writePacket.failure(err)))
+        catchError((err: PacketError) => of(deviceActions.writePacket.failure(err)))
     );
 export const writeFile = (action$: ActionsObservable<RootAction>) => {
     //Baiscally, we handle writing a file here. We send out a openwrite, wait for it to respond and then
     //endlessly write (expand recursively calls itself) we then split into two branches and share the current result
-    //between them
+    //between them.
+    //The tap opens the file upload dialog whenever we upload a file.
     let actions = action$.pipe(
         filter(isActionOf(deviceActions.writeFile.request)),
+        tap(() => Actions.push("status")),
         switchMap((action: { payload: NXTFile }) => writePacket(OpenWrite.createPacket(action.payload))),
         switchMap((packet: OpenWrite) => packet.responseReceived),
         switchMap((packet) => of(Write.createPacket((packet as OpenWrite).file))),

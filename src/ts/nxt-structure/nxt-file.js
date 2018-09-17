@@ -23,24 +23,12 @@ var NXTFile = /** @class */ (function () {
         this.name = name;
         this.fileData = fileData;
         this.writtenBytes = 0;
-        this.state = NXTFileState.OPENING;
         this.data = [];
         if (fileData) {
             this.data = fileData;
             this.size = fileData.length;
         }
     }
-    Object.defineProperty(NXTFile.prototype, "status", {
-        get: function () {
-            return this.state;
-        },
-        set: function (status) {
-            this.state = status;
-            // this.uploadStatus$.emit(this.state);
-        },
-        enumerable: true,
-        configurable: true
-    });
     Object.defineProperty(NXTFile.prototype, "percentage", {
         get: function () {
             if (this.writtenBytes == 0)
@@ -50,9 +38,6 @@ var NXTFile = /** @class */ (function () {
         enumerable: true,
         configurable: true
     });
-    NXTFile.prototype.hasError = function () {
-        return this.state == NXTFileState.ERROR || this.state == NXTFileState.FILE_EXISTS;
-    };
     NXTFile.prototype.readData = function (number) {
         var _a;
         (_a = this.data).push.apply(_a, __spread(number));
@@ -73,17 +58,6 @@ var NXTFile = /** @class */ (function () {
     return NXTFile;
 }());
 export { NXTFile };
-export var NXTFileState;
-(function (NXTFileState) {
-    NXTFileState["OPENING"] = "Opening File";
-    NXTFileState["WRITING"] = "Writing File";
-    NXTFileState["CLOSING"] = "Closing File";
-    NXTFileState["WRITTEN"] = "Written File";
-    NXTFileState["DELETED"] = "Deleted File";
-    NXTFileState["READ"] = "Read File";
-    NXTFileState["ERROR"] = "Error";
-    NXTFileState["FILE_EXISTS"] = "File already exists";
-})(NXTFileState || (NXTFileState = {}));
 export var NXTFileMode;
 (function (NXTFileMode) {
     NXTFileMode[NXTFileMode["READ"] = 0] = "READ";

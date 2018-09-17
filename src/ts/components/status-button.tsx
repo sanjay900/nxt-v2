@@ -23,7 +23,7 @@ type Props = {
     fetchDeviceInfo: Function
 }
 
-class StatusButtons extends React.Component<Props, StatusState> {
+class StatusButton extends React.Component<Props, StatusState> {
     private _animation!: Animated.CompositeAnimation;
 
     constructor(props: Props) {
@@ -50,24 +50,21 @@ class StatusButtons extends React.Component<Props, StatusState> {
         this._animation.start();
     }
 
-    componentWillReceiveProps(nextProps: Props) {
-        if (this.props.status != nextProps.status) {
-            if (nextProps.status == ConnectionStatus.CONNECTING) {
+    componentDidUpdate(prevProps: Props) {
+        if (this.props.status != prevProps.status) {
+            if (this.props.status == ConnectionStatus.CONNECTING) {
                 this.startAnimation();
             } else {
                 this._animation.stop();
                 this.setState({opacity: new Animated.Value(1)});
             }
         }
-        if (nextProps.lastMessage && this.props.lastMessage != nextProps.lastMessage) {
-            Toast.showShortBottom(`Message from bluetooth device: ${nextProps.lastMessage}`);
+        if (this.props.lastMessage && this.props.lastMessage != prevProps.lastMessage) {
+            Toast.showShortBottom(`Message from bluetooth device: ${this.props.lastMessage}`);
         }
     }
 
     render() {
-
-        /** some styling **/
-
         return (
             <View style={styles.container}>
                 <AnimatedIcon name="bluetooth" style={this.getStyle()} size={30}/>
@@ -92,7 +89,7 @@ const mapStateToProps = (state: State) => {
     };
 };
 
-export default connect(mapStateToProps)(StatusButtons);
+export default connect(mapStateToProps)(StatusButton);
 const styles = StyleSheet.create({
     container: {
         flex: 1,

@@ -19,8 +19,7 @@ type StatusState = {
 type Props = {
     status: ConnectionStatus,
     device?: Device,
-    lastMessage?: string,
-    fetchDeviceInfo: Function
+    lastMessage?: string
 }
 
 class StatusButton extends React.Component<Props, StatusState> {

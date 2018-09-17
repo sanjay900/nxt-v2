@@ -23,9 +23,9 @@ import MotorStatus from "./components/motor-status";
 import StatusButton from "./components/status-button";
 import Settings from "./components/settings";
 import { connect, Provider } from 'react-redux';
-import { Text, View } from "react-native";
+import { Button, StyleSheet, View } from "react-native";
+import { Text } from "react-native-elements";
 import PopupDialog from "react-native-popup-dialog";
-import { Button } from "react-native-elements";
 import { writeFile } from "./actions/device-actions";
 import { NXTFile } from "./nxt-structure/nxt-file";
 import SteeringControl from "../../SteeringControl.rxe";
@@ -37,7 +37,7 @@ var App = /** @class */ (function (_super) {
     App.prototype.render = function () {
         var _this = this;
         return (<Provider store={this.props.store}>
-                <View style={{ flex: 1 }}>
+                <View style={styles.container}>
                     <Router right={function () { return <StatusButton />; }}>
                         <Modal hideNavBar>
                             <Tabs key="root">
@@ -54,10 +54,23 @@ var App = /** @class */ (function (_super) {
                     <PopupDialog ref={function (popupDialog) {
             _this.popupDialog = popupDialog;
         }}>
-                        <View>
-                            <Text>Hello</Text>
-                            <Button title="Upload Program" onPress={this.writeProgram.bind(this)}/>
-                            <Button title="Cancel" onPress={function () { return _this.popupDialog.dismiss(); }}/>
+                        <View style={styles.alertContainer}>
+                            <Text h4 style={styles.text}>Motor Control Program Missing</Text>
+                            <View style={styles.container}/>
+                            <Text style={styles.text}>The program for controlling NXT motors is missing on your NXT
+                                Device.</Text>
+                            <Text style={styles.text}>Would you like to upload the NXT motor control program?</Text>
+                            <Text style={styles.text}>Note that without this program, motor control will not
+                                work.</Text>
+                            <View style={styles.container}/>
+                            <View style={styles.buttonContainer}>
+                                <View style={styles.container}>
+                                    <Button title="Upload Program" onPress={this.writeProgram.bind(this)}/>
+                                </View>
+                                <View style={styles.container}>
+                                    <Button title="Cancel" onPress={function () { return _this.popupDialog.dismiss(); }}/>
+                                </View>
+                            </View>
                         </View>
                     </PopupDialog>
                 </View>
@@ -91,3 +104,18 @@ var mapDispatchToProps = function (dispatch) {
     };
 };
 export default connect(mapStateToProps, mapDispatchToProps)(App);
+var styles = StyleSheet.create({
+    container: {
+        flex: 1
+    },
+    buttonContainer: {
+        flexDirection: 'row'
+    },
+    alertContainer: {
+        flex: 1,
+        flexDirection: 'column'
+    },
+    text: {
+        textAlign: "center"
+    }
+});

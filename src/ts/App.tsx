@@ -12,9 +12,9 @@ import Settings from "./components/settings";
 import {connect, Provider} from 'react-redux';
 import {Dispatch, Store} from 'redux';
 import {State} from "./store";
-import {Text, View} from "react-native";
+import {Button, StyleSheet, View} from "react-native";
+import {Text} from "react-native-elements";
 import PopupDialog from "react-native-popup-dialog";
-import {Button} from "react-native-elements";
 import {writeFile} from "./actions/device-actions";
 import {NXTFile} from "./nxt-structure/nxt-file";
 import SteeringControl from "../../SteeringControl.rxe";
@@ -22,7 +22,7 @@ import SteeringControl from "../../SteeringControl.rxe";
 type Props = {
     store: Store,
     programToUpload?: string,
-    uploadFile: (file: string)=>{}
+    uploadFile: (file: string) => {}
 }
 
 class App extends React.Component<Props> {
@@ -31,7 +31,7 @@ class App extends React.Component<Props> {
     render() {
         return (
             <Provider store={this.props.store}>
-                <View style={{flex: 1}}>
+                <View style={styles.container}>
                     <Router right={() => <StatusButton/>}>
                         <Modal hideNavBar>
                             <Tabs key="root">
@@ -64,10 +64,23 @@ class App extends React.Component<Props> {
                             this.popupDialog = popupDialog;
                         }}
                     >
-                        <View>
-                            <Text>Hello</Text>
-                            <Button title="Upload Program" onPress={this.writeProgram.bind(this)}/>
-                            <Button title="Cancel" onPress={() => this.popupDialog!.dismiss()}/>
+                        <View style={styles.alertContainer}>
+                            <Text h4 style={styles.text}>Motor Control Program Missing</Text>
+                            <View style={styles.container}/>
+                            <Text style={styles.text}>The program for controlling NXT motors is missing on your NXT
+                                Device.</Text>
+                            <Text style={styles.text}>Would you like to upload the NXT motor control program?</Text>
+                            <Text style={styles.text}>Note that without this program, motor control will not
+                                work.</Text>
+                            <View style={styles.container}/>
+                            <View style={styles.buttonContainer}>
+                                <View style={styles.container}>
+                                    <Button title="Upload Program" onPress={this.writeProgram.bind(this)}/>
+                                </View>
+                                <View style={styles.container}>
+                                    <Button title="Cancel" onPress={() => this.popupDialog!.dismiss()}/>
+                                </View>
+                            </View>
                         </View>
                     </PopupDialog>
                 </View>
@@ -105,3 +118,18 @@ const mapDispatchToProps = (dispatch: Dispatch) => {
     }
 };
 export default connect(mapStateToProps, mapDispatchToProps)(App);
+const styles = StyleSheet.create({
+    container: {
+        flex: 1
+    },
+    buttonContainer: {
+        flexDirection: 'row'
+    },
+    alertContainer: {
+        flex: 1,
+        flexDirection: 'column'
+    },
+    text: {
+        textAlign: "center"
+    }
+});

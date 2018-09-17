@@ -19,12 +19,12 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 import 'mdn-polyfills/String.prototype.padEnd';
-import { Subject } from "rxjs/internal/Subject";
 import { packetBuffer } from "../../bluetooth-events";
+import { Subject } from "rxjs";
 var Packet = /** @class */ (function () {
     function Packet(_id) {
         this._id = _id;
-        this.responseRecieved = new Subject();
+        this.responseReceived = Subject.create();
     }
     Object.defineProperty(Packet.prototype, "id", {
         get: function () {

@@ -65,14 +65,14 @@ function parsePacket(data, store) {
             store.dispatch(readPacket(packet, packet.id));
             if (packet.status != 0) {
                 if (SystemCommandResponse[packet.status]) {
-                    packet.responseRecieved.error(SystemCommandResponse[packet.status]);
+                    packet.responseReceived.error(SystemCommandResponse[packet.status]);
                 }
                 else {
-                    packet.responseRecieved.error(DirectCommandResponse[packet.status]);
+                    packet.responseReceived.error(DirectCommandResponse[packet.status]);
                 }
             }
             else {
-                packet.responseRecieved.next(packet);
+                packet.responseReceived.next(packet);
             }
         }
     }

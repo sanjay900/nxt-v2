@@ -5,12 +5,7 @@ import {State} from "../store";
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import Toast from "@remobile/react-native-toast";
-import {writeFile, writePacket} from "../actions/device-actions";
-import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {ConnectionStatus} from "../reducers/bluetooth";
-import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
-import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
-import {NXTFile} from "../nxt-structure/nxt-file";
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const Colours: { [key: string]: string } = {
@@ -30,6 +25,7 @@ type Props = {
 
 class StatusButtons extends React.Component<Props, StatusState> {
     private _animation!: Animated.CompositeAnimation;
+
     constructor(props: Props) {
         super(props);
         this.state = {

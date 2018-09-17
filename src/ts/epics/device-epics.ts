@@ -13,7 +13,6 @@ import {Write} from "../nxt-structure/packets/system/write";
 import {Close} from "../nxt-structure/packets/system/close";
 import {OpenWrite} from "../nxt-structure/packets/system/open-write";
 import {StartProgram} from "../nxt-structure/packets/direct/start-program";
-import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
 
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
@@ -28,7 +27,7 @@ export const sendPacket: Epic<RootAction, RootAction, RootState> = (action$) =>
     action$.pipe(
         filter(isActionOf(deviceActions.writePacket.request)),
         switchMap((action: { payload: Packet }) => write(action.payload)),
-        switchMap((action: Packet) => from(action.responseRecieved)),
+        switchMap((action: Packet) => from(action.responseReceived)),
         map(deviceActions.writePacket.success),
         catchError(err => of(deviceActions.writePacket.failure(err)))
     );
@@ -39,7 +38,7 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
     return action$.pipe(
         filter(isActionOf(deviceActions.writeFile.request)),
         switchMap((action: { payload: NXTFile }) => write(OpenWrite.createPacket(action.payload))),
-        switchMap((packet: OpenWrite) => packet.responseRecieved),
+        switchMap((packet: OpenWrite) => packet.responseReceived),
         switchMap((packet) => of(Write.createPacket((packet as OpenWrite).file))),
         expand((packet: Write) => {
             if (packet.file.hasWritten()) {

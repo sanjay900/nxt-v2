@@ -3,16 +3,17 @@ import {SystemCommandResponse} from "./system-command-response";
 import {SystemCommand} from "./system-command";
 import {DirectCommand} from "./direct-command";
 import 'mdn-polyfills/String.prototype.padEnd';
-import {Subject} from "rxjs/internal/Subject";
 import {packetBuffer} from "../../bluetooth-events";
+import {Subject} from "rxjs";
 
 export abstract class Packet {
     static FILE_NAME_LENGTH: number = 20;
     static S_WORD_LENGTH: number = 20;
     public status: DirectCommandResponse | SystemCommandResponse;
-    public responseRecieved: Subject<Packet> = new Subject<Packet>();
+    public responseReceived: Subject<Packet> = Subject.create();
 
     protected constructor(protected _id: SystemCommand | DirectCommand) {
+
     }
 
     get id(): SystemCommand | DirectCommand {

@@ -3,6 +3,7 @@ import {Packet} from "../nxt-structure/packets/packet";
 import {DirectCommand} from "../nxt-structure/packets/direct-command";
 import {SystemCommand} from "../nxt-structure/packets/system-command";
 import {NXTFile} from "../nxt-structure/nxt-file";
+import {Write} from "../nxt-structure/packets/system/write";
 
 
 export const readPacket = createAction("readPacket", resolve => {
@@ -20,3 +21,7 @@ export const writeFile = createAsyncAction(
   'writeFileResponse',
   'writeFileFailure'
 )<NXTFile, void, Error>();
+
+export const writeFileProgress = createAction("writeFileProgress", resolve => {
+    return (packet: Write) => resolve({packet});
+});

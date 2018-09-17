@@ -4,3 +4,6 @@ export var readPacket = createAction("readPacket", function (resolve) {
 });
 export var writePacket = createAsyncAction('writePacketRequest', 'writePacketResponse', 'writePacketFailure')();
 export var writeFile = createAsyncAction('writeFileRequest', 'writeFileResponse', 'writeFileFailure')();
+export var writeFileProgress = createAction("writeFileProgress", function (resolve) {
+    return function (packet) { return resolve({ packet: packet }); };
+});

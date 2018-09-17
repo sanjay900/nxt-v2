@@ -16,6 +16,7 @@ import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-v
 import {DirectCommand} from "../nxt-structure/packets/direct-command";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
 import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
+import {NXTFile} from "../nxt-structure/nxt-file";
 
 export type DeviceAction = ActionType<typeof deviceActions>;
 
@@ -53,7 +54,8 @@ export type DeviceState = {
         version: {
             protocol: string,
             firmware: string
-        }
+        },
+        currentFile?: NXTFile
     },
     outputs: {
         A: SystemOutput,
@@ -145,10 +147,13 @@ export const device = (state: DeviceState = initialState, action: DeviceAction) 
     switch (action.type) {
         case getType(deviceActions.readPacket):
             return {...state, ...processIncomingPacket(action.payload.packet, state)};
-
+        case getType(deviceActions.writeFileProgress):
+            console.log(action.payload.packet.file.name);
+            console.log(action.payload.packet.file.percentage);
+            return {...state, info: {...state.info, currentFile: action.payload.packet.file}};
         case getType(deviceActions.writeFile.failure):
+            console.error(action.payload);
             return {...state, lastMessage: action.payload.message};
-
         case getType(deviceActions.writePacket.request):
             return {...state, ...processOutgoingPacket(action.payload, state)};
 

@@ -24,7 +24,7 @@ import { Subject } from "rxjs";
 var Packet = /** @class */ (function () {
     function Packet(_id) {
         this._id = _id;
-        this.responseReceived = Subject.create();
+        this.responseReceived = new Subject();
     }
     Object.defineProperty(Packet.prototype, "id", {
         get: function () {

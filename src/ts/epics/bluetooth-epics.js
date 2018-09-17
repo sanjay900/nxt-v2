@@ -15,15 +15,13 @@ export var requestDevices = function (action$) {
     }));
 };
 export var connectToDevice = function (action$) {
-    return action$.pipe(filter(isActionOf(bluetoothActions.connectToDevice.request)), switchMap(function (action) {
-        return from(ReactNativeBluetoothSerial.connect(action.payload.id)).pipe(mergeMap(function () { return [
-            bluetoothActions.connectToDevice.success(),
-            writePacket.request(GetBatteryLevel.createPacket()),
-            writePacket.request(GetDeviceInfo.createPacket()),
-            writePacket.request(GetFirmwareVersion.createPacket()),
-            writeFile.request(new NXTFile("SteeringControl.rxe", SteeringControl))
-        ]; }), catchError(function (err) { return of(bluetoothActions.connectToDevice.failure(err)); }));
-    }));
+    return action$.pipe(filter(isActionOf(bluetoothActions.connectToDevice.request)), switchMap(function (action) { return from(ReactNativeBluetoothSerial.connect(action.payload.id)); }), mergeMap(function () { return [
+        bluetoothActions.connectToDevice.success(),
+        writePacket.request(GetBatteryLevel.createPacket()),
+        writePacket.request(GetDeviceInfo.createPacket()),
+        writePacket.request(GetFirmwareVersion.createPacket()),
+        writeFile.request(new NXTFile("SteeringControl.rxe", SteeringControl))
+    ]; }), catchError(function (err) { return of(bluetoothActions.connectToDevice.failure(err)); }));
 };
 export var disconnectFromDevice = function (action$) {
     return action$.pipe(filter(isActionOf(bluetoothActions.disconnectFromDevice.request)), switchMap(function () {

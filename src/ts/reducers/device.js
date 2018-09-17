@@ -80,7 +80,12 @@ export var device = function (state, action) {
     switch (action.type) {
         case getType(deviceActions.readPacket):
             return __assign({}, state, processIncomingPacket(action.payload.packet, state));
+        case getType(deviceActions.writeFileProgress):
+            console.log(action.payload.packet.file.name);
+            console.log(action.payload.packet.file.percentage);
+            return __assign({}, state, { info: __assign({}, state.info, { currentFile: action.payload.packet.file }) });
         case getType(deviceActions.writeFile.failure):
+            console.error(action.payload);
             return __assign({}, state, { lastMessage: action.payload.message });
         case getType(deviceActions.writePacket.request):
             return __assign({}, state, processOutgoingPacket(action.payload, state));

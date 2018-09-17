@@ -10,7 +10,7 @@ export abstract class Packet {
     static FILE_NAME_LENGTH: number = 20;
     static S_WORD_LENGTH: number = 20;
     public status: DirectCommandResponse | SystemCommandResponse;
-    public responseReceived: Subject<Packet> = Subject.create();
+    public responseReceived: Subject<Packet> = new Subject();
 
     protected constructor(protected _id: SystemCommand | DirectCommand) {
 

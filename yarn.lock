@@ -1981,6 +1981,15 @@ babel-plugin-flow-react-proptypes@^24.1.2:
     babel-traverse "^6.25.0"
     babel-types "^6.25.0"
 
+babel-plugin-flow-react-proptypes@^9.1.1:
+  version "9.2.0"
+  resolved "https://registry.yarnpkg.com/babel-plugin-flow-react-proptypes/-/babel-plugin-flow-react-proptypes-9.2.0.tgz#d32594b5c85ea90cb625e10f9954d114526ddeae"
+  dependencies:
+    babel-core "^6.25.0"
+    babel-template "^6.25.0"
+    babel-traverse "^6.25.0"
+    babel-types "^6.25.0"
+
 babel-plugin-flow-to-typescript@^0.2.0:
   version "0.2.0"
   resolved "https://registry.yarnpkg.com/babel-plugin-flow-to-typescript/-/babel-plugin-flow-to-typescript-0.2.0.tgz#62b9c53bf5f2ebd938561e5d1b3e63278e023e0b"
@@ -8837,6 +8846,13 @@ react-native-gesture-handler@^1.0.7:
     hoist-non-react-statics "^2.3.1"
     invariant "^2.2.2"
     prop-types "^15.5.10"
+
+react-native-popup-dialog@^0.15.0:
+  version "0.15.0"
+  resolved "https://registry.yarnpkg.com/react-native-popup-dialog/-/react-native-popup-dialog-0.15.0.tgz#26c494babc4c627bb3ec8146203bb04fa3827b7f"
+  dependencies:
+    babel-plugin-flow-react-proptypes "^9.1.1"
+    prop-types "^15.6.0"
 
 react-native-progress@^3.5.0:
   version "3.5.0"

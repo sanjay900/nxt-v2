@@ -28,19 +28,16 @@ export const requestDevices: Epic<RootAction, RootAction, RootState> = (action$)
 export const connectToDevice: Epic<RootAction, RootAction, RootState> = (action$) =>
     action$.pipe(
         filter(isActionOf(bluetoothActions.connectToDevice.request)),
-        switchMap(action =>
-            from(ReactNativeBluetoothSerial.connect(action.payload.id)).pipe(
-                mergeMap(() => [
-                        bluetoothActions.connectToDevice.success(),
-                        writePacket.request(GetBatteryLevel.createPacket()),
-                        writePacket.request(GetDeviceInfo.createPacket()),
-                        writePacket.request(GetFirmwareVersion.createPacket()),
-                        writeFile.request(new NXTFile("SteeringControl.rxe", SteeringControl))
-                    ]
-                ),
-                catchError(err => of(bluetoothActions.connectToDevice.failure(err)))
-            )
-        )
+        switchMap(action => from(ReactNativeBluetoothSerial.connect(action.payload.id))),
+        mergeMap(() => [
+                bluetoothActions.connectToDevice.success(),
+                writePacket.request(GetBatteryLevel.createPacket()),
+                writePacket.request(GetDeviceInfo.createPacket()),
+                writePacket.request(GetFirmwareVersion.createPacket()),
+                writeFile.request(new NXTFile("SteeringControl.rxe", SteeringControl))
+            ]
+        ),
+        catchError(err => of(bluetoothActions.connectToDevice.failure(err)))
     )
 ;
 export const disconnectFromDevice: Epic<RootAction, RootAction, RootState> = (action$) =>

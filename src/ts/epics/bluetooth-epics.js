@@ -1,5 +1,5 @@
 import { isActionOf } from "typesafe-actions";
-import { catchError, filter, map, mergeMap, switchMap } from "rxjs/operators";
+import { catchError, concatMap, filter, map, switchMap } from "rxjs/operators";
 import { from, of } from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import * as bluetoothActions from '../actions/bluetooth-actions';
@@ -15,12 +15,12 @@ export var requestDevices = function (action$) {
     }));
 };
 export var connectToDevice = function (action$) {
-    return action$.pipe(filter(isActionOf(bluetoothActions.connectToDevice.request)), switchMap(function (action) { return from(ReactNativeBluetoothSerial.connect(action.payload.id)); }), mergeMap(function () { return [
-        bluetoothActions.connectToDevice.success(),
+    return action$.pipe(filter(isActionOf(bluetoothActions.connectToDevice.request)), switchMap(function (action) { return from(ReactNativeBluetoothSerial.connect(action.payload.id)); }), concatMap(function () { return [
         writePacket.request(GetBatteryLevel.createPacket()),
         writePacket.request(GetDeviceInfo.createPacket()),
         writePacket.request(GetFirmwareVersion.createPacket()),
-        writePacket.request(StartProgram.createPacket(SteeringControl))
+        writePacket.request(StartProgram.createPacket(SteeringControl)),
+        bluetoothActions.connectToDevice.success(),
     ]; }), catchError(function (err) { return of(bluetoothActions.connectToDevice.failure(err)); }));
 };
 export var disconnectFromDevice = function (action$) {

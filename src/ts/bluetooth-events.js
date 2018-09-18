@@ -18,7 +18,6 @@ var __spread = (this && this.__spread) || function () {
     for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
     return ar;
 };
-//TODO: handle bluetooth events and converting them to actions
 import BluetoothSerial from "react-native-bluetooth-serial";
 import { disconnect } from "./actions/bluetooth-actions";
 import { TelegramType } from "./nxt-structure/nxt-packet";

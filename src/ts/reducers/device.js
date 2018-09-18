@@ -62,9 +62,9 @@ var initialState = {
         3: __assign({}, initialSensor),
         4: __assign({}, initialSensor)
     }, outputConfig: {
-        config: SteeringConfig.FRONT_STEERING,
         invertSteering: false,
         invertThrottle: false,
+        config: SteeringConfig.FRONT_STEERING,
         power: 0,
         targetAngle: 0,
         frontOutputs: {
@@ -94,6 +94,22 @@ export var device = function (state, action) {
             return __assign({}, state);
         case getType(deviceActions.writePacket.failure):
             return __assign({}, state, { lastMessage: action.payload.error.message });
+        case getType(deviceActions.joystickMove):
+            if (action.payload.name == "STEERING") {
+                return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { targetAngle: action.payload.x * 41 }) });
+            }
+            else {
+                return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { power: action.payload.y * 41 }) });
+            }
+        case getType(deviceActions.joystickRelease):
+            if (action.payload == "STEERING") {
+                return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { targetAngle: 0 }) });
+            }
+            else {
+                return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { power: 0 }) });
+            }
+        case getType(deviceActions.writeConfig.request):
+            return __assign({}, state, { outputConfig: action.payload });
     }
     return state;
 };
@@ -127,3 +143,8 @@ function processIncomingPacket(packet, state) {
     }
     return {};
 }
+export var Mode;
+(function (Mode) {
+    Mode[Mode["JOYSTICK"] = 0] = "JOYSTICK";
+    Mode[Mode["TILT"] = 1] = "TILT";
+})(Mode || (Mode = {}));

@@ -1,5 +1,5 @@
 import {ActionType, getType} from "typesafe-actions";
-import {Mode} from "./joystick";
+import {Mode} from "./device";
 import * as coreActions from "../actions/core-actions";
 
 export type CoreAction = ActionType<typeof coreActions>;

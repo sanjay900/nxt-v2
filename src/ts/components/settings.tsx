@@ -16,6 +16,7 @@ type Props = {
     disconnect: () => void,
     startApp: () => void,
 }
+//TODO: If we get around to making it so that we can configure ports, make it so that there is a save button that verifies the config, and do the verification step here, not elsewhere.
 const Settings: React.SFC<Props> = (props) => {
     const {list, device, connectToDevice, status, disconnect, startApp} = props;
     let button;

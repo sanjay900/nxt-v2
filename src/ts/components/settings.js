@@ -5,6 +5,7 @@ import { connect } from "react-redux";
 import { ConnectionStatus } from "../reducers/bluetooth";
 import { writePacket } from "../actions/device-actions";
 import { StartProgram } from "../nxt-structure/packets/direct/start-program";
+//TODO: If we get around to making it so that we can configure ports, make it so that there is a save button that verifies the config, and do the verification step here, not elsewhere.
 var Settings = function (props) {
     var list = props.list, device = props.device, connectToDevice = props.connectToDevice, status = props.status, disconnect = props.disconnect, startApp = props.startApp;
     var button;

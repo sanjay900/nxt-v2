@@ -1,7 +1,7 @@
-import {Epic} from "redux-observable";
+import {ActionsObservable, Epic} from "redux-observable";
 import {isActionOf} from "typesafe-actions";
 import {RootAction, RootState} from "../store";
-import {catchError, filter, map, mergeMap, switchMap} from "rxjs/operators";
+import {catchError, concatMap, filter, map, switchMap} from "rxjs/operators";
 import {from, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 
@@ -25,16 +25,16 @@ export const requestDevices: Epic<RootAction, RootAction, RootState> = (action$)
         )
     );
 
-export const connectToDevice: Epic<RootAction, RootAction, RootState> = (action$) =>
+export const connectToDevice = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(bluetoothActions.connectToDevice.request)),
         switchMap(action => from(ReactNativeBluetoothSerial.connect(action.payload.id))),
-        mergeMap(() => [
-                bluetoothActions.connectToDevice.success(),
+        concatMap(() => [
                 writePacket.request(GetBatteryLevel.createPacket()),
                 writePacket.request(GetDeviceInfo.createPacket()),
                 writePacket.request(GetFirmwareVersion.createPacket()),
-                writePacket.request(StartProgram.createPacket(SteeringControl))
+                writePacket.request(StartProgram.createPacket(SteeringControl)),
+                bluetoothActions.connectToDevice.success(),
             ]
         ),
         catchError(err => of(bluetoothActions.connectToDevice.failure(err)))

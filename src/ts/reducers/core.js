@@ -10,7 +10,7 @@ var __assign = (this && this.__assign) || function () {
     return __assign.apply(this, arguments);
 };
 import { getType } from "typesafe-actions";
-import { Mode } from "./joystick";
+import { Mode } from "./device";
 import * as coreActions from "../actions/core-actions";
 var initialState = {
     mode: Mode.JOYSTICK

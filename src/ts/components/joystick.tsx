@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {StyleSheet, View} from "react-native";
-import {Joystick as JoystickEvent} from "../reducers/joystick";
+import {Joystick as JoystickEvent} from "../reducers/device";
 import {
   PanGestureHandler,
   PanGestureHandlerGestureEvent,
@@ -8,8 +8,9 @@ import {
   State
 } from "react-native-gesture-handler";
 import {connect} from "react-redux";
-import {joystickMove, joystickRelease, joystickTouch} from "../actions/joystick-actions";
+import {joystickMove} from "../actions/device-actions";
 import {Dispatch} from "redux";
+import {joystickRelease, joystickTouch} from "../actions/device-actions";
 
 const CIRCLE_SIZE = 80;
 const MAX = 70;

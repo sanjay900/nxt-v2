@@ -4,7 +4,7 @@ import Joystick from "./joystick";
 import {connect} from 'react-redux';
 import {State} from "../store";
 import {toggle} from "../actions/core-actions";
-import {Mode} from "../reducers/joystick";
+import {Mode} from "../reducers/device";
 
 type Props = {
     currentMode: Mode,

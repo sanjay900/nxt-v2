@@ -13,9 +13,8 @@ var __extends = (this && this.__extends) || (function () {
 })();
 import { SystemPacket } from "./system-packet";
 import { Packet } from "../packet";
-import { NXTFileMode, NXTFileState } from "../../nxt-file";
+import { NXTFileMode } from "../../nxt-file";
 import { SystemCommand } from "../system-command";
-import { SystemCommandResponse } from "../system-command-response";
 var OpenWrite = /** @class */ (function (_super) {
     __extends(OpenWrite, _super);
     function OpenWrite() {
@@ -28,19 +27,12 @@ var OpenWrite = /** @class */ (function (_super) {
     };
     OpenWrite.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
-        if (this.status == SystemCommandResponse.FILE_ALREADY_EXISTS) {
-            this.file.status = NXTFileState.FILE_EXISTS;
-        }
-        else if (this.status != SystemCommandResponse.SUCCESS) {
-            this.file.status = NXTFileState.ERROR;
-        }
     };
     OpenWrite.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);
         Packet.writeFileName(this.file.name, data);
         Packet.writeLong(this.file.size, data);
         this.file.mode = NXTFileMode.WRITE;
-        this.file.status = NXTFileState.OPENING;
     };
     return OpenWrite;
 }(SystemPacket));

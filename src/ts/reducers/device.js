@@ -16,7 +16,6 @@ import { getType } from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
 import { DirectCommand } from "../nxt-structure/packets/direct-command";
 import { connectToDevice } from "../actions/bluetooth-actions";
-import { DirectCommandResponse } from "../nxt-structure/packets/direct-command-response";
 var initialSensor = {
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
@@ -87,18 +86,13 @@ export var device = function (state, action) {
         case getType(deviceActions.writeFileProgress):
             return __assign({}, state, { info: __assign({}, state.info, { currentFile: action.payload.packet.file }) });
         case getType(deviceActions.writeFile.failure):
-            return __assign({}, state, { lastMessage: action.payload.message });
+            console.error(action.payload.error.message);
+            return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.writePacket.request):
             return __assign({}, state, processOutgoingPacket(action.payload, state));
         case getType(deviceActions.writePacket.success):
             return __assign({}, state);
         case getType(deviceActions.writePacket.failure):
-            //If a program fails to start, we should upload it, not report an error.
-            if (action.payload.packet.id == DirectCommand.START_PROGRAM &&
-                action.payload.packet.status == DirectCommandResponse.OUT_OF_RANGE) {
-                var start = action.payload.packet;
-                return __assign({}, state, { info: __assign({}, state.info, { programToUpload: start.programName }) });
-            }
             return __assign({}, state, { lastMessage: action.payload.error.message });
     }
     return state;

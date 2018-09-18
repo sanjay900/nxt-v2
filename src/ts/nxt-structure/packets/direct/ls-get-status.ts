@@ -17,7 +17,7 @@ export class LsGetStatus extends DirectPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    this.bytesReady = data.shift();
+    this.bytesReady = data.shift()!;
   }
 
   protected writePacketData(expectResponse: boolean, data: number[]): void {

@@ -5,11 +5,15 @@ import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import { Buffer } from "buffer";
 import * as deviceActions from '../actions/device-actions';
 import { writeFileProgress } from '../actions/device-actions';
+import { NXTFile } from "../nxt-structure/nxt-file";
 import { Write } from "../nxt-structure/packets/system/write";
 import { Close } from "../nxt-structure/packets/system/close";
 import { OpenWrite } from "../nxt-structure/packets/system/open-write";
 import { StartProgram } from "../nxt-structure/packets/direct/start-program";
 import { Actions } from "react-native-router-flux";
+import { DirectCommandResponse } from "../nxt-structure/packets/direct-command-response";
+import { Alert } from "react-native";
+import { fileList, SteeringControl } from "../utils/Files";
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
  * @param {Packet} packet the packet to write
@@ -19,7 +23,26 @@ function writePacket(packet) {
     return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true))).then(function () { return packet; }));
 }
 export var sendPacket = function (action$) {
-    return action$.pipe(filter(isActionOf(deviceActions.writePacket.request)), switchMap(function (action) { return writePacket(action.payload); }), switchMap(function (action) { return from(action.responseReceived); }), map(deviceActions.writePacket.success), catchError(function (err) { return of(deviceActions.writePacket.failure(err)); }));
+    return action$.pipe(filter(isActionOf(deviceActions.writePacket.request)), switchMap(function (action) { return writePacket(action.payload); }), switchMap(function (action) { return from(action.responseReceived); }), map(deviceActions.writePacket.success), catchError(function (err) {
+        if (err.packet instanceof StartProgram && err.packet.status == DirectCommandResponse.OUT_OF_RANGE) {
+            var file_1 = new NXTFile(err.packet.programName, fileList[err.packet.programName]);
+            file_1.autoStart = true;
+            if (file_1.name == SteeringControl) {
+                return from(new Promise(function (resolve) {
+                    Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
+                        "Would you like to upload the NXT motor control program?\n" +
+                        "Note that without this program, motor control will not work.", [
+                        { text: "Upload Program", onPress: function () { return resolve(deviceActions.writeFile.request(file_1)); } },
+                        { text: "Cancel", style: 'cancel' }
+                    ]);
+                }));
+            }
+            else {
+                return of(deviceActions.writeFile.request(file_1));
+            }
+        }
+        return of(deviceActions.writePacket.failure(err));
+    }));
 };
 export var writeFile = function (action$) {
     //Baiscally, we handle writing a file here. We send out a openwrite, wait for it to respond and then

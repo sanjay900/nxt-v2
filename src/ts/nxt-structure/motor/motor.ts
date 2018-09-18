@@ -18,7 +18,6 @@ import {
 } from "./motor-constants";
 
 export class MotorProvider {
-  private static MOTOR_PROGRAM: string = "SteeringControl.rxe";
   private targetAngle: number = 0;
   private hasUpdate: boolean = false;
   private power: number = 0;

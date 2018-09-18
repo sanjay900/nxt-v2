@@ -12,10 +12,8 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import { SystemPacket } from "./system-packet";
-import { NXTFileState } from "../../nxt-file";
 import { SystemCommand } from "../system-command";
 import { Packet } from "../packet";
-import { SystemCommandResponse } from "../system-command-response";
 var Delete = /** @class */ (function (_super) {
     __extends(Delete, _super);
     function Delete() {
@@ -28,12 +26,6 @@ var Delete = /** @class */ (function (_super) {
     };
     Delete.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
-        if (this.status == SystemCommandResponse.SUCCESS) {
-            this.file.status = NXTFileState.DELETED;
-        }
-        else {
-            this.file.status = NXTFileState.ERROR;
-        }
     };
     Delete.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);

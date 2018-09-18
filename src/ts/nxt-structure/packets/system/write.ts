@@ -1,6 +1,5 @@
 import {SystemPacket} from "./system-packet";
-import {SystemCommandResponse} from "../system-command-response";
-import {NXTFile, NXTFileState} from "../../nxt-file";
+import {NXTFile} from "../../nxt-file";
 import {SystemCommand} from "../system-command";
 
 export class Write extends SystemPacket {
@@ -20,15 +19,11 @@ export class Write extends SystemPacket {
     super.readPacket(data);
     //TODO: we should technically handle this, but i also really do not care
     let handle: number = data.shift()!;
-    if (this.status != SystemCommandResponse.SUCCESS) {
-      this.file.status = NXTFileState.ERROR;
-    }
   }
 
   protected writePacketData(expectResponse: boolean, data: number[]): void {
     super.writePacketData(expectResponse, data);
     data.push(this.file.handle);
     data.push(...this.file.nextChunk());
-    this.file.status = NXTFileState.WRITING;
   }
 }

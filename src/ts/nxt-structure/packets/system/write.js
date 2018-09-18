@@ -32,8 +32,6 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 import { SystemPacket } from "./system-packet";
-import { SystemCommandResponse } from "../system-command-response";
-import { NXTFileState } from "../../nxt-file";
 import { SystemCommand } from "../system-command";
 var Write = /** @class */ (function (_super) {
     __extends(Write, _super);
@@ -49,15 +47,11 @@ var Write = /** @class */ (function (_super) {
         _super.prototype.readPacket.call(this, data);
         //TODO: we should technically handle this, but i also really do not care
         var handle = data.shift();
-        if (this.status != SystemCommandResponse.SUCCESS) {
-            this.file.status = NXTFileState.ERROR;
-        }
     };
     Write.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);
         data.push(this.file.handle);
         data.push.apply(data, __spread(this.file.nextChunk()));
-        this.file.status = NXTFileState.WRITING;
     };
     return Write;
 }(SystemPacket));

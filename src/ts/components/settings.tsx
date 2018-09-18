@@ -5,21 +5,25 @@ import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import {State} from "../store";
 import {ConnectionStatus} from "../reducers/bluetooth";
+import {writePacket} from "../actions/device-actions";
+import {StartProgram} from "../nxt-structure/packets/direct/start-program";
 
 type Props = {
-    connectToDevice: (device: Device) => void,
     device?: Device,
     list: Device[],
     status: ConnectionStatus,
+    connectToDevice: (device: Device) => void,
     disconnect: () => void,
+    startApp: () => void,
 }
 const Settings: React.SFC<Props> = (props) => {
-    const {list, device, connectToDevice, status, disconnect} = props;
+    const {list, device, connectToDevice, status, disconnect, startApp} = props;
     let button;
     if (status == ConnectionStatus.DISCONNECTED) {
         button = <Button onPress={() => device && connectToDevice(device)} title={"Connect to device"}/>
     } else {
-        button = <Button onPress={() => device && disconnect()} title={"Disconnect from device"}/>
+        button = <View><Button onPress={() => device && disconnect()} title={"Disconnect from device"}/>
+            <Button onPress={startApp} title={"Start Motor App"}/></View>
     }
     let devices = list.map(device => <Picker.Item key={device.id} label={device.name} value={device}/>);
     return (
@@ -44,7 +48,10 @@ const mapStateToProps = (state: State) => {
 };
 const mapDispatchToProps = (dispatch: Function) => ({
     connectToDevice: (device: Device) => dispatch(connectToDevice.request(device)),
-    disconnect: () => dispatch(disconnectFromDevice.request())
+    disconnect: () => dispatch(disconnectFromDevice.request()),
+    startApp: () => {
+        dispatch(writePacket.request(StartProgram.createPacket("SteeringControl.rxe")))
+    }
 });
 export default connect(mapStateToProps, mapDispatchToProps)(Settings);
 const styles = StyleSheet.create({

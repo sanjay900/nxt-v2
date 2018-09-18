@@ -27,11 +27,11 @@ export class GetInputValues extends DirectPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    this.port = data.shift();
+    this.port = data.shift()!;
     this.valid = Packet.readBoolean(data);
     this.calibrated = Packet.readBoolean(data);
-    this.type = data.shift();
-    this.mode = data.shift();
+    this.type = data.shift()!;
+    this.mode = data.shift()!;
     this.rawValue = Packet.readUWord(data);
     this.normalizedValue = Packet.readUWord(data);
     this.scaledValue = Packet.readSWord(data);

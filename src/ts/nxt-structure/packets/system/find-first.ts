@@ -20,7 +20,7 @@ export class FindFirst extends SystemPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    this.handle = data.shift();
+    this.handle = data.shift()!;
     this.fileName = Packet.readAsciiz(data, Packet.FILE_NAME_LENGTH);
     this.fileSize = Packet.readLong(data);
   }

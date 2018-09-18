@@ -14,7 +14,7 @@ var __extends = (this && this.__extends) || (function () {
 import { SystemPacket } from "./system-packet";
 import { SystemCommand } from "../system-command";
 import { Packet } from "../packet";
-import { NXTFileMode, NXTFileState } from "../../nxt-file";
+import { NXTFileMode } from "../../nxt-file";
 var OpenRead = /** @class */ (function (_super) {
     __extends(OpenRead, _super);
     function OpenRead() {
@@ -33,7 +33,6 @@ var OpenRead = /** @class */ (function (_super) {
         _super.prototype.writePacketData.call(this, expectResponse, data);
         Packet.writeFileName(this.file.name, data);
         this.file.mode = NXTFileMode.READ;
-        this.file.status = NXTFileState.OPENING;
     };
     return OpenRead;
 }(SystemPacket));

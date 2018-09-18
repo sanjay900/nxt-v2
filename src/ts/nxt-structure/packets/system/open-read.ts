@@ -1,7 +1,7 @@
 import {SystemPacket} from "./system-packet";
 import {SystemCommand} from "../system-command";
 import {Packet} from "../packet";
-import {NXTFile, NXTFileMode, NXTFileState} from "../../nxt-file";
+import {NXTFile, NXTFileMode} from "../../nxt-file";
 
 export class OpenRead extends SystemPacket {
   public file: NXTFile;
@@ -25,6 +25,5 @@ export class OpenRead extends SystemPacket {
     super.writePacketData(expectResponse, data);
     Packet.writeFileName(this.file.name, data);
     this.file.mode = NXTFileMode.READ;
-    this.file.status = NXTFileState.OPENING;
   }
 }

@@ -1,8 +1,7 @@
 import {SystemPacket} from "./system-packet";
-import {NXTFile, NXTFileState} from "../../nxt-file";
+import {NXTFile} from "../../nxt-file";
 import {SystemCommand} from "../system-command";
 import {Packet} from "../packet";
-import {SystemCommandResponse} from "../system-command-response";
 
 export class Delete extends SystemPacket {
   public file: NXTFile;
@@ -19,11 +18,6 @@ export class Delete extends SystemPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    if (this.status == SystemCommandResponse.SUCCESS) {
-      this.file.status = NXTFileState.DELETED;
-    } else {
-      this.file.status = NXTFileState.ERROR;
-    }
   }
 
   protected writePacketData(expectResponse: boolean, data: number[]): void {

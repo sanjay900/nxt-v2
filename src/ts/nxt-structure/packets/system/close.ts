@@ -1,33 +1,26 @@
 import {SystemPacket} from "./system-packet";
-import {NXTFile, NXTFileState} from "../../nxt-file";
+import {NXTFile} from "../../nxt-file";
 import {SystemCommand} from "../system-command";
-import {SystemCommandResponse} from "../system-command-response";
 
 export class Close extends SystemPacket {
-  public file: NXTFile;
+    public file: NXTFile;
 
-  constructor() {
-    super(SystemCommand.CLOSE);
-  }
-
-  public static createPacket(file: NXTFile) {
-    let packet = new Close();
-    packet.file = file;
-    return packet;
-  }
-
-  readPacket(data: number[]): void {
-    super.readPacket(data);
-    if (this.status != SystemCommandResponse.SUCCESS) {
-      this.file.status = NXTFileState.ERROR;
-    } else {
-      this.file.status = NXTFileState.WRITTEN;
+    constructor() {
+        super(SystemCommand.CLOSE);
     }
-  }
 
-  protected writePacketData(expectResponse: boolean, data: number[]): void {
-    super.writePacketData(expectResponse, data);
-    data.push(this.file.handle);
-    this.file.status = NXTFileState.CLOSING;
-  }
+    public static createPacket(file: NXTFile) {
+        let packet = new Close();
+        packet.file = file;
+        return packet;
+    }
+
+    readPacket(data: number[]): void {
+        super.readPacket(data);
+    }
+
+    protected writePacketData(expectResponse: boolean, data: number[]): void {
+        super.writePacketData(expectResponse, data);
+        data.push(this.file.handle);
+    }
 }

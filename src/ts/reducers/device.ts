@@ -59,8 +59,7 @@ export type DeviceState = {
             protocol: string,
             firmware: string
         },
-        currentFile?: NXTFile,
-        programToUpload?: string
+        currentFile?: NXTFile
     },
     outputs: {
         A: SystemOutput,
@@ -161,7 +160,8 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
         case getType(deviceActions.writeFileProgress):
             return {...state, info: {...state.info, currentFile: action.payload.packet.file}};
         case getType(deviceActions.writeFile.failure):
-            return {...state, lastMessage: action.payload.message};
+            console.error(action.payload.error.message);
+            return {...state, lastMessage: action.payload.error.message};
         case getType(deviceActions.writePacket.request):
             return {...state, ...processOutgoingPacket(action.payload, state)};
 
@@ -169,15 +169,6 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             return {...state};
 
         case getType(deviceActions.writePacket.failure):
-            //If a program fails to start, we should upload it, not report an error.
-            if (action.payload.packet.id == DirectCommand.START_PROGRAM &&
-                action.payload.packet.status == DirectCommandResponse.OUT_OF_RANGE) {
-                let start: StartProgram = action.payload.packet as StartProgram;
-                return {
-                    ...state,
-                    info: {...state.info, programToUpload: start.programName}
-                };
-            }
             return {...state, lastMessage: action.payload.error.message};
     }
     return state;

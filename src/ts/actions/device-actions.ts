@@ -21,7 +21,7 @@ export const writeFile = createAsyncAction(
   'writeFileRequest',
   'writeFileResponse',
   'writeFileFailure'
-)<NXTFile, void, Error>();
+)<NXTFile, void, PacketError>();
 
 export const writeFileProgress = createAction("writeFileProgress", resolve => {
     return (packet: Write) => resolve({packet});

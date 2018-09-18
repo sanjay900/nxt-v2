@@ -1,8 +1,7 @@
 import {SystemPacket} from "./system-packet";
 import {Packet} from "../packet";
-import {NXTFile, NXTFileMode, NXTFileState} from "../../nxt-file";
+import {NXTFile, NXTFileMode} from "../../nxt-file";
 import {SystemCommand} from "../system-command";
-import {SystemCommandResponse} from "../system-command-response";
 
 export class OpenWrite extends SystemPacket {
   public file: NXTFile;
@@ -19,11 +18,6 @@ export class OpenWrite extends SystemPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    if (this.status == SystemCommandResponse.FILE_ALREADY_EXISTS) {
-      this.file.status = NXTFileState.FILE_EXISTS;
-    } else if (this.status != SystemCommandResponse.SUCCESS) {
-      this.file.status = NXTFileState.ERROR;
-    }
   }
 
   protected writePacketData(expectResponse: boolean, data: number[]): void {
@@ -31,6 +25,5 @@ export class OpenWrite extends SystemPacket {
     Packet.writeFileName(this.file.name, data);
     Packet.writeLong(this.file.size, data);
     this.file.mode = NXTFileMode.WRITE;
-    this.file.status = NXTFileState.OPENING;
   }
 }

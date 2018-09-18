@@ -12,9 +12,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import { SystemPacket } from "./system-packet";
-import { NXTFileState } from "../../nxt-file";
 import { SystemCommand } from "../system-command";
-import { SystemCommandResponse } from "../system-command-response";
 var Close = /** @class */ (function (_super) {
     __extends(Close, _super);
     function Close() {
@@ -27,17 +25,10 @@ var Close = /** @class */ (function (_super) {
     };
     Close.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
-        if (this.status != SystemCommandResponse.SUCCESS) {
-            this.file.status = NXTFileState.ERROR;
-        }
-        else {
-            this.file.status = NXTFileState.WRITTEN;
-        }
     };
     Close.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);
         data.push(this.file.handle);
-        this.file.status = NXTFileState.CLOSING;
     };
     return Close;
 }(SystemPacket));

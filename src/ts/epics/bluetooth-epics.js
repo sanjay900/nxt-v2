@@ -7,6 +7,7 @@ import { writePacket } from "../actions/device-actions";
 import { GetBatteryLevel } from "../nxt-structure/packets/direct/get-battery-level";
 import { GetDeviceInfo } from "../nxt-structure/packets/system/get-device-info";
 import { GetFirmwareVersion } from "../nxt-structure/packets/system/get-firmware-version";
+import { SteeringControl } from "../utils/Files";
 import { StartProgram } from "../nxt-structure/packets/direct/start-program";
 export var requestDevices = function (action$) {
     return action$.pipe(filter(isActionOf(bluetoothActions.listDevices.request)), switchMap(function () {
@@ -19,7 +20,7 @@ export var connectToDevice = function (action$) {
         writePacket.request(GetBatteryLevel.createPacket()),
         writePacket.request(GetDeviceInfo.createPacket()),
         writePacket.request(GetFirmwareVersion.createPacket()),
-        writePacket.request(StartProgram.createPacket("SteeringControl.rxe"))
+        writePacket.request(StartProgram.createPacket(SteeringControl))
     ]; }), catchError(function (err) { return of(bluetoothActions.connectToDevice.failure(err)); }));
 };
 export var disconnectFromDevice = function (action$) {

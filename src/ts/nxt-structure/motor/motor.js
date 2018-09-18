@@ -335,7 +335,6 @@ var MotorProvider = /** @class */ (function () {
         //   alert.present();
         // }
     }
-    MotorProvider.MOTOR_PROGRAM = "SteeringControl.rxe";
     MotorProvider.CONFIG_PACKET_ID = "B";
     MotorProvider.DRIVE_PACKET_ID = "A";
     MotorProvider.PACKET_MAILBOX = 0;

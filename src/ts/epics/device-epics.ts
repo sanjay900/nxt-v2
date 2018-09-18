@@ -1,6 +1,6 @@
-import {ActionsObservable, Epic} from "redux-observable";
+import {ActionsObservable} from "redux-observable";
 import {isActionOf} from "typesafe-actions";
-import {RootAction, RootState} from "../store";
+import {RootAction} from "../store";
 import {catchError, expand, filter, map, share, switchMap, tap} from "rxjs/operators";
 import {EMPTY, from, merge, Observable, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
@@ -14,9 +14,11 @@ import {Write} from "../nxt-structure/packets/system/write";
 import {Close} from "../nxt-structure/packets/system/close";
 import {OpenWrite} from "../nxt-structure/packets/system/open-write";
 import {StartProgram} from "../nxt-structure/packets/direct/start-program";
-import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {PacketError} from "../reducers/device";
 import {Actions} from "react-native-router-flux";
+import {DirectCommandResponse} from "../nxt-structure/packets/direct-command-response";
+import {Alert} from "react-native";
+import {fileList, SteeringControl} from "../utils/Files";
 
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
@@ -27,14 +29,33 @@ function writePacket<T extends Packet>(packet: T): Observable<T> {
     return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true))).then(() => packet));
 }
 
-export const sendPacket: Epic<RootAction, RootAction, RootState> = (action$) =>
+export const sendPacket = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.writePacket.request)),
         switchMap((action: { payload: Packet }) => writePacket(action.payload)),
         switchMap((action: Packet) => from(action.responseReceived)),
         map(deviceActions.writePacket.success),
-        catchError((err: PacketError) => of(deviceActions.writePacket.failure(err)))
+        catchError((err: PacketError) => {
+            if (err.packet instanceof StartProgram && err.packet.status == DirectCommandResponse.OUT_OF_RANGE) {
+                let file = new NXTFile(err.packet.programName, fileList[err.packet.programName]);
+                file.autoStart = true;
+                if (file.name == SteeringControl) {
+                    return from(new Promise(resolve => {
+                        Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
+                            "Would you like to upload the NXT motor control program?\n" +
+                            "Note that without this program, motor control will not work.", [
+                            {text: "Upload Program", onPress: () => resolve(deviceActions.writeFile.request(file))},
+                            {text: "Cancel", style: 'cancel'}
+                        ]);
+                    }))
+                } else {
+                    return of(deviceActions.writeFile.request(file));
+                }
+            }
+            return of(deviceActions.writePacket.failure(err))
+        })
     );
+
 export const writeFile = (action$: ActionsObservable<RootAction>) => {
     //Baiscally, we handle writing a file here. We send out a openwrite, wait for it to respond and then
     //endlessly write (expand recursively calls itself) we then split into two branches and share the current result
@@ -61,7 +82,7 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
         actions.pipe(
             filter(data => !data.file.hasWritten()),
             map(writeFileProgress),
-            catchError(err => of(deviceActions.writeFile.failure(err))),
+            catchError((err: PacketError) => of(deviceActions.writeFile.failure(err))),
         ),
         actions.pipe(
             filter(data => data.file.hasWritten()),
@@ -70,10 +91,10 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
                 if (packet.file.autoStart) {
                     return writePacket(StartProgram.createPacket(packet.file.name));
                 }
-                return EMPTY
+                return EMPTY;
             }),
             map(deviceActions.writeFile.success),
-            catchError(err => of(deviceActions.writeFile.failure(err))),
+            catchError((err: PacketError) => of(deviceActions.writeFile.failure(err))),
         )
     )
 };

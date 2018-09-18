@@ -23,8 +23,8 @@ export class MessageRead extends DirectPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    this.localInbox = data.shift();
-    let messageSize: number = data.shift();
+    this.localInbox = data.shift()!;
+    let messageSize: number = data.shift()!;
     this.message = Packet.readAsciiz(data, MessageRead.MESSAGE_LENGTH);
     this.message = this.message.substring(0, messageSize);
   }

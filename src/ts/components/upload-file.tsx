@@ -25,7 +25,7 @@ const UploadFile: React.SFC<Props> = ({deviceInfo}: Props) => {
             <Text style={styles.margin}>{file.name}</Text>
             <FormLabel>Status</FormLabel>
             <Progress.Bar progress={file.percentage} style={styles.margin}/>
-            <Text style={styles.margin}>{file.hasWritten()?"Uploading File":"Upload Complete!"}</Text>
+            <Text style={styles.margin}>{file.hasWritten() ? "Upload Complete!" : "Uploading File"}</Text>
             <View style={styles.container}/>
             <Button title="Return" onPress={Actions.pop}/>
         </View>

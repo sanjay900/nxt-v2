@@ -3,14 +3,17 @@ import React from "react";
 import { connectToDevice, disconnectFromDevice } from "../actions/bluetooth-actions";
 import { connect } from "react-redux";
 import { ConnectionStatus } from "../reducers/bluetooth";
+import { writePacket } from "../actions/device-actions";
+import { StartProgram } from "../nxt-structure/packets/direct/start-program";
 var Settings = function (props) {
-    var list = props.list, device = props.device, connectToDevice = props.connectToDevice, status = props.status, disconnect = props.disconnect;
+    var list = props.list, device = props.device, connectToDevice = props.connectToDevice, status = props.status, disconnect = props.disconnect, startApp = props.startApp;
     var button;
     if (status == ConnectionStatus.DISCONNECTED) {
         button = <Button onPress={function () { return device && connectToDevice(device); }} title={"Connect to device"}/>;
     }
     else {
-        button = <Button onPress={function () { return device && disconnect(); }} title={"Disconnect from device"}/>;
+        button = <View><Button onPress={function () { return device && disconnect(); }} title={"Disconnect from device"}/>
+            <Button onPress={startApp} title={"Start Motor App"}/></View>;
     }
     var devices = list.map(function (device) { return <Picker.Item key={device.id} label={device.name} value={device}/>; });
     return (<View style={styles.container}>
@@ -30,7 +33,10 @@ var mapStateToProps = function (state) {
 };
 var mapDispatchToProps = function (dispatch) { return ({
     connectToDevice: function (device) { return dispatch(connectToDevice.request(device)); },
-    disconnect: function () { return dispatch(disconnectFromDevice.request()); }
+    disconnect: function () { return dispatch(disconnectFromDevice.request()); },
+    startApp: function () {
+        dispatch(writePacket.request(StartProgram.createPacket("SteeringControl.rxe")));
+    }
 }); };
 export default connect(mapStateToProps, mapDispatchToProps)(Settings);
 var styles = StyleSheet.create({

@@ -19,7 +19,7 @@ export class LsRead extends DirectPacket {
 
   readPacket(data: number[]): void {
     super.readPacket(data);
-    this.bytesRead = data.shift();
+    this.bytesRead = data.shift()!;
     this.rxData = data.splice(0, LsRead.RX_DATA_SIZE);
   }
 

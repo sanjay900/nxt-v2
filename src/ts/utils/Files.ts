@@ -1,5 +1,5 @@
-import { Buffer } from 'buffer';
-var file64 = "TWluZHN0b3Jtc05YVAAABTkCNgegBOEESwKWAgEAGQBWBSAALggGAAAABgEEAAoBCAAKAQwACgEQ\n" +
+import {Buffer} from 'buffer';
+const file64 = "TWluZHN0b3Jtc05YVAAABTkCNgegBOEESwKWAgEAGQBWBSAALggGAAAABgEEAAoBCAAKAQwACgEQ\n" +
     "AAoBFAAKARgABgAcAAYBIAAGACQABgAoAAYALAAGADAABgA0AAYAOAAGADwABgBAAAYBRAAJAEgA\n" +
     "BgBMAAYAUAAGAVQACQBYAAYAXAAGAWAABgFkAAYBaAAGAWwABgFwAAYBdAAFAHgABQF8AAYBgAAF\n" +
     "AYQABgCIAAUAjAAFAZAABgGUAAYBmAAGAZwABgGgAAkApAAGAKgACQCsAAYAsAAJALQABgC4AAYB\n" +
@@ -138,4 +138,10 @@ var file64 = "TWluZHN0b3Jtc05YVAAABTkCNgegBOEESwKWAgEAGQBWBSAALggGAAAABgEEAAoBCA
     "OQAlABGB7AAlACYAE0gmACdkBQDsABRIJQARgAkBOQAbAAaA7AAJAewAC0gbACdkBQAJAe1IOQAS\n" +
     "ZAkBJgAGgAkBCwEJASpgAAACACaECADsAA8BAkg7ACVABAABSDwAFqD1Ae0B5QA9APJI9QEqYAAA\n" +
     "AAA+KRtgEQEmAC1I5QDZSz8APioqYAAAAAAvQCIA\n";
-export default Array.from(new Buffer(file64, "base64"));
+export type FileList = {
+    [key: string]: number[]
+}
+export const SteeringControl = "SteeringControl.rxe";
+export const fileList: FileList  = {
+    SteeringControl: Array.from(new Buffer(file64, "base64"))
+};

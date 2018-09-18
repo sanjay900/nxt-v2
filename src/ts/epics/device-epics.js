@@ -35,7 +35,7 @@ export var motorHandler = function (action$, state$) {
         if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
             return empty();
         }
-        if (out.config == SteeringConfig.TANK && !out.tankOutputs.leftPort || !out.tankOutputs.rightPort) {
+        if (out.config == SteeringConfig.TANK && (!out.tankOutputs.leftPort || !out.tankOutputs.rightPort)) {
             out.targetAngle = 0;
             out.power = 0;
         }
@@ -48,6 +48,17 @@ export var motorHandler = function (action$, state$) {
             var outPower = out.power * (out.invertThrottle ? -1 : 1);
             return writePacket(MessageWrite.createPacket(PACKET_MAILBOX, DRIVE_PACKET_ID + numberToNXT(outAngle) + numberToNXT(outPower))).pipe(map(function () { return out; }));
         }
+        return of(out).pipe(delay(100));
+    }), map(deviceActions.startMotorHandler.success), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }));
+};
+export var sensorHandler = function (action$, state$) {
+    return action$.pipe(filter(isActionOf(deviceActions.startSensorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function (prevOut) {
+        var state = state$.value;
+        var out = state.device.outputConfig;
+        if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
+            return empty();
+        }
+        //TODO: read sensors here and map them,
         return of(out).pipe(delay(100));
     }), map(deviceActions.startMotorHandler.success), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }));
 };

@@ -16,7 +16,11 @@ export const writeConfig = createAsyncAction(
     'writeConfigResponse',
     'writeConfigFailure'
 )<OutputConfig, void, PacketError>();
-
+export const startSensorHandler = createAsyncAction(
+    'startSensorHandlerRequest',
+    'startSensorHandlerResponse',
+    'startSensorHandlertFailure'
+)<void, void, PacketError>();
 export const startMotorHandler = createAsyncAction(
     'startMotorHandlerRequest',
     'startMotorHandlerResponse',

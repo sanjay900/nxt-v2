@@ -3,7 +3,6 @@ import {SystemCommandResponse} from "./system-command-response";
 import {SystemCommand} from "./system-command";
 import {DirectCommand} from "./direct-command";
 import 'mdn-polyfills/String.prototype.padEnd';
-import {packetBuffer} from "../../bluetooth-events";
 import {Subject} from "rxjs";
 
 export abstract class Packet {
@@ -78,7 +77,6 @@ export abstract class Packet {
         let header: number[] = [];
         Packet.writeWord(data.length, header);
         data.unshift(...header);
-        packetBuffer.push(this);
         return new Uint8Array(data);
     }
 

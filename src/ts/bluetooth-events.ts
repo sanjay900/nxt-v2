@@ -10,7 +10,6 @@ import {SystemCommandResponse} from "./nxt-structure/packets/system-command-resp
 import {DirectCommandResponse} from "./nxt-structure/packets/direct-command-response";
 
 let buffer: number[] = [];
-export let packetBuffer: Packet[] = [];
 
 export function initEvents(store: Store) {
     BluetoothSerial.on('bluetoothEnabled', () => {
@@ -45,9 +44,9 @@ function parsePacket(data: number[], store: Store<RootState>) {
         //What we do here, is since it is a reply, we look for the packet that is being replied to, and
         //then update that packet with the response. We then check the status, and throw errors if required.
         let messageType: number = data.shift()!;
-        let packetIndex: number = packetBuffer.findIndex(p => p.id == messageType);
+        let packetIndex: number = store.getState().device.packetBuffer.findIndex(p => p.id == messageType);
         if (packetIndex != -1) {
-            let packet: Packet = packetBuffer.splice(packetIndex, 1)[0];
+            let packet: Packet = store.getState().device.packetBuffer.splice(packetIndex, 1)[0];
             packet.readPacket(data);
             store.dispatch(readPacket(packet, packet.id));
             if (packet.status != 0) {

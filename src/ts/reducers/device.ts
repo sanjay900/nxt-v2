@@ -73,6 +73,7 @@ export type DeviceState = {
         },
         currentFile?: NXTFile
     },
+    packetBuffer: Packet[],
     outputs: {
         A: SystemOutput,
         B: SystemOutput,
@@ -111,6 +112,7 @@ const initialOutput: SystemOutput = {
     dataHistory: []
 };
 const initialState: DeviceState = {
+    packetBuffer: [],
     info: {
         currentProgramName: "None",
         deviceName: "NXT",
@@ -168,6 +170,7 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             return {...state};
 
         case getType(deviceActions.writePacket.failure):
+            console.error(action.payload);
             return {...state, lastMessage: action.payload.error.message};
 
         case getType(deviceActions.joystickMove):
@@ -193,10 +196,10 @@ function processOutgoingPacket(packet: Packet, state: DeviceState): any {
         case SystemCommand.SET_BRICK_NAME:
             let {name: deviceName} = packet as SetBrickName;
             return {
-                info: {...state.info, deviceName}
+                info: {...state.info, deviceName}, packetBuffer: [...state.packetBuffer, packet]
             };
     }
-    return {};
+    return {packetBuffer: [...state.packetBuffer, packet]};
 }
 
 function processIncomingPacket(packet: Packet, state: DeviceState): any {

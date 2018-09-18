@@ -9,6 +9,26 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __read = (this && this.__read) || function (o, n) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator];
+    if (!m) return o;
+    var i = m.call(o), r, ar = [], e;
+    try {
+        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
+    }
+    catch (error) { e = { error: error }; }
+    finally {
+        try {
+            if (r && !r.done && (m = i["return"])) m.call(i);
+        }
+        finally { if (e) throw e.error; }
+    }
+    return ar;
+};
+var __spread = (this && this.__spread) || function () {
+    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
+    return ar;
+};
 import { MultiOutputPort, OutputRegulationMode, OutputRunState, SingleOutputPort, SteeringConfig } from "../nxt-structure/motor/motor-constants";
 import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor/sensor";
 import { SystemCommand } from "../nxt-structure/packets/system-command";
@@ -41,6 +61,7 @@ var initialOutput = {
     dataHistory: []
 };
 var initialState = {
+    packetBuffer: [],
     info: {
         currentProgramName: "None",
         deviceName: "NXT",
@@ -93,6 +114,7 @@ export var device = function (state, action) {
         case getType(deviceActions.writePacket.success):
             return __assign({}, state);
         case getType(deviceActions.writePacket.failure):
+            console.error(action.payload);
             return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.joystickMove):
             if (action.payload.name == "STEERING") {
@@ -118,10 +140,10 @@ function processOutgoingPacket(packet, state) {
         case SystemCommand.SET_BRICK_NAME:
             var deviceName = packet.name;
             return {
-                info: __assign({}, state.info, { deviceName: deviceName })
+                info: __assign({}, state.info, { deviceName: deviceName }), packetBuffer: __spread(state.packetBuffer, [packet])
             };
     }
-    return {};
+    return { packetBuffer: __spread(state.packetBuffer, [packet]) };
 }
 function processIncomingPacket(packet, state) {
     switch (packet.id) {

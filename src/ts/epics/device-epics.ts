@@ -45,7 +45,7 @@ export const motorHandler = (action$: ActionsObservable<RootAction>, state$: Sta
             if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
                 return empty();
             }
-            if (out.config == SteeringConfig.TANK && !out.tankOutputs.leftPort || !out.tankOutputs.rightPort) {
+            if (out.config == SteeringConfig.TANK && (!out.tankOutputs.leftPort || !out.tankOutputs.rightPort)) {
                 out.targetAngle = 0;
                 out.power = 0;
             }
@@ -58,6 +58,23 @@ export const motorHandler = (action$: ActionsObservable<RootAction>, state$: Sta
                 let outPower = out.power * (out.invertThrottle ? -1 : 1);
                 return writePacket(MessageWrite.createPacket(PACKET_MAILBOX, DRIVE_PACKET_ID + numberToNXT(outAngle) + numberToNXT(outPower))).pipe(map(() => out));
             }
+            return of(out).pipe(delay(100));
+        }),
+        map(deviceActions.startMotorHandler.success),
+        catchError((err: PacketError) => of(deviceActions.startMotorHandler.failure(err))),
+    );
+
+export const sensorHandler = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
+    action$.pipe(
+        filter(isActionOf(deviceActions.startSensorHandler.request)),
+        map(() => state$.value.device.outputConfig),
+        expand(prevOut => {
+            let state = state$.value;
+            let out = state.device.outputConfig;
+            if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
+                return empty();
+            }
+            //TODO: read sensors here and map them,
             return of(out).pipe(delay(100));
         }),
         map(deviceActions.startMotorHandler.success),

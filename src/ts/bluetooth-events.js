@@ -26,7 +26,6 @@ import { readPacket } from "./actions/device-actions";
 import { SystemCommandResponse } from "./nxt-structure/packets/system-command-response";
 import { DirectCommandResponse } from "./nxt-structure/packets/direct-command-response";
 var buffer = [];
-export var packetBuffer = [];
 export function initEvents(store) {
     BluetoothSerial.on('bluetoothEnabled', function () {
     });
@@ -57,9 +56,9 @@ function parsePacket(data, store) {
         //What we do here, is since it is a reply, we look for the packet that is being replied to, and
         //then update that packet with the response. We then check the status, and throw errors if required.
         var messageType_1 = data.shift();
-        var packetIndex = packetBuffer.findIndex(function (p) { return p.id == messageType_1; });
+        var packetIndex = store.getState().device.packetBuffer.findIndex(function (p) { return p.id == messageType_1; });
         if (packetIndex != -1) {
-            var packet = packetBuffer.splice(packetIndex, 1)[0];
+            var packet = store.getState().device.packetBuffer.splice(packetIndex, 1)[0];
             packet.readPacket(data);
             store.dispatch(readPacket(packet, packet.id));
             if (packet.status != 0) {

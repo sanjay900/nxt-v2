@@ -42,6 +42,7 @@ var initialSensor = {
     mode: InputSensorMode.RAW,
     dataHistory: [],
     data: {
+        port: 0,
         rawValue: 0,
         scaledValue: 0
     }

@@ -1,6 +1,6 @@
 import { isActionOf } from "typesafe-actions";
 import { catchError, concatMap, delay, expand, filter, map, share, switchMap, tap } from "rxjs/operators";
-import { empty, EMPTY, from, merge, of } from "rxjs";
+import { EMPTY, from, merge, of } from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import { Buffer } from "buffer";
 import * as deviceActions from '../actions/device-actions';
@@ -24,6 +24,7 @@ import { LsWrite } from "../nxt-structure/packets/direct/ls-write";
 import { LsGetStatus } from "../nxt-structure/packets/direct/ls-get-status";
 import { LsRead } from "../nxt-structure/packets/direct/ls-read";
 import { GetInputValues } from "../nxt-structure/packets/direct/get-input-values";
+import { UltrasonicSensorCommand } from "../nxt-structure/ultrasonic-sensor-command";
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
  * @param {Packet} packet the packet to write
@@ -59,7 +60,7 @@ export var motorHandler = function (action$, state$) {
         var state = state$.value;
         var out = state.device.outputConfig;
         if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
-            return empty();
+            return EMPTY;
         }
         if (out.config == SteeringConfig.TANK && (!out.tankOutputs.leftPort || !out.tankOutputs.rightPort)) {
             out.targetAngle = 0;
@@ -80,17 +81,39 @@ export var motorHandler = function (action$, state$) {
         packet: EmptyPacket.createPacket()
     })); }));
 };
+export var sensorConfig = function (action$) {
+    return action$.pipe(filter(isActionOf(deviceActions.sensorConfig.request)), switchMap(function (_a) {
+        var config = _a.payload;
+        if (config.type == SensorType.ULTRASONIC_CM || config.type == SensorType.ULTRASONIC_INCH) {
+            return writePacket(LsWrite.createPacket(config.port, [0x02, UltrasonicSensorRegister.COMMAND, UltrasonicSensorCommand.CONTINUOUS_MEASUREMENT], 0)).pipe(map(function () { return config; }));
+        }
+        return of(config);
+    }), map(function (config) {
+        var sensor = {
+            type: config.type,
+            systemType: TYPE_TO_TYPE.get(config.type),
+            mode: TYPE_TO_MODE.get(config.type),
+            data: {
+                rawValue: 0,
+                scaledValue: 0,
+                port: config.port
+            },
+            dataHistory: []
+        };
+        deviceActions.sensorConfig.success({ sensor: sensor, port: config.port });
+    }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
+        error: err,
+        packet: EmptyPacket.createPacket()
+    })); }));
+};
 export var sensorHandler = function (action$, state$) {
-    return action$.pipe(filter(isActionOf(deviceActions.sensorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function (data) {
-        //TODO: maybe we should keep track of the orignal state, and init sensors if the sensor type changes?
-        //TODO: or we just have a seperate update epic?
-        //TODO: also, we should
+    return action$.pipe(filter(isActionOf(deviceActions.sensorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function () {
         var state = state$.value;
         if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
-            return empty();
+            return EMPTY;
         }
         return merge(tickSensor(1, state$), tickSensor(2, state$), tickSensor(3, state$), tickSensor(4, state$)).pipe(delay(100));
-    }), map(deviceActions.sensorHandlerProgress), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
+    }), map(deviceActions.sensorUpdate), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); }));

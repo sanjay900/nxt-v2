@@ -1,8 +1,4 @@
-import { SetInputMode } from "../../../../../../Code/nxt/src/providers/nxt/packets/direct/set-input-mode";
-import { LsWrite } from "../../../../../../Code/nxt/src/providers/nxt/packets/direct/ls-write";
 import { Subject } from "rxjs";
-import { UltrasonicSensorRegister } from "./i2c-register";
-import { UltrasonicSensorCommand } from "../../../../../../Code/nxt/src/providers/nxt/ultrasonic-sensor-command";
 export var InputSensorMode;
 (function (InputSensorMode) {
     InputSensorMode[InputSensorMode["RAW"] = 0] = "RAW";
@@ -55,7 +51,6 @@ var SensorProvider = /** @class */ (function () {
         ]);
     }
     SensorProvider.prototype.setSensorType = function (type, port) {
-        var _this = this;
         var sensorsExist = this.sensors.filter(function (type) { return type != SensorType.NONE; }).length != 0;
         this.sensors[port] = type;
         if (type == SensorType.NONE)
@@ -63,20 +58,6 @@ var SensorProvider = /** @class */ (function () {
         if (type == SensorType.ULTRASONIC_CM || type == SensorType.ULTRASONIC_INCH) {
             this.initUS(port);
         }
-        this.nxt.writePacket(true, SetInputMode.createPacket(port, this.typeMap.get(type), this.modeMap.get(type)));
-        if (!sensorsExist) {
-            setTimeout(function () {
-                //directly tick this sensor if none are in use
-                _this.lastSensorUpdate = port - 1;
-                _this.tickNextSensor();
-            }, 1000);
-        }
-    };
-    SensorProvider.prototype.initUS = function (port) {
-        var _this = this;
-        setTimeout(function () {
-            _this.nxt.writePacket(true, LsWrite.createPacket(port, [0x02, UltrasonicSensorRegister.COMMAND, UltrasonicSensorCommand.CONTINUOUS_MEASUREMENT], 0));
-        }, 1000);
     };
     SensorProvider.CM_TO_INCH = 0.393700;
     return SensorProvider;

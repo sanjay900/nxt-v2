@@ -4,9 +4,10 @@ export var readPacket = createAction("readPacket", function (resolve) {
 });
 export var writeConfig = createAsyncAction('writeConfigRequest', 'writeConfigResponse', 'writeConfigFailure')();
 export var sensorHandler = createAsyncAction('sensorHandlerRequest', 'sensorHandlerResponse', 'sensorHandlerFailure')();
-export var sensorHandlerProgress = createAction("sensorHandlerProgress", function (resolve) {
+export var sensorUpdate = createAction("sensorUpdate", function (resolve) {
     return function (sensorData) { return resolve(sensorData); };
 });
+export var sensorConfig = createAsyncAction('sensorConfigRequest', 'sensorConfigResponse', 'sensorConfigFailure')();
 export var startMotorHandler = createAsyncAction('startMotorHandlerRequest', 'startMotorHandlerResponse', 'startMotorHandlertFailure')();
 export var writePacket = createAsyncAction('writePacketRequest', 'writePacketResponse', 'writePacketFailure')();
 export var writeFile = createAsyncAction('writeFileRequest', 'writeFileResponse', 'writeFileFailure')();

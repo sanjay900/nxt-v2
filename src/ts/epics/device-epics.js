@@ -32,16 +32,6 @@ export var startHandlers = function (action$, state$) {
         startMotorHandler.request()
     ]; }));
 };
-function askToUpload(file) {
-    return new Promise(function (resolve) {
-        Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
-            "Would you like to upload the NXT motor control program?\n" +
-            "Note that without this program, motor control will not work.", [
-            { text: "Upload Program", onPress: function () { return resolve(deviceActions.writeFile.request(file)); } },
-            { text: "Cancel", style: 'cancel' }
-        ]);
-    });
-}
 export var sendPacket = function (action$) {
     return action$.pipe(filter(isActionOf(deviceActions.writePacket.request)), switchMap(function (action) { return writePacket(action.payload); }), switchMap(function (action) { return from(action.responseReceived); }), map(deviceActions.writePacket.success), catchError(function (err) {
         //If the user asks to start a program, and it is missing on the device, we get an out_of_range error.
@@ -91,3 +81,13 @@ export var writeFile = function (action$) {
         packet: EmptyPacket.createPacket()
     })); })));
 };
+function askToUpload(file) {
+    return new Promise(function (resolve) {
+        Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
+            "Would you like to upload the NXT motor control program?\n" +
+            "Note that without this program, motor control will not work.", [
+            { text: "Upload Program", onPress: function () { return resolve(deviceActions.writeFile.request(file)); } },
+            { text: "Cancel", style: 'cancel' }
+        ]);
+    });
+}

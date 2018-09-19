@@ -41,17 +41,6 @@ export const startHandlers = (action$: ActionsObservable<RootAction>, state$: St
         )
     );
 
-function askToUpload(file: NXTFile) {
-    return new Promise(resolve => {
-        Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
-            "Would you like to upload the NXT motor control program?\n" +
-            "Note that without this program, motor control will not work.", [
-            {text: "Upload Program", onPress: () => resolve(deviceActions.writeFile.request(file))},
-            {text: "Cancel", style: 'cancel'}
-        ]);
-    })
-}
-
 export const sendPacket = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.writePacket.request)),
@@ -129,3 +118,14 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
         )
     )
 };
+
+function askToUpload(file: NXTFile) {
+    return new Promise(resolve => {
+        Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
+            "Would you like to upload the NXT motor control program?\n" +
+            "Note that without this program, motor control will not work.", [
+            {text: "Upload Program", onPress: () => resolve(deviceActions.writeFile.request(file))},
+            {text: "Cancel", style: 'cancel'}
+        ]);
+    })
+}

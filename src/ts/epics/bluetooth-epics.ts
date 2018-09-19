@@ -6,12 +6,13 @@ import {from, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 
 import * as bluetoothActions from '../actions/bluetooth-actions';
-import {writePacket} from "../actions/device-actions";
+import {sensorConfig, sensorHandler, writePacket} from "../actions/device-actions";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
 import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
 import {SteeringControl} from "../utils/Files";
 import {StartProgram} from "../nxt-structure/packets/direct/start-program";
+import {SensorType} from "../nxt-structure/sensor/sensor-constants";
 
 
 export const requestDevices: Epic<RootAction, RootAction, RootState> = (action$) =>
@@ -35,6 +36,9 @@ export const connectToDevice = (action$: ActionsObservable<RootAction>) =>
                 writePacket.request(GetFirmwareVersion.createPacket()),
                 writePacket.request(StartProgram.createPacket(SteeringControl)),
                 bluetoothActions.connectToDevice.success(),
+                sensorHandler.request,
+                sensorConfig.request({type: SensorType.LIGHT_ACTIVE, port: 1}),
+
             ]
         ),
         catchError(err => of(bluetoothActions.connectToDevice.failure(err)))

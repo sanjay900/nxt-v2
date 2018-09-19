@@ -5,6 +5,7 @@ import {SystemCommand} from "../nxt-structure/packets/system-command";
 import {NXTFile} from "../nxt-structure/nxt-file";
 import {Write} from "../nxt-structure/packets/system/write";
 import {Joystick, OutputConfig, PacketError} from "../reducers/device";
+import {SensorData} from "../nxt-structure/sensor/sensor";
 
 
 export const readPacket = createAction("readPacket", resolve => {
@@ -19,8 +20,11 @@ export const writeConfig = createAsyncAction(
 export const sensorHandler = createAsyncAction(
     'sensorHandlerRequest',
     'sensorHandlerResponse',
-    'sensorHandlertFailure'
+    'sensorHandlerFailure'
 )<void, void, PacketError>();
+export const sensorHandlerProgress = createAction("sensorHandlerProgress", resolve => {
+    return (sensorData: SensorData) => resolve(sensorData);
+});
 export const startMotorHandler = createAsyncAction(
     'startMotorHandlerRequest',
     'startMotorHandlerResponse',

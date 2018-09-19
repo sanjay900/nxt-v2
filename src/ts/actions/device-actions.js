@@ -3,7 +3,10 @@ export var readPacket = createAction("readPacket", function (resolve) {
     return function (packet, type) { return resolve({ packet: packet, type: type }); };
 });
 export var writeConfig = createAsyncAction('writeConfigRequest', 'writeConfigResponse', 'writeConfigFailure')();
-export var sensorHandler = createAsyncAction('sensorHandlerRequest', 'sensorHandlerResponse', 'sensorHandlertFailure')();
+export var sensorHandler = createAsyncAction('sensorHandlerRequest', 'sensorHandlerResponse', 'sensorHandlerFailure')();
+export var sensorHandlerProgress = createAction("sensorHandlerProgress", function (resolve) {
+    return function (sensorData) { return resolve(sensorData); };
+});
 export var startMotorHandler = createAsyncAction('startMotorHandlerRequest', 'startMotorHandlerResponse', 'startMotorHandlertFailure')();
 export var writePacket = createAsyncAction('writePacketRequest', 'writePacketResponse', 'writePacketFailure')();
 export var writeFile = createAsyncAction('writeFileRequest', 'writeFileResponse', 'writeFileFailure')();

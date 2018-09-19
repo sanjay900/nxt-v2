@@ -81,24 +81,27 @@ export var motorHandler = function (action$, state$) {
     })); }));
 };
 export var sensorHandler = function (action$, state$) {
-    return action$.pipe(filter(isActionOf(deviceActions.sensorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function () {
+    return action$.pipe(filter(isActionOf(deviceActions.sensorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function (data) {
+        //TODO: maybe we should keep track of the orignal state, and init sensors if the sensor type changes?
+        //TODO: or we just have a seperate update epic?
+        //TODO: also, we should
         var state = state$.value;
         if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
             return empty();
         }
         return merge(tickSensor(1, state$), tickSensor(2, state$), tickSensor(3, state$), tickSensor(4, state$)).pipe(delay(100));
-    }), map(deviceActions.sensorHandler.success), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
+    }), map(deviceActions.sensorHandlerProgress), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); }));
 };
 function readI2CRegister(register, port) {
-    return writePacket(LsWrite.createPacket(port, [0x02, register], 1)).pipe(function () { return writePacket(LsGetStatus.createPacket(port)); }, filter(function (packet) { return packet.bytesReady > 0; }), function () { return writePacket(LsRead.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rxData[0], scaledValue: packet.rxData[0] }); }));
+    return writePacket(LsWrite.createPacket(port, [0x02, register], 1)).pipe(function () { return writePacket(LsGetStatus.createPacket(port)); }, filter(function (packet) { return packet.bytesReady > 0; }), function () { return writePacket(LsRead.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rxData[0], scaledValue: packet.rxData[0], port: port }); }));
 }
 function tickSensor(port, state$) {
     var sensor = state$.value.device.inputs[port];
     var pipe = of(state$.value.device.outputConfig).pipe(filter(function () { return sensor.type != SensorType.NONE; }), share());
-    return merge(pipe.pipe(filter(function () { return sensor.type == SensorType.ULTRASONIC_CM || sensor.type == SensorType.ULTRASONIC_INCH; }), function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), pipe.pipe(filter(function () { return sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH; }), function () { return writePacket(GetInputValues.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rawValue, scaledValue: packet.scaledValue }); })));
+    return merge(pipe.pipe(filter(function () { return sensor.type == SensorType.ULTRASONIC_CM || sensor.type == SensorType.ULTRASONIC_INCH; }), function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), pipe.pipe(filter(function () { return sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH; }), function () { return writePacket(GetInputValues.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rawValue, scaledValue: packet.scaledValue, port: port }); })));
 }
 export var writeConfig = function (action$) {
     return action$.pipe(filter(isActionOf(deviceActions.writeConfig.request)), switchMap(function (_a) {

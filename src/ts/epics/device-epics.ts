@@ -98,7 +98,10 @@ export const sensorHandler = (action$: ActionsObservable<RootAction>, state$: St
     action$.pipe(
         filter(isActionOf(deviceActions.sensorHandler.request)),
         map(() => state$.value.device.outputConfig),
-        expand(() => {
+        expand(data => {
+            //TODO: maybe we should keep track of the orignal state, and init sensors if the sensor type changes?
+            //TODO: or we just have a seperate update epic?
+            //TODO: also, we should
             let state = state$.value;
             if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
                 return empty();
@@ -110,7 +113,7 @@ export const sensorHandler = (action$: ActionsObservable<RootAction>, state$: St
                 tickSensor(4, state$)
             ).pipe(delay(100));
         }),
-        map(deviceActions.sensorHandler.success),
+        map(deviceActions.sensorHandlerProgress),
         catchError((err: PacketError) => of(deviceActions.startMotorHandler.failure(err))),
         catchError((err: Error) => of(deviceActions.startMotorHandler.failure({
             error: err,
@@ -123,7 +126,7 @@ function readI2CRegister(register: number, port: number): Observable<SensorData>
         () => writePacket(LsGetStatus.createPacket(port)),
         filter((packet: LsGetStatus) => packet.bytesReady > 0),
         () => writePacket(LsRead.createPacket(port)),
-        map(packet => ({rawValue: packet.rxData[0], scaledValue: packet.rxData[0]}))
+        map(packet => ({rawValue: packet.rxData[0], scaledValue: packet.rxData[0], port: port}))
     )
 }
 
@@ -141,7 +144,7 @@ function tickSensor(port: number, state$: StateObservable<RootState>): Observabl
         pipe.pipe(
             filter(() => sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH),
             () => writePacket(GetInputValues.createPacket(port)),
-            map(packet => ({rawValue: packet.rawValue, scaledValue: packet.scaledValue}))
+            map(packet => ({rawValue: packet.rawValue, scaledValue: packet.scaledValue, port: port}))
         )
     )
 }

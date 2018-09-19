@@ -22,6 +22,13 @@ import {fileList, SteeringControl} from "../utils/Files";
 import {ConnectionStatus} from "../reducers/bluetooth";
 import {SteeringConfig} from "../nxt-structure/motor/motor-constants";
 import {MessageWrite} from "../nxt-structure/packets/direct/message-write";
+import {EmptyPacket} from "../nxt-structure/packets/EmptyPacket";
+import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor/sensor";
+import {UltrasonicSensorRegister} from "../nxt-structure/sensor/i2c-register";
+import {LsWrite} from "../nxt-structure/packets/direct/ls-write";
+import {LsGetStatus} from "../nxt-structure/packets/direct/ls-get-status";
+import {LsRead} from "../nxt-structure/packets/direct/ls-read";
+import {GetInputValues} from "../nxt-structure/packets/direct/get-input-values";
 
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
@@ -35,6 +42,25 @@ function writePacket<T extends Packet>(packet: T): Observable<T> {
 const CONFIG_PACKET_ID = "B";
 const DRIVE_PACKET_ID = "A";
 const PACKET_MAILBOX = 0;
+const CM_TO_INCH = 0.393700;
+const TYPE_TO_MODE: Map<SensorType, InputSensorMode> = new Map<SensorType, InputSensorMode>([
+    [SensorType.SOUND_DB, InputSensorMode.RAW],
+    [SensorType.SOUND_DBA, InputSensorMode.RAW],
+    [SensorType.LIGHT_ACTIVE, InputSensorMode.RAW],
+    [SensorType.LIGHT_INACTIVE, InputSensorMode.RAW],
+    [SensorType.TOUCH, InputSensorMode.BOOLEAN],
+    [SensorType.ULTRASONIC_INCH, InputSensorMode.RAW],
+    [SensorType.ULTRASONIC_CM, InputSensorMode.RAW],
+]);
+const TYPE_TO_TYPE: Map<SensorType, InputSensorType> = new Map<SensorType, InputSensorType>([
+    [SensorType.SOUND_DB, InputSensorType.SOUND_DB],
+    [SensorType.SOUND_DBA, InputSensorType.SOUND_DBA],
+    [SensorType.TOUCH, InputSensorType.TOUCH],
+    [SensorType.LIGHT_ACTIVE, InputSensorType.LIGHT_ACTIVE],
+    [SensorType.LIGHT_INACTIVE, InputSensorType.LIGHT_INACTIVE],
+    [SensorType.ULTRASONIC_INCH, InputSensorType.LOW_SPEED_9V],
+    [SensorType.ULTRASONIC_CM, InputSensorType.LOW_SPEED_9V],
+]);
 export const motorHandler = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.startMotorHandler.request)),
@@ -62,24 +88,64 @@ export const motorHandler = (action$: ActionsObservable<RootAction>, state$: Sta
         }),
         map(deviceActions.startMotorHandler.success),
         catchError((err: PacketError) => of(deviceActions.startMotorHandler.failure(err))),
+        catchError((err: Error) => of(deviceActions.startMotorHandler.failure({
+            error: err,
+            packet: EmptyPacket.createPacket()
+        }))),
     );
 
 export const sensorHandler = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
     action$.pipe(
-        filter(isActionOf(deviceActions.startSensorHandler.request)),
+        filter(isActionOf(deviceActions.sensorHandler.request)),
         map(() => state$.value.device.outputConfig),
-        expand(prevOut => {
+        expand(() => {
             let state = state$.value;
-            let out = state.device.outputConfig;
             if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
                 return empty();
             }
-            //TODO: read sensors here and map them,
-            return of(out).pipe(delay(100));
+            return merge(
+                tickSensor(1, state$),
+                tickSensor(2, state$),
+                tickSensor(3, state$),
+                tickSensor(4, state$)
+            ).pipe(delay(100));
         }),
-        map(deviceActions.startMotorHandler.success),
+        map(deviceActions.sensorHandler.success),
         catchError((err: PacketError) => of(deviceActions.startMotorHandler.failure(err))),
+        catchError((err: Error) => of(deviceActions.startMotorHandler.failure({
+            error: err,
+            packet: EmptyPacket.createPacket()
+        }))),
     );
+
+function readI2CRegister(register: number, port: number): Observable<SensorData> {
+    return writePacket(LsWrite.createPacket(port, [0x02, register], 1)).pipe(
+        () => writePacket(LsGetStatus.createPacket(port)),
+        filter((packet: LsGetStatus) => packet.bytesReady > 0),
+        () => writePacket(LsRead.createPacket(port)),
+        map(packet => ({rawValue: packet.rxData[0], scaledValue: packet.rxData[0]}))
+    )
+}
+
+function tickSensor(port: number, state$: StateObservable<RootState>): Observable<SensorData> {
+    let sensor = state$.value.device.inputs[port];
+    let pipe = of(state$.value.device.outputConfig).pipe(
+        filter(() => sensor.type != SensorType.NONE),
+        share()
+    );
+    return merge(
+        pipe.pipe(
+            filter(() => sensor.type == SensorType.ULTRASONIC_CM || sensor.type == SensorType.ULTRASONIC_INCH),
+            () => readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port)
+        ),
+        pipe.pipe(
+            filter(() => sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH),
+            () => writePacket(GetInputValues.createPacket(port)),
+            map(packet => ({rawValue: packet.rawValue, scaledValue: packet.scaledValue}))
+        )
+    )
+}
+
 export const writeConfig = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.writeConfig.request)),
@@ -103,7 +169,11 @@ export const writeConfig = (action$: ActionsObservable<RootAction>) =>
             }
         }),
         map(deviceActions.writeConfig.success),
-        catchError((err: PacketError) => of(deviceActions.writeConfig.failure(err)))
+        catchError((err: PacketError) => of(deviceActions.writeConfig.failure(err))),
+        catchError((err: Error) => of(deviceActions.writeConfig.failure({
+            error: err,
+            packet: EmptyPacket.createPacket()
+        })))
     );
 
 function numberToNXT(number: number) {
@@ -122,6 +192,18 @@ export const startHandlers = (action$: ActionsObservable<RootAction>, state$: St
             ]
         )
     );
+
+function askToUpload(file: NXTFile) {
+    return new Promise(resolve => {
+        Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
+            "Would you like to upload the NXT motor control program?\n" +
+            "Note that without this program, motor control will not work.", [
+            {text: "Upload Program", onPress: () => resolve(deviceActions.writeFile.request(file))},
+            {text: "Cancel", style: 'cancel'}
+        ]);
+    })
+}
+
 export const sendPacket = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.writePacket.request)),
@@ -129,24 +211,24 @@ export const sendPacket = (action$: ActionsObservable<RootAction>) =>
         switchMap((action: Packet) => from(action.responseReceived)),
         map(deviceActions.writePacket.success),
         catchError((err: PacketError) => {
+            //If the user asks to start a program, and it is missing on the device, we get an out_of_range error.
+            //In this case, we either ask them to upload the motor control program, or if they are running their
+            //own program, then we just upload it anyways.
             if (err.packet instanceof StartProgram && err.packet.status == DirectCommandResponse.OUT_OF_RANGE) {
                 let file = new NXTFile(err.packet.programName, fileList[err.packet.programName]);
                 file.autoStart = true;
                 if (file.name == SteeringControl) {
-                    return from(new Promise(resolve => {
-                        Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
-                            "Would you like to upload the NXT motor control program?\n" +
-                            "Note that without this program, motor control will not work.", [
-                            {text: "Upload Program", onPress: () => resolve(deviceActions.writeFile.request(file))},
-                            {text: "Cancel", style: 'cancel'}
-                        ]);
-                    }))
+                    return from(askToUpload(file))
                 } else {
                     return of(deviceActions.writeFile.request(file));
                 }
             }
             return of(deviceActions.writePacket.failure(err))
-        })
+        }),
+        catchError((err: Error) => of(deviceActions.writeConfig.failure({
+            error: err,
+            packet: EmptyPacket.createPacket()
+        })))
     );
 
 export const writeFile = (action$: ActionsObservable<RootAction>) => {
@@ -176,6 +258,10 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
             filter(data => !data.file.hasWritten()),
             map(writeFileProgress),
             catchError((err: PacketError) => of(deviceActions.writeFile.failure(err))),
+            catchError((err: Error) => of(deviceActions.writeConfig.failure({
+                error: err,
+                packet: EmptyPacket.createPacket()
+            })))
         ),
         actions.pipe(
             filter(data => data.file.hasWritten()),
@@ -188,6 +274,10 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
             }),
             map(deviceActions.writeFile.success),
             catchError((err: PacketError) => of(deviceActions.writeFile.failure(err))),
+            catchError((err: Error) => of(deviceActions.writeConfig.failure({
+                error: err,
+                packet: EmptyPacket.createPacket()
+            })))
         )
     )
 };

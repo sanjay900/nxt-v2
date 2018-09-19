@@ -17,6 +17,13 @@ import { fileList, SteeringControl } from "../utils/Files";
 import { ConnectionStatus } from "../reducers/bluetooth";
 import { SteeringConfig } from "../nxt-structure/motor/motor-constants";
 import { MessageWrite } from "../nxt-structure/packets/direct/message-write";
+import { EmptyPacket } from "../nxt-structure/packets/EmptyPacket";
+import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor/sensor";
+import { UltrasonicSensorRegister } from "../nxt-structure/sensor/i2c-register";
+import { LsWrite } from "../nxt-structure/packets/direct/ls-write";
+import { LsGetStatus } from "../nxt-structure/packets/direct/ls-get-status";
+import { LsRead } from "../nxt-structure/packets/direct/ls-read";
+import { GetInputValues } from "../nxt-structure/packets/direct/get-input-values";
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
  * @param {Packet} packet the packet to write
@@ -28,6 +35,25 @@ function writePacket(packet) {
 var CONFIG_PACKET_ID = "B";
 var DRIVE_PACKET_ID = "A";
 var PACKET_MAILBOX = 0;
+var CM_TO_INCH = 0.393700;
+var TYPE_TO_MODE = new Map([
+    [SensorType.SOUND_DB, InputSensorMode.RAW],
+    [SensorType.SOUND_DBA, InputSensorMode.RAW],
+    [SensorType.LIGHT_ACTIVE, InputSensorMode.RAW],
+    [SensorType.LIGHT_INACTIVE, InputSensorMode.RAW],
+    [SensorType.TOUCH, InputSensorMode.BOOLEAN],
+    [SensorType.ULTRASONIC_INCH, InputSensorMode.RAW],
+    [SensorType.ULTRASONIC_CM, InputSensorMode.RAW],
+]);
+var TYPE_TO_TYPE = new Map([
+    [SensorType.SOUND_DB, InputSensorType.SOUND_DB],
+    [SensorType.SOUND_DBA, InputSensorType.SOUND_DBA],
+    [SensorType.TOUCH, InputSensorType.TOUCH],
+    [SensorType.LIGHT_ACTIVE, InputSensorType.LIGHT_ACTIVE],
+    [SensorType.LIGHT_INACTIVE, InputSensorType.LIGHT_INACTIVE],
+    [SensorType.ULTRASONIC_INCH, InputSensorType.LOW_SPEED_9V],
+    [SensorType.ULTRASONIC_CM, InputSensorType.LOW_SPEED_9V],
+]);
 export var motorHandler = function (action$, state$) {
     return action$.pipe(filter(isActionOf(deviceActions.startMotorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function (prevOut) {
         var state = state$.value;
@@ -49,19 +75,31 @@ export var motorHandler = function (action$, state$) {
             return writePacket(MessageWrite.createPacket(PACKET_MAILBOX, DRIVE_PACKET_ID + numberToNXT(outAngle) + numberToNXT(outPower))).pipe(map(function () { return out; }));
         }
         return of(out).pipe(delay(100));
-    }), map(deviceActions.startMotorHandler.success), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }));
+    }), map(deviceActions.startMotorHandler.success), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
+        error: err,
+        packet: EmptyPacket.createPacket()
+    })); }));
 };
 export var sensorHandler = function (action$, state$) {
-    return action$.pipe(filter(isActionOf(deviceActions.startSensorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function (prevOut) {
+    return action$.pipe(filter(isActionOf(deviceActions.sensorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function () {
         var state = state$.value;
-        var out = state.device.outputConfig;
         if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
             return empty();
         }
-        //TODO: read sensors here and map them,
-        return of(out).pipe(delay(100));
-    }), map(deviceActions.startMotorHandler.success), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }));
+        return merge(tickSensor(1, state$), tickSensor(2, state$), tickSensor(3, state$), tickSensor(4, state$)).pipe(delay(100));
+    }), map(deviceActions.sensorHandler.success), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
+        error: err,
+        packet: EmptyPacket.createPacket()
+    })); }));
 };
+function readI2CRegister(register, port) {
+    return writePacket(LsWrite.createPacket(port, [0x02, register], 1)).pipe(function () { return writePacket(LsGetStatus.createPacket(port)); }, filter(function (packet) { return packet.bytesReady > 0; }), function () { return writePacket(LsRead.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rxData[0], scaledValue: packet.rxData[0] }); }));
+}
+function tickSensor(port, state$) {
+    var sensor = state$.value.device.inputs[port];
+    var pipe = of(state$.value.device.outputConfig).pipe(filter(function () { return sensor.type != SensorType.NONE; }), share());
+    return merge(pipe.pipe(filter(function () { return sensor.type == SensorType.ULTRASONIC_CM || sensor.type == SensorType.ULTRASONIC_INCH; }), function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), pipe.pipe(filter(function () { return sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH; }), function () { return writePacket(GetInputValues.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rawValue, scaledValue: packet.scaledValue }); })));
+}
 export var writeConfig = function (action$) {
     return action$.pipe(filter(isActionOf(deviceActions.writeConfig.request)), switchMap(function (_a) {
         var config = _a.payload;
@@ -77,7 +115,10 @@ export var writeConfig = function (action$) {
                 config.tankOutputs.leftPort +
                 config.tankOutputs.rightPort));
         }
-    }), map(deviceActions.writeConfig.success), catchError(function (err) { return of(deviceActions.writeConfig.failure(err)); }));
+    }), map(deviceActions.writeConfig.success), catchError(function (err) { return of(deviceActions.writeConfig.failure(err)); }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
+        error: err,
+        packet: EmptyPacket.createPacket()
+    })); }));
 };
 function numberToNXT(number) {
     var start = number < 0 ? "-" : "0";
@@ -93,27 +134,36 @@ export var startHandlers = function (action$, state$) {
         startMotorHandler.request()
     ]; }));
 };
+function askToUpload(file) {
+    return new Promise(function (resolve) {
+        Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
+            "Would you like to upload the NXT motor control program?\n" +
+            "Note that without this program, motor control will not work.", [
+            { text: "Upload Program", onPress: function () { return resolve(deviceActions.writeFile.request(file)); } },
+            { text: "Cancel", style: 'cancel' }
+        ]);
+    });
+}
 export var sendPacket = function (action$) {
     return action$.pipe(filter(isActionOf(deviceActions.writePacket.request)), switchMap(function (action) { return writePacket(action.payload); }), switchMap(function (action) { return from(action.responseReceived); }), map(deviceActions.writePacket.success), catchError(function (err) {
+        //If the user asks to start a program, and it is missing on the device, we get an out_of_range error.
+        //In this case, we either ask them to upload the motor control program, or if they are running their
+        //own program, then we just upload it anyways.
         if (err.packet instanceof StartProgram && err.packet.status == DirectCommandResponse.OUT_OF_RANGE) {
-            var file_1 = new NXTFile(err.packet.programName, fileList[err.packet.programName]);
-            file_1.autoStart = true;
-            if (file_1.name == SteeringControl) {
-                return from(new Promise(function (resolve) {
-                    Alert.alert("Motor Control Program Missing", "The program for controlling NXT motors is missing on your NXT Device.\n\n" +
-                        "Would you like to upload the NXT motor control program?\n" +
-                        "Note that without this program, motor control will not work.", [
-                        { text: "Upload Program", onPress: function () { return resolve(deviceActions.writeFile.request(file_1)); } },
-                        { text: "Cancel", style: 'cancel' }
-                    ]);
-                }));
+            var file = new NXTFile(err.packet.programName, fileList[err.packet.programName]);
+            file.autoStart = true;
+            if (file.name == SteeringControl) {
+                return from(askToUpload(file));
             }
             else {
-                return of(deviceActions.writeFile.request(file_1));
+                return of(deviceActions.writeFile.request(file));
             }
         }
         return of(deviceActions.writePacket.failure(err));
-    }));
+    }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
+        error: err,
+        packet: EmptyPacket.createPacket()
+    })); }));
 };
 export var writeFile = function (action$) {
     //Baiscally, we handle writing a file here. We send out a openwrite, wait for it to respond and then
@@ -130,10 +180,16 @@ export var writeFile = function (action$) {
     }), share());
     //We have one branch dealing with updating about the current progress, and another that handles tasks required after
     //the file is written.
-    return merge(actions.pipe(filter(function (data) { return !data.file.hasWritten(); }), map(writeFileProgress), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); })), actions.pipe(filter(function (data) { return data.file.hasWritten(); }), switchMap(function (packet) { return writePacket(Close.createPacket(packet.file)); }), switchMap(function (packet) {
+    return merge(actions.pipe(filter(function (data) { return !data.file.hasWritten(); }), map(writeFileProgress), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
+        error: err,
+        packet: EmptyPacket.createPacket()
+    })); })), actions.pipe(filter(function (data) { return data.file.hasWritten(); }), switchMap(function (packet) { return writePacket(Close.createPacket(packet.file)); }), switchMap(function (packet) {
         if (packet.file.autoStart) {
             return writePacket(StartProgram.createPacket(packet.file.name));
         }
         return EMPTY;
-    }), map(deviceActions.writeFile.success), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); })));
+    }), map(deviceActions.writeFile.success), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
+        error: err,
+        packet: EmptyPacket.createPacket()
+    })); })));
 };

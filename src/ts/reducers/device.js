@@ -107,7 +107,7 @@ export var device = function (state, action) {
         case getType(deviceActions.writeFileProgress):
             return __assign({}, state, { info: __assign({}, state.info, { currentFile: action.payload.packet.file }) });
         case getType(deviceActions.writeFile.failure):
-            console.error(action.payload.error.message);
+            console.error(action.payload);
             return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.writePacket.request):
             return __assign({}, state, processOutgoingPacket(action.payload, state));

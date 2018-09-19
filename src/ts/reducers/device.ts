@@ -83,7 +83,8 @@ export type DeviceState = {
         1: SystemSensor,
         2: SystemSensor,
         3: SystemSensor,
-        4: SystemSensor
+        4: SystemSensor,
+        [key: number]: SystemSensor
     }
     outputConfig: OutputConfig
 }
@@ -161,7 +162,7 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
         case getType(deviceActions.writeFileProgress):
             return {...state, info: {...state.info, currentFile: action.payload.packet.file}};
         case getType(deviceActions.writeFile.failure):
-            console.error(action.payload.error.message);
+            console.error(action.payload);
             return {...state, lastMessage: action.payload.error.message};
         case getType(deviceActions.writePacket.request):
             return {...state, ...processOutgoingPacket(action.payload, state)};

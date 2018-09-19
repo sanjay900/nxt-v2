@@ -1,4 +1,6 @@
-import * as bluetooth from './bluetooth-epics';
 import {combineEpics} from "redux-observable";
+import * as bluetooth from './bluetooth-epics';
 import * as device from "./device-epics";
-export const epics = combineEpics(...[...Object.values(bluetooth), ...Object.values(device)]);
+import * as sensor from "./sensor-epics";
+import * as motor from "./motor-epics";
+export const epics = combineEpics(...[...Object.values(bluetooth), ...Object.values(device), ...Object.values(sensor), ...Object.values(motor)]);

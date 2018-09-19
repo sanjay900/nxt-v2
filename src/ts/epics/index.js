@@ -18,7 +18,9 @@ var __spread = (this && this.__spread) || function () {
     for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
     return ar;
 };
-import * as bluetooth from './bluetooth-epics';
 import { combineEpics } from "redux-observable";
+import * as bluetooth from './bluetooth-epics';
 import * as device from "./device-epics";
-export var epics = combineEpics.apply(void 0, __spread(Object.values(bluetooth), Object.values(device)));
+import * as sensor from "./sensor-epics";
+import * as motor from "./motor-epics";
+export var epics = combineEpics.apply(void 0, __spread(Object.values(bluetooth), Object.values(device), Object.values(sensor), Object.values(motor)));

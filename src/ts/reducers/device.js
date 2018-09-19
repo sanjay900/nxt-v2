@@ -30,7 +30,7 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 import { MultiOutputPort, OutputRegulationMode, OutputRunState, SingleOutputPort, SteeringConfig } from "../nxt-structure/motor/motor-constants";
-import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor/sensor";
+import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor/sensor-constants";
 import { SystemCommand } from "../nxt-structure/packets/system-command";
 import { getType } from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";

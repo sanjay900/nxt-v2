@@ -18,7 +18,7 @@ import { ConnectionStatus } from "../reducers/bluetooth";
 import { SteeringConfig } from "../nxt-structure/motor/motor-constants";
 import { MessageWrite } from "../nxt-structure/packets/direct/message-write";
 import { EmptyPacket } from "../nxt-structure/packets/EmptyPacket";
-import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor/sensor";
+import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor/sensor-constants";
 import { UltrasonicSensorRegister } from "../nxt-structure/sensor/i2c-register";
 import { LsWrite } from "../nxt-structure/packets/direct/ls-write";
 import { LsGetStatus } from "../nxt-structure/packets/direct/ls-get-status";
@@ -124,7 +124,10 @@ function readI2CRegister(register, port) {
 function tickSensor(port, state$) {
     var sensor = state$.value.device.inputs[port];
     var pipe = of(state$.value.device.outputConfig).pipe(filter(function () { return sensor.type != SensorType.NONE; }), share());
-    return merge(pipe.pipe(filter(function () { return sensor.type == SensorType.ULTRASONIC_CM || sensor.type == SensorType.ULTRASONIC_INCH; }), function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), pipe.pipe(filter(function () { return sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH; }), function () { return writePacket(GetInputValues.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rawValue, scaledValue: packet.scaledValue, port: port }); })));
+    return merge(pipe.pipe(filter(function () { return sensor.type == SensorType.ULTRASONIC_CM || sensor.type == SensorType.ULTRASONIC_INCH; }), function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }, map(function (data) {
+        var scale = sensor.type == SensorType.ULTRASONIC_INCH ? CM_TO_INCH : 1;
+        return { scaledValue: data.scaledValue * scale, rawValue: data.rawValue, port: port };
+    })), pipe.pipe(filter(function () { return sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH; }), function () { return writePacket(GetInputValues.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rawValue, scaledValue: packet.scaledValue, port: port }); })));
 }
 export var writeConfig = function (action$) {
     return action$.pipe(filter(isActionOf(deviceActions.writeConfig.request)), switchMap(function (_a) {

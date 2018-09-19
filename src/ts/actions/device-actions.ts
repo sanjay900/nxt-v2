@@ -5,7 +5,7 @@ import {SystemCommand} from "../nxt-structure/packets/system-command";
 import {NXTFile} from "../nxt-structure/nxt-file";
 import {Write} from "../nxt-structure/packets/system/write";
 import {Joystick, OutputConfig, PacketError, SystemSensor} from "../reducers/device";
-import {SensorData, SensorType} from "../nxt-structure/sensor/sensor";
+import {SensorData, SensorType} from "../nxt-structure/sensor/sensor-constants";
 
 
 export const readPacket = createAction("readPacket", resolve => {

@@ -6,7 +6,7 @@ import {
   SingleOutputPort,
   SteeringConfig
 } from "../nxt-structure/motor/motor-constants";
-import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor/sensor";
+import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor/sensor-constants";
 import {Packet} from "../nxt-structure/packets/packet";
 import {SystemCommand} from "../nxt-structure/packets/system-command";
 import {ActionType, getType} from "typesafe-actions";

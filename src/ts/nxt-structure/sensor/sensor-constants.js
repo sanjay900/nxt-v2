@@ -1,4 +1,3 @@
-import { Subject } from "rxjs";
 export var InputSensorMode;
 (function (InputSensorMode) {
     InputSensorMode[InputSensorMode["RAW"] = 0] = "RAW";
@@ -26,43 +25,6 @@ export var InputSensorType;
     InputSensorType[InputSensorType["LOW_SPEED_9V"] = 11] = "LOW_SPEED_9V";
     InputSensorType[InputSensorType["NUMBER_OF_SENSOR_TYPES"] = 12] = "NUMBER_OF_SENSOR_TYPES";
 })(InputSensorType || (InputSensorType = {}));
-var SensorProvider = /** @class */ (function () {
-    function SensorProvider() {
-        this.sensorEvent$ = new Subject();
-        this.lastSensorUpdate = -1;
-        this.sensors = [SensorType.NONE, SensorType.NONE, SensorType.NONE, SensorType.NONE];
-        this.modeMap = new Map([
-            [SensorType.SOUND_DB, InputSensorMode.RAW],
-            [SensorType.SOUND_DBA, InputSensorMode.RAW],
-            [SensorType.LIGHT_ACTIVE, InputSensorMode.RAW],
-            [SensorType.LIGHT_INACTIVE, InputSensorMode.RAW],
-            [SensorType.TOUCH, InputSensorMode.BOOLEAN],
-            [SensorType.ULTRASONIC_INCH, InputSensorMode.RAW],
-            [SensorType.ULTRASONIC_CM, InputSensorMode.RAW],
-        ]);
-        this.typeMap = new Map([
-            [SensorType.SOUND_DB, InputSensorType.SOUND_DB],
-            [SensorType.SOUND_DBA, InputSensorType.SOUND_DBA],
-            [SensorType.TOUCH, InputSensorType.TOUCH],
-            [SensorType.LIGHT_ACTIVE, InputSensorType.LIGHT_ACTIVE],
-            [SensorType.LIGHT_INACTIVE, InputSensorType.LIGHT_INACTIVE],
-            [SensorType.ULTRASONIC_INCH, InputSensorType.LOW_SPEED_9V],
-            [SensorType.ULTRASONIC_CM, InputSensorType.LOW_SPEED_9V],
-        ]);
-    }
-    SensorProvider.prototype.setSensorType = function (type, port) {
-        var sensorsExist = this.sensors.filter(function (type) { return type != SensorType.NONE; }).length != 0;
-        this.sensors[port] = type;
-        if (type == SensorType.NONE)
-            return;
-        if (type == SensorType.ULTRASONIC_CM || type == SensorType.ULTRASONIC_INCH) {
-            this.initUS(port);
-        }
-    };
-    SensorProvider.CM_TO_INCH = 0.393700;
-    return SensorProvider;
-}());
-export { SensorProvider };
 export var SensorType;
 (function (SensorType) {
     SensorType["LIGHT_ACTIVE"] = "Light (Active)";

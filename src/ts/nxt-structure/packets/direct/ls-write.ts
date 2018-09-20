@@ -12,7 +12,7 @@ export class LsWrite extends DirectPacket {
 
   public static createPacket(port: number, txData: number[], rxDataLength: number) {
     let packet: LsWrite = new LsWrite();
-    packet.port = port;
+    packet.port = port-1;
     packet.txData = txData;
     packet.rxDataLength = rxDataLength;
     return packet;

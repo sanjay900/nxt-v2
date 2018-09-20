@@ -9,26 +9,6 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-var __read = (this && this.__read) || function (o, n) {
-    var m = typeof Symbol === "function" && o[Symbol.iterator];
-    if (!m) return o;
-    var i = m.call(o), r, ar = [], e;
-    try {
-        while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
-    }
-    catch (error) { e = { error: error }; }
-    finally {
-        try {
-            if (r && !r.done && (m = i["return"])) m.call(i);
-        }
-        finally { if (e) throw e.error; }
-    }
-    return ar;
-};
-var __spread = (this && this.__spread) || function () {
-    for (var ar = [], i = 0; i < arguments.length; i++) ar = ar.concat(__read(arguments[i]));
-    return ar;
-};
 import { MultiOutputPort, OutputRegulationMode, OutputRunState, SingleOutputPort, SteeringConfig } from "../nxt-structure/motor/motor-constants";
 import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor/sensor-constants";
 import { SystemCommand } from "../nxt-structure/packets/system-command";
@@ -36,6 +16,7 @@ import { getType } from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
 import { DirectCommand } from "../nxt-structure/packets/direct-command";
 import { connectToDevice } from "../actions/bluetooth-actions";
+import { set } from "dot-prop-immutable";
 var initialSensor = {
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
@@ -62,7 +43,6 @@ var initialOutput = {
     dataHistory: []
 };
 var initialState = {
-    packetBuffer: [],
     info: {
         currentProgramName: "None",
         deviceName: "NXT",
@@ -114,8 +94,13 @@ export var device = function (state, action) {
             return __assign({}, state, processOutgoingPacket(action.payload, state));
         case getType(deviceActions.writePacket.success):
             return __assign({}, state);
+        case getType(deviceActions.sensorConfig.failure):
+            console.log("config", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
+        case getType(deviceActions.sensorHandler.failure):
+            console.log("handler", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
+            return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.writePacket.failure):
-            console.error(action.payload);
+            console.log(action.payload);
             return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.joystickMove):
             if (action.payload.name == "STEERING") {
@@ -133,6 +118,11 @@ export var device = function (state, action) {
             }
         case getType(deviceActions.writeConfig.request):
             return __assign({}, state, { outputConfig: action.payload });
+        case getType(deviceActions.sensorConfig.request):
+            return set(state, "inputs." + action.payload.port + ".type", action.payload.sensorType);
+        case getType(deviceActions.sensorUpdate):
+            console.log(action);
+            return state;
     }
     return state;
 };
@@ -141,10 +131,10 @@ function processOutgoingPacket(packet, state) {
         case SystemCommand.SET_BRICK_NAME:
             var deviceName = packet.name;
             return {
-                info: __assign({}, state.info, { deviceName: deviceName }), packetBuffer: __spread(state.packetBuffer, [packet])
+                info: __assign({}, state.info, { deviceName: deviceName })
             };
     }
-    return { packetBuffer: __spread(state.packetBuffer, [packet]) };
+    return {};
 }
 function processIncomingPacket(packet, state) {
     switch (packet.id) {

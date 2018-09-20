@@ -5,12 +5,12 @@ export class ResetInputScaledValue extends DirectPacket {
   private port: number;
 
   constructor() {
-    super(DirectCommand.PLAY_TONE);
+    super(DirectCommand.RESET_INPUT_SCALED_VALUE);
   }
 
   public static createPacket(port: number) {
     let packet: ResetInputScaledValue = new ResetInputScaledValue();
-    packet.port = port;
+    packet.port = port-1;
     return packet;
   }
 

@@ -16,11 +16,11 @@ import { DirectPacket } from "./direct-packet";
 var ResetInputScaledValue = /** @class */ (function (_super) {
     __extends(ResetInputScaledValue, _super);
     function ResetInputScaledValue() {
-        return _super.call(this, DirectCommand.PLAY_TONE) || this;
+        return _super.call(this, DirectCommand.RESET_INPUT_SCALED_VALUE) || this;
     }
     ResetInputScaledValue.createPacket = function (port) {
         var packet = new ResetInputScaledValue();
-        packet.port = port;
+        packet.port = port - 1;
         return packet;
     };
     ResetInputScaledValue.prototype.writePacketData = function (expectResponse, data) {

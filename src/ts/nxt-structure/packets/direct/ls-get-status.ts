@@ -11,7 +11,7 @@ export class LsGetStatus extends DirectPacket {
 
   public static createPacket(port: number) {
     let packet: LsGetStatus = new LsGetStatus();
-    packet.port = port;
+    packet.port = port-1;
     return packet;
   }
 

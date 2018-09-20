@@ -14,7 +14,7 @@ export class SetInputMode extends DirectPacket {
 
   public static createPacket(port: number, type: InputSensorType, mode: InputSensorMode) {
     let packet: SetInputMode = new SetInputMode();
-    packet.port = port;
+    packet.port = port-1;
     packet.type = type;
     packet.mode = mode;
     return packet;

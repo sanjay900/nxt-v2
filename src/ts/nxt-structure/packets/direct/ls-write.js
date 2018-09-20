@@ -40,7 +40,7 @@ var LsWrite = /** @class */ (function (_super) {
     }
     LsWrite.createPacket = function (port, txData, rxDataLength) {
         var packet = new LsWrite();
-        packet.port = port;
+        packet.port = port - 1;
         packet.txData = txData;
         packet.rxDataLength = rxDataLength;
         return packet;

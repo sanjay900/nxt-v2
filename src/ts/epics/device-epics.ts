@@ -27,7 +27,10 @@ import {EmptyPacket} from "../nxt-structure/packets/EmptyPacket";
  * @returns {Observable<Packet>} the observer
  */
 export function writePacket<T extends Packet>(packet: T): Observable<T> {
-    return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true))).then(() => packet));
+    return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true)))).pipe(
+        switchMap(() => packet.responseReceived),
+        map(() => packet)
+    );
 }
 
 export const startHandlers = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
@@ -45,7 +48,6 @@ export const sendPacket = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.writePacket.request)),
         switchMap((action: { payload: Packet }) => writePacket(action.payload)),
-        switchMap((action: Packet) => from(action.responseReceived)),
         map(deviceActions.writePacket.success),
         catchError((err: PacketError) => {
             //If the user asks to start a program, and it is missing on the device, we get an out_of_range error.
@@ -77,8 +79,7 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
         filter(isActionOf(deviceActions.writeFile.request)),
         tap(() => Actions.push("status")),
         switchMap((action: { payload: NXTFile }) => writePacket(OpenWrite.createPacket(action.payload))),
-        switchMap((packet: OpenWrite) => packet.responseReceived),
-        switchMap((packet) => of(Write.createPacket((packet as OpenWrite).file))),
+        switchMap((packet) => of(Write.createPacket(packet.file))),
         expand((packet: Write) => {
             if (packet.file.hasWritten()) {
                 return EMPTY;

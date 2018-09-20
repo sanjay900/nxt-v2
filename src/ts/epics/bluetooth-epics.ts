@@ -6,7 +6,8 @@ import {from, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 
 import * as bluetoothActions from '../actions/bluetooth-actions';
-import {sensorConfig, sensorHandler, writePacket} from "../actions/device-actions";
+import * as deviceActions from "../actions/device-actions";
+import {sensorConfig, writePacket} from "../actions/device-actions";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
 import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
@@ -31,14 +32,16 @@ export const connectToDevice = (action$: ActionsObservable<RootAction>) =>
         filter(isActionOf(bluetoothActions.connectToDevice.request)),
         switchMap(action => from(ReactNativeBluetoothSerial.connect(action.payload.id))),
         concatMap(() => [
+                bluetoothActions.connectToDevice.success(),
                 writePacket.request(GetBatteryLevel.createPacket()),
                 writePacket.request(GetDeviceInfo.createPacket()),
                 writePacket.request(GetFirmwareVersion.createPacket()),
                 writePacket.request(StartProgram.createPacket(SteeringControl)),
-                bluetoothActions.connectToDevice.success(),
-                sensorHandler.request,
-                sensorConfig.request({type: SensorType.LIGHT_ACTIVE, port: 1}),
-
+                sensorConfig.request({sensorType: SensorType.ULTRASONIC_CM, port: 1}),
+                sensorConfig.request({sensorType: SensorType.LIGHT_ACTIVE, port: 2}),
+                sensorConfig.request({sensorType: SensorType.TOUCH, port: 3}),
+                sensorConfig.request({sensorType: SensorType.SOUND_DBA, port: 4}),
+                deviceActions.sensorHandler.request([1, 2, 3, 4]),
             ]
         ),
         catchError(err => of(bluetoothActions.connectToDevice.failure(err)))

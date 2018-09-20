@@ -20,7 +20,7 @@ var LsGetStatus = /** @class */ (function (_super) {
     }
     LsGetStatus.createPacket = function (port) {
         var packet = new LsGetStatus();
-        packet.port = port;
+        packet.port = port - 1;
         return packet;
     };
     LsGetStatus.prototype.readPacket = function (data) {

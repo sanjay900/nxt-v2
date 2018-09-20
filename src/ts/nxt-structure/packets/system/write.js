@@ -45,8 +45,9 @@ var Write = /** @class */ (function (_super) {
     };
     Write.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
-        //TODO: we should technically handle this, but i also really do not care
-        var handle = data.shift();
+    };
+    Write.prototype.packetMatches = function (data) {
+        return _super.prototype.packetMatches.call(this, data) && data[2] == this.file.handle;
     };
     Write.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);

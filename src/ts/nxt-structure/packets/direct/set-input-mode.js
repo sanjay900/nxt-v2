@@ -20,7 +20,7 @@ var SetInputMode = /** @class */ (function (_super) {
     }
     SetInputMode.createPacket = function (port, type, mode) {
         var packet = new SetInputMode();
-        packet.port = port;
+        packet.port = port - 1;
         packet.type = type;
         packet.mode = mode;
         return packet;

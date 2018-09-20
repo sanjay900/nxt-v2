@@ -4,6 +4,7 @@ import {SystemCommand} from "./system-command";
 import {DirectCommand} from "./direct-command";
 import 'mdn-polyfills/String.prototype.padEnd';
 import {Subject} from "rxjs";
+import {packetBuffer} from "../../bluetooth-events";
 
 export abstract class Packet {
     static FILE_NAME_LENGTH: number = 20;
@@ -77,7 +78,12 @@ export abstract class Packet {
         let header: number[] = [];
         Packet.writeWord(data.length, header);
         data.unshift(...header);
+        packetBuffer.push(this);
         return new Uint8Array(data);
+    }
+
+    public packetMatches(data: number[]): boolean {
+        return data[0] == this.id;
     }
 
     protected abstract writePacketData(expectResponse: boolean, data: number[]): void;

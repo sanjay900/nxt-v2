@@ -3,27 +3,29 @@ import {NXTFile} from "../../nxt-file";
 import {SystemCommand} from "../system-command";
 
 export class Write extends SystemPacket {
-  public file: NXTFile;
+    public file: NXTFile;
 
-  constructor() {
-    super(SystemCommand.WRITE);
-  }
+    constructor() {
+        super(SystemCommand.WRITE);
+    }
 
-  public static createPacket(file: NXTFile) {
-    let packet = new Write();
-    packet.file = file;
-    return packet;
-  }
+    public static createPacket(file: NXTFile) {
+        let packet = new Write();
+        packet.file = file;
+        return packet;
+    }
 
-  readPacket(data: number[]): void {
-    super.readPacket(data);
-    //TODO: we should technically handle this, but i also really do not care
-    let handle: number = data.shift()!;
-  }
+    readPacket(data: number[]): void {
+        super.readPacket(data);
+    }
 
-  protected writePacketData(expectResponse: boolean, data: number[]): void {
-    super.writePacketData(expectResponse, data);
-    data.push(this.file.handle);
-    data.push(...this.file.nextChunk());
-  }
+    public packetMatches(data: number[]): boolean {
+        return super.packetMatches(data) && data[2] == this.file.handle;
+    }
+
+    protected writePacketData(expectResponse: boolean, data: number[]): void {
+        super.writePacketData(expectResponse, data);
+        data.push(this.file.handle);
+        data.push(...this.file.nextChunk());
+    }
 }

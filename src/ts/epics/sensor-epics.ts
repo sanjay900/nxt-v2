@@ -2,7 +2,7 @@ import {ActionsObservable, StateObservable} from "redux-observable";
 import {RootAction, RootState} from "../store";
 import {EMPTY, merge, Observable, of} from "rxjs";
 import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor/sensor-constants";
-import {catchError, delay, expand, filter, map, share, switchMap} from "rxjs/operators";
+import {catchError, delay, expand, filter, map, share, switchMap, tap} from "rxjs/operators";
 import {UltrasonicSensorRegister} from "../nxt-structure/sensor/i2c-register";
 import {GetInputValues} from "../nxt-structure/packets/direct/get-input-values";
 import {LsWrite} from "../nxt-structure/packets/direct/ls-write";
@@ -15,6 +15,7 @@ import {UltrasonicSensorCommand} from "../nxt-structure/ultrasonic-sensor-comman
 import {PacketError, SystemSensor} from "../reducers/device";
 import {EmptyPacket} from "../nxt-structure/packets/EmptyPacket";
 import {ConnectionStatus} from "../reducers/bluetooth";
+import {SetInputMode} from "../nxt-structure/packets/direct/set-input-mode";
 
 const CM_TO_INCH = 0.393700;
 export const TYPE_TO_MODE: Map<SensorType, InputSensorMode> = new Map<SensorType, InputSensorMode>([
@@ -35,53 +36,17 @@ export const TYPE_TO_TYPE: Map<SensorType, InputSensorType> = new Map<SensorType
     [SensorType.ULTRASONIC_INCH, InputSensorType.LOW_SPEED_9V],
     [SensorType.ULTRASONIC_CM, InputSensorType.LOW_SPEED_9V],
 ]);
-
-function readI2CRegister(register: number, port: number): Observable<SensorData> {
-    return writePacket(LsWrite.createPacket(port, [0x02, register], 1)).pipe(
-        () => writePacket(LsGetStatus.createPacket(port)),
-        filter((packet: LsGetStatus) => packet.bytesReady > 0),
-        () => writePacket(LsRead.createPacket(port)),
-        map(packet => ({rawValue: packet.rxData[0], scaledValue: packet.rxData[0], port: port}))
-    )
-}
-
-export function tickSensor(port: number, state$: StateObservable<RootState>): Observable<SensorData> {
-    let sensor = state$.value.device.inputs[port];
-    let pipe = of(state$.value.device.outputConfig).pipe(
-        filter(() => sensor.type != SensorType.NONE),
-        share()
-    );
-    return merge(
-        pipe.pipe(
-            filter(() => sensor.type == SensorType.ULTRASONIC_CM || sensor.type == SensorType.ULTRASONIC_INCH),
-            () => readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port),
-            map(data => {
-                let scale = sensor.type == SensorType.ULTRASONIC_INCH ? CM_TO_INCH : 1;
-                return {scaledValue: data.scaledValue * scale, rawValue: data.rawValue, port: port}
-            })
-        ),
-        pipe.pipe(
-            filter(() => sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH),
-            () => writePacket(GetInputValues.createPacket(port)),
-            map(packet => ({rawValue: packet.rawValue, scaledValue: packet.scaledValue, port: port}))
-        )
-    )
-}
-
 export const sensorConfig = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.sensorConfig.request)),
-        switchMap(({payload: config}: { payload: { port: number, type: SensorType } }) => {
-            if (config.type == SensorType.ULTRASONIC_CM || config.type == SensorType.ULTRASONIC_INCH) {
-                return writePacket(LsWrite.createPacket(config.port, [0x02, UltrasonicSensorRegister.COMMAND, UltrasonicSensorCommand.CONTINUOUS_MEASUREMENT], 0)).pipe(map(() => config))
-            }
+        switchMap(({payload: config}: { payload: { port: number, sensorType: SensorType } }) => {
             return of(config);
         }),
-        map(config => {
+        switchMap(config => {
             let sensor: SystemSensor = {
-                type: config.type,
-                systemType: TYPE_TO_TYPE.get(config.type)!,
-                mode: TYPE_TO_MODE.get(config.type)!,
+                type: config.sensorType,
+                systemType: TYPE_TO_TYPE.get(config.sensorType)!,
+                mode: TYPE_TO_MODE.get(config.sensorType)!,
                 data: {
                     rawValue: 0,
                     scaledValue: 0,
@@ -89,10 +54,26 @@ export const sensorConfig = (action$: ActionsObservable<RootAction>) =>
                 },
                 dataHistory: []
             };
-            deviceActions.sensorConfig.success({sensor, port: config.port});
+            return writePacket(SetInputMode.createPacket(config.port, sensor.systemType, sensor.mode)).pipe(map(() => ({
+                port: config.port,
+                sensorType: sensor
+            })));
         }),
-        catchError((err: PacketError) => of(deviceActions.startMotorHandler.failure(err))),
-        catchError((err: Error) => of(deviceActions.startMotorHandler.failure({
+        switchMap(config => {
+            if (config.sensorType.type == SensorType.ULTRASONIC_CM || config.sensorType.type == SensorType.ULTRASONIC_INCH) {
+                return writePacket(
+                    LsWrite.createPacket(
+                        config.port,
+                        [0x02, UltrasonicSensorRegister.COMMAND, UltrasonicSensorCommand.CONTINUOUS_MEASUREMENT],
+                        0)).pipe(map(() => config)
+                )
+            } else {
+                return of(config)
+            }
+        }),
+        map(deviceActions.sensorConfig.success),
+        catchError((err: PacketError) => of(deviceActions.sensorConfig.failure(err))),
+        catchError((err: Error) => of(deviceActions.sensorConfig.failure({
             error: err,
             packet: EmptyPacket.createPacket()
         }))),
@@ -100,23 +81,83 @@ export const sensorConfig = (action$: ActionsObservable<RootAction>) =>
 export const sensorHandler = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.sensorHandler.request)),
-        map(() => state$.value.device.outputConfig),
-        expand(() => {
+        switchMap(ports => ports.payload),
+        map(port => ({port})),
+        expand(port => {
             let state = state$.value;
             if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
                 return EMPTY;
             }
-            return merge(
-                tickSensor(1, state$),
-                tickSensor(2, state$),
-                tickSensor(3, state$),
-                tickSensor(4, state$)
-            ).pipe(delay(100));
+            return of(port).pipe(
+                delay(100),
+                switchMap(() => tickSensor(port.port, state$)),
+                catchError(() => {
+                        //Digital sensors return errors to tell you you cannot read from them, so instead of passing those errors to the user,
+                        //its better to silence them and not return data
+                        return of({rawValue: -1, scaledValue: -1, port: port.port});
+                    }
+                )
+            );
         }),
+        filter(data => data.rawValue >= 0),
+        //Unwrap the observable returned by tickSensor
         map(deviceActions.sensorUpdate),
-        catchError((err: PacketError) => of(deviceActions.startMotorHandler.failure(err))),
-        catchError((err: Error) => of(deviceActions.startMotorHandler.failure({
+        catchError((err: PacketError) => of(deviceActions.sensorHandler.failure(err))),
+        catchError((err: Error) => of(deviceActions.sensorHandler.failure({
             error: err,
             packet: EmptyPacket.createPacket()
         }))),
     );
+
+
+function readI2CRegister(register: number, port: number): Observable<SensorData> {
+    let p = of(port).pipe(
+        switchMap(() => writePacket(LsWrite.createPacket(port, [0x02, register], 1))),
+        switchMap(() => writePacket(LsGetStatus.createPacket(port))),
+        share()
+    );
+    return merge(
+        p.pipe(
+            filter(packet => packet.bytesReady > 0),
+            switchMap(() => writePacket(LsRead.createPacket(port))),
+            map(packet => ({rawValue: packet.rxData[0], scaledValue: packet.rxData[0], port: port}))
+        ),
+        p.pipe(
+            filter(packet => packet.bytesReady == 0),
+            //If the sensor isnt ready, we can just ignore its data
+            map(() => ({rawValue: -1, scaledValue: -1, port: port}))
+        ),
+    );
+}
+
+function isUltrasonic(type: SensorType) {
+    return type == SensorType.ULTRASONIC_INCH || type == SensorType.ULTRASONIC_CM;
+}
+
+export function tickSensor(port: number, state$: StateObservable<RootState>) {
+    let p = of(port).pipe(share());
+    //Merge together the possibilities for each type of sensor tick
+    return merge(
+        p.pipe(
+            filter(() => state$.value.device.inputs[port].type == SensorType.NONE),
+            map(() => ({rawValue: 0, scaledValue: 0, port}))
+        ),
+        p.pipe(
+            filter(() => isUltrasonic(state$.value.device.inputs[port].type)),
+            switchMap(() => readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port)),
+            map(data => {
+                let scale = state$.value.device.inputs[port].type == SensorType.ULTRASONIC_INCH ? CM_TO_INCH : 1;
+                return {scaledValue: data.scaledValue * scale, rawValue: data.rawValue, port: port}
+            })
+        ),
+        p.pipe(
+            filter(() => state$.value.device.inputs[port].type != SensorType.NONE && !isUltrasonic(state$.value.device.inputs[port].type)),
+            switchMap(() => writePacket(GetInputValues.createPacket(port))),
+            map(packet => ({
+                rawValue: packet.rawValue,
+                scaledValue: packet.scaledValue,
+                port: port
+            })),
+        )
+    );
+}

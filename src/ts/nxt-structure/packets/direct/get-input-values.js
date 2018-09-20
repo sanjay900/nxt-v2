@@ -21,12 +21,12 @@ var GetInputValues = /** @class */ (function (_super) {
     }
     GetInputValues.createPacket = function (port) {
         var packet = new GetInputValues();
-        packet.port = port;
+        packet.port = port - 1;
         return packet;
     };
     GetInputValues.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
-        this.port = data.shift();
+        this.port = data.shift() + 1;
         this.valid = Packet.readBoolean(data);
         this.calibrated = Packet.readBoolean(data);
         this.type = data.shift();
@@ -35,6 +35,9 @@ var GetInputValues = /** @class */ (function (_super) {
         this.normalizedValue = Packet.readUWord(data);
         this.scaledValue = Packet.readSWord(data);
         this.calibratedValue = Packet.readSWord(data);
+    };
+    GetInputValues.prototype.packetMatches = function (data) {
+        return _super.prototype.packetMatches.call(this, data) && data[2] == this.port;
     };
     GetInputValues.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);

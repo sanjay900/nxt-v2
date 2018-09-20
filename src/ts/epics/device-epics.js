@@ -21,7 +21,7 @@ import { EmptyPacket } from "../nxt-structure/packets/EmptyPacket";
  * @returns {Observable<Packet>} the observer
  */
 export function writePacket(packet) {
-    return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true))).then(function () { return packet; }));
+    return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true)))).pipe(switchMap(function () { return packet.responseReceived; }), map(function () { return packet; }));
 }
 export var startHandlers = function (action$, state$) {
     return action$.pipe(filter(isActionOf(deviceActions.writePacket.success)), filter(function (_a) {
@@ -33,7 +33,7 @@ export var startHandlers = function (action$, state$) {
     ]; }));
 };
 export var sendPacket = function (action$) {
-    return action$.pipe(filter(isActionOf(deviceActions.writePacket.request)), switchMap(function (action) { return writePacket(action.payload); }), switchMap(function (action) { return from(action.responseReceived); }), map(deviceActions.writePacket.success), catchError(function (err) {
+    return action$.pipe(filter(isActionOf(deviceActions.writePacket.request)), switchMap(function (action) { return writePacket(action.payload); }), map(deviceActions.writePacket.success), catchError(function (err) {
         //If the user asks to start a program, and it is missing on the device, we get an out_of_range error.
         //In this case, we either ask them to upload the motor control program, or if they are running their
         //own program, then we just upload it anyways.
@@ -58,7 +58,7 @@ export var writeFile = function (action$) {
     //endlessly write (expand recursively calls itself) we then split into two branches and share the current result
     //between them.
     //The tap opens the file upload dialog whenever we upload a file.
-    var actions = action$.pipe(filter(isActionOf(deviceActions.writeFile.request)), tap(function () { return Actions.push("status"); }), switchMap(function (action) { return writePacket(OpenWrite.createPacket(action.payload)); }), switchMap(function (packet) { return packet.responseReceived; }), switchMap(function (packet) { return of(Write.createPacket(packet.file)); }), expand(function (packet) {
+    var actions = action$.pipe(filter(isActionOf(deviceActions.writeFile.request)), tap(function () { return Actions.push("status"); }), switchMap(function (action) { return writePacket(OpenWrite.createPacket(action.payload)); }), switchMap(function (packet) { return of(Write.createPacket(packet.file)); }), expand(function (packet) {
         if (packet.file.hasWritten()) {
             return EMPTY;
         }

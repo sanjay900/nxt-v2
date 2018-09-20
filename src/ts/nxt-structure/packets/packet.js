@@ -20,6 +20,7 @@ var __spread = (this && this.__spread) || function () {
 };
 import 'mdn-polyfills/String.prototype.padEnd';
 import { Subject } from "rxjs";
+import { packetBuffer } from "../../bluetooth-events";
 var Packet = /** @class */ (function () {
     function Packet(_id) {
         this._id = _id;
@@ -79,7 +80,11 @@ var Packet = /** @class */ (function () {
         var header = [];
         Packet.writeWord(data.length, header);
         data.unshift.apply(data, __spread(header));
+        packetBuffer.push(this);
         return new Uint8Array(data);
+    };
+    Packet.prototype.packetMatches = function (data) {
+        return data[0] == this.id;
     };
     Packet.FILE_NAME_LENGTH = 20;
     Packet.S_WORD_LENGTH = 20;

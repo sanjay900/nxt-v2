@@ -20,19 +20,18 @@ var LsRead = /** @class */ (function (_super) {
     }
     LsRead.createPacket = function (port) {
         var packet = new LsRead();
-        packet.port = port;
+        packet.port = port - 1;
         return packet;
     };
     LsRead.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
         this.bytesRead = data.shift();
-        this.rxData = data.splice(0, LsRead.RX_DATA_SIZE);
+        this.rxData = data;
     };
     LsRead.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);
         data.push(this.port);
     };
-    LsRead.RX_DATA_SIZE = 20;
     return LsRead;
 }(DirectPacket));
 export { LsRead };

@@ -21,7 +21,7 @@ export const sensorHandler = createAsyncAction(
     'sensorHandlerRequest',
     'sensorHandlerResponse',
     'sensorHandlerFailure'
-)<void, void, PacketError>();
+)<number[], void, PacketError>();
 export const sensorUpdate = createAction("sensorUpdate", resolve => {
     return (sensorData: SensorData) => resolve(sensorData);
 });
@@ -29,7 +29,7 @@ export const sensorConfig = createAsyncAction(
   'sensorConfigRequest',
   'sensorConfigResponse',
   'sensorConfigFailure'
-)<{port: number, type: SensorType}, {port: number, sensor: SystemSensor}, PacketError>();
+)<{port: number, sensorType: SensorType}, {port: number, sensorType: SystemSensor}, PacketError>();
 
 export const startMotorHandler = createAsyncAction(
     'startMotorHandlerRequest',

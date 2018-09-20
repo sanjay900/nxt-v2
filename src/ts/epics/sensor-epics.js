@@ -12,6 +12,7 @@ import * as deviceActions from "../actions/device-actions";
 import { UltrasonicSensorCommand } from "../nxt-structure/ultrasonic-sensor-command";
 import { EmptyPacket } from "../nxt-structure/packets/EmptyPacket";
 import { ConnectionStatus } from "../reducers/bluetooth";
+import { SetInputMode } from "../nxt-structure/packets/direct/set-input-mode";
 var CM_TO_INCH = 0.393700;
 export var TYPE_TO_MODE = new Map([
     [SensorType.SOUND_DB, InputSensorMode.RAW],
@@ -31,29 +32,15 @@ export var TYPE_TO_TYPE = new Map([
     [SensorType.ULTRASONIC_INCH, InputSensorType.LOW_SPEED_9V],
     [SensorType.ULTRASONIC_CM, InputSensorType.LOW_SPEED_9V],
 ]);
-function readI2CRegister(register, port) {
-    return writePacket(LsWrite.createPacket(port, [0x02, register], 1)).pipe(function () { return writePacket(LsGetStatus.createPacket(port)); }, filter(function (packet) { return packet.bytesReady > 0; }), function () { return writePacket(LsRead.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rxData[0], scaledValue: packet.rxData[0], port: port }); }));
-}
-export function tickSensor(port, state$) {
-    var sensor = state$.value.device.inputs[port];
-    var pipe = of(state$.value.device.outputConfig).pipe(filter(function () { return sensor.type != SensorType.NONE; }), share());
-    return merge(pipe.pipe(filter(function () { return sensor.type == SensorType.ULTRASONIC_CM || sensor.type == SensorType.ULTRASONIC_INCH; }), function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }, map(function (data) {
-        var scale = sensor.type == SensorType.ULTRASONIC_INCH ? CM_TO_INCH : 1;
-        return { scaledValue: data.scaledValue * scale, rawValue: data.rawValue, port: port };
-    })), pipe.pipe(filter(function () { return sensor.type != SensorType.ULTRASONIC_CM && sensor.type != SensorType.ULTRASONIC_INCH; }), function () { return writePacket(GetInputValues.createPacket(port)); }, map(function (packet) { return ({ rawValue: packet.rawValue, scaledValue: packet.scaledValue, port: port }); })));
-}
 export var sensorConfig = function (action$) {
     return action$.pipe(filter(isActionOf(deviceActions.sensorConfig.request)), switchMap(function (_a) {
         var config = _a.payload;
-        if (config.type == SensorType.ULTRASONIC_CM || config.type == SensorType.ULTRASONIC_INCH) {
-            return writePacket(LsWrite.createPacket(config.port, [0x02, UltrasonicSensorRegister.COMMAND, UltrasonicSensorCommand.CONTINUOUS_MEASUREMENT], 0)).pipe(map(function () { return config; }));
-        }
         return of(config);
-    }), map(function (config) {
+    }), switchMap(function (config) {
         var sensor = {
-            type: config.type,
-            systemType: TYPE_TO_TYPE.get(config.type),
-            mode: TYPE_TO_MODE.get(config.type),
+            type: config.sensorType,
+            systemType: TYPE_TO_TYPE.get(config.sensorType),
+            mode: TYPE_TO_MODE.get(config.sensorType),
             data: {
                 rawValue: 0,
                 scaledValue: 0,
@@ -61,21 +48,58 @@ export var sensorConfig = function (action$) {
             },
             dataHistory: []
         };
-        deviceActions.sensorConfig.success({ sensor: sensor, port: config.port });
-    }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
+        return writePacket(SetInputMode.createPacket(config.port, sensor.systemType, sensor.mode)).pipe(map(function () { return ({
+            port: config.port,
+            sensorType: sensor
+        }); }));
+    }), switchMap(function (config) {
+        if (config.sensorType.type == SensorType.ULTRASONIC_CM || config.sensorType.type == SensorType.ULTRASONIC_INCH) {
+            return writePacket(LsWrite.createPacket(config.port, [0x02, UltrasonicSensorRegister.COMMAND, UltrasonicSensorCommand.CONTINUOUS_MEASUREMENT], 0)).pipe(map(function () { return config; }));
+        }
+        else {
+            return of(config);
+        }
+    }), map(deviceActions.sensorConfig.success), catchError(function (err) { return of(deviceActions.sensorConfig.failure(err)); }), catchError(function (err) { return of(deviceActions.sensorConfig.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); }));
 };
 export var sensorHandler = function (action$, state$) {
-    return action$.pipe(filter(isActionOf(deviceActions.sensorHandler.request)), map(function () { return state$.value.device.outputConfig; }), expand(function () {
+    return action$.pipe(filter(isActionOf(deviceActions.sensorHandler.request)), switchMap(function (ports) { return ports.payload; }), map(function (port) { return ({ port: port }); }), expand(function (port) {
         var state = state$.value;
         if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
             return EMPTY;
         }
-        return merge(tickSensor(1, state$), tickSensor(2, state$), tickSensor(3, state$), tickSensor(4, state$)).pipe(delay(100));
-    }), map(deviceActions.sensorUpdate), catchError(function (err) { return of(deviceActions.startMotorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.startMotorHandler.failure({
+        return of(port).pipe(delay(100), switchMap(function () { return tickSensor(port.port, state$); }), catchError(function () {
+            //Digital sensors return errors to tell you you cannot read from them, so instead of passing those errors to the user,
+            //its better to silence them and not return data
+            return of({ rawValue: -1, scaledValue: -1, port: port.port });
+        }));
+    }), filter(function (data) { return data.rawValue >= 0; }), 
+    //Unwrap the observable returned by tickSensor
+    map(deviceActions.sensorUpdate), catchError(function (err) { return of(deviceActions.sensorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.sensorHandler.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); }));
 };
+function readI2CRegister(register, port) {
+    var p = of(port).pipe(switchMap(function () { return writePacket(LsWrite.createPacket(port, [0x02, register], 1)); }), switchMap(function () { return writePacket(LsGetStatus.createPacket(port)); }), share());
+    return merge(p.pipe(filter(function (packet) { return packet.bytesReady > 0; }), switchMap(function () { return writePacket(LsRead.createPacket(port)); }), map(function (packet) { return ({ rawValue: packet.rxData[0], scaledValue: packet.rxData[0], port: port }); })), p.pipe(filter(function (packet) { return packet.bytesReady == 0; }), 
+    //If the sensor isnt ready, we can just ignore its data
+    map(function () { return ({ rawValue: -1, scaledValue: -1, port: port }); })));
+}
+function isUltrasonic(type) {
+    return type == SensorType.ULTRASONIC_INCH || type == SensorType.ULTRASONIC_CM;
+}
+export function tickSensor(port, state$) {
+    var p = of(port).pipe(share());
+    //Merge together the possibilities for each type of sensor tick
+    return merge(p.pipe(filter(function () { return state$.value.device.inputs[port].type == SensorType.NONE; }), map(function () { return ({ rawValue: 0, scaledValue: 0, port: port }); })), p.pipe(filter(function () { return isUltrasonic(state$.value.device.inputs[port].type); }), switchMap(function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), map(function (data) {
+        var scale = state$.value.device.inputs[port].type == SensorType.ULTRASONIC_INCH ? CM_TO_INCH : 1;
+        return { scaledValue: data.scaledValue * scale, rawValue: data.rawValue, port: port };
+    })), p.pipe(filter(function () { return state$.value.device.inputs[port].type != SensorType.NONE && !isUltrasonic(state$.value.device.inputs[port].type); }), switchMap(function () { return writePacket(GetInputValues.createPacket(port)); }), map(function (packet) { return ({
+        rawValue: packet.rawValue,
+        scaledValue: packet.scaledValue,
+        port: port
+    }); })));
+}

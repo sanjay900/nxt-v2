@@ -5,12 +5,16 @@ var __read = (this && this.__read) || function (o, n) {
     try {
         while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
     }
-    catch (error) { e = { error: error }; }
+    catch (error) {
+        e = {error: error};
+    }
     finally {
         try {
             if (r && !r.done && (m = i["return"])) m.call(i);
         }
-        finally { if (e) throw e.error; }
+        finally {
+            if (e) throw e.error;
+        }
     }
     return ar;
 };
@@ -29,6 +33,7 @@ var NXTFile = /** @class */ (function () {
             this.size = fileData.length;
         }
     }
+
     Object.defineProperty(NXTFile.prototype, "percentage", {
         get: function () {
             if (this.writtenBytes == 0)
@@ -57,7 +62,7 @@ var NXTFile = /** @class */ (function () {
     NXTFile.PACKET_SIZE = 64;
     return NXTFile;
 }());
-export { NXTFile };
+export {NXTFile};
 export var NXTFileMode;
 (function (NXTFileMode) {
     NXTFileMode[NXTFileMode["READ"] = 0] = "READ";

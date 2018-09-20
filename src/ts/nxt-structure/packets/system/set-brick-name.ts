@@ -4,20 +4,20 @@ import {Packet} from "../packet";
 import 'mdn-polyfills/String.prototype.padEnd';
 
 export class SetBrickName extends SystemPacket {
-  public name: string;
+    public name: string;
 
-  constructor() {
-    super(SystemCommand.SET_BRICK_NAME);
-  }
+    constructor() {
+        super(SystemCommand.SET_BRICK_NAME);
+    }
 
-  public static createPacket(name: string) {
-    let packet = new SetBrickName();
-    packet.name = name;
-    return packet;
-  }
+    public static createPacket(name: string) {
+        let packet = new SetBrickName();
+        packet.name = name;
+        return packet;
+    }
 
-  protected writePacketData(expectResponse: boolean, data: number[]): void {
-    super.writePacketData(expectResponse, data);
-    Packet.writeAsciiz(this.name.padEnd(16, "\0"), data);
-  }
+    protected writePacketData(expectResponse: boolean, data: number[]): void {
+        super.writePacketData(expectResponse, data);
+        Packet.writeAsciiz(this.name.padEnd(16, "\0"), data);
+    }
 }

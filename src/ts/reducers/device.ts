@@ -103,10 +103,10 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             return {...state};
 
         case getType(deviceActions.sensorConfig.failure):
-            console.log("config",action.payload.error,DirectCommand[action.payload.packet.id],SystemCommand[action.payload.packet.id]);
+            console.log("config", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
             return {...state, lastMessage: action.payload.error.message};
         case getType(deviceActions.sensorHandler.failure):
-            console.log("handler",action.payload.error,DirectCommand[action.payload.packet.id],SystemCommand[action.payload.packet.id]);
+            console.log("handler", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
             return {...state, lastMessage: action.payload.error.message};
         case getType(deviceActions.writePacket.failure):
             console.log(action.payload);
@@ -130,7 +130,7 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
         case getType(deviceActions.sensorConfig.request):
             return set(state, `inputs.${action.payload.port}.type`, action.payload.sensorType);
         case getType(deviceActions.enableSensors):
-            let sensors = action.payload || [1,2,3,4];
+            let sensors = action.payload || [1, 2, 3, 4];
             for (let sensor of sensors) {
                 state = set(state, `inputs.${sensor}.enabled`, true);
             }

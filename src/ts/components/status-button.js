@@ -14,9 +14,9 @@ var __extends = (this && this.__extends) || (function () {
 import { Animated, StyleSheet, View } from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
+import { ConnectionStatus } from "../store";
 import { connect } from "react-redux";
 import Toast from "@remobile/react-native-toast";
-import { ConnectionStatus } from "../store";
 var AnimatedIcon = Animated.createAnimatedComponent(Icon);
 var Colours = {
     connecting: "black",

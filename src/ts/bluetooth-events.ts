@@ -10,6 +10,7 @@ import {DirectCommandResponse} from "./nxt-structure/packets/direct-command-resp
 
 let buffer: number[] = [];
 export let packetBuffer: Packet[] = [];
+
 export function initEvents(store: Store) {
     BluetoothSerial.on('bluetoothEnabled', () => {
 

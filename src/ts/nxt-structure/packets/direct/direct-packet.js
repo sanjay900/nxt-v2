@@ -11,8 +11,7 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-import { Packet } from "../packet";
-import { TelegramType } from "../packet";
+import { Packet, TelegramType } from "../packet";
 var DirectPacket = /** @class */ (function (_super) {
     __extends(DirectPacket, _super);
     function DirectPacket() {

@@ -1,8 +1,8 @@
 import {ActionsObservable, StateObservable} from "redux-observable";
-import {RootAction, RootState, SystemSensor} from "../store";
+import {ConnectionStatus, RootAction, RootState, SystemSensor} from "../store";
 import {EMPTY, merge, Observable, of} from "rxjs";
 import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor-constants";
-import {catchError, delay, expand, filter, map, share, switchMap, tap} from "rxjs/operators";
+import {catchError, delay, expand, filter, map, share, switchMap} from "rxjs/operators";
 import {UltrasonicSensorRegister} from "../nxt-structure/i2c-register";
 import {GetInputValues} from "../nxt-structure/packets/direct/get-input-values";
 import {LsWrite} from "../nxt-structure/packets/direct/ls-write";
@@ -14,7 +14,6 @@ import * as deviceActions from "../actions/device-actions";
 import {UltrasonicSensorCommand} from "../nxt-structure/ultrasonic-sensor-command";
 import {PacketError} from "../reducers/device";
 import {EmptyPacket} from "../nxt-structure/packets/empty-packet";
-import {ConnectionStatus} from "../store";
 import {SetInputMode} from "../nxt-structure/packets/direct/set-input-mode";
 
 const CM_TO_INCH = 0.393700;

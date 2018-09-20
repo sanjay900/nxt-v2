@@ -15,8 +15,7 @@ import React, { Component } from "react";
 import { StyleSheet, View } from "react-native";
 import { PanGestureHandler, State } from "react-native-gesture-handler";
 import { connect } from "react-redux";
-import { joystickMove } from "../actions/device-actions";
-import { joystickRelease, joystickTouch } from "../actions/device-actions";
+import { joystickMove, joystickRelease, joystickTouch } from "../actions/device-actions";
 var CIRCLE_SIZE = 80;
 var MAX = 70;
 var BACK_SIZE_LOCKED = CIRCLE_SIZE / 2;
@@ -30,11 +29,11 @@ var Joystick = /** @class */ (function (_super) {
     }
     Joystick.prototype.render = function () {
         return (<View style={styles.container} onLayout={this.onPageLayout.bind(this)}>
-        <View style={[styles.circle, this.getBackStyle()]}/>
-        <PanGestureHandler onGestureEvent={this.onMove.bind(this)} onHandlerStateChange={this.startStop.bind(this)}>
-          <View style={[styles.circle, this.getStyle()]}/>
-        </PanGestureHandler>
-      </View>);
+                <View style={[styles.circle, this.getBackStyle()]}/>
+                <PanGestureHandler onGestureEvent={this.onMove.bind(this)} onHandlerStateChange={this.startStop.bind(this)}>
+                    <View style={[styles.circle, this.getStyle()]}/>
+                </PanGestureHandler>
+            </View>);
     };
     Joystick.prototype.startStop = function (event) {
         if (event.nativeEvent.state == State.BEGAN) {

@@ -1,4 +1,5 @@
 import {Buffer} from 'buffer';
+
 const file64 = "TWluZHN0b3Jtc05YVAAABTkCNgegBOEESwKWAgEAGQBWBSAALggGAAAABgEEAAoBCAAKAQwACgEQ\n" +
     "AAoBFAAKARgABgAcAAYBIAAGACQABgAoAAYALAAGADAABgA0AAYAOAAGADwABgBAAAYBRAAJAEgA\n" +
     "BgBMAAYAUAAGAVQACQBYAAYAXAAGAWAABgFkAAYBaAAGAWwABgFwAAYBdAAFAHgABQF8AAYBgAAF\n" +
@@ -142,6 +143,6 @@ export type FileList = {
     [key: string]: number[]
 }
 export const SteeringControl = "SteeringControl.rxe";
-export const fileList: FileList  = {
+export const fileList: FileList = {
     SteeringControl: Array.from(new Buffer(file64, "base64"))
 };

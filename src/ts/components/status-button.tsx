@@ -1,11 +1,10 @@
 import {Animated, StyleSheet, View} from "react-native";
 import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
-import {State} from "../store";
+import {ConnectionStatus, State} from "../store";
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import Toast from "@remobile/react-native-toast";
-import {ConnectionStatus} from "../store";
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const Colours: { [key: string]: string } = {

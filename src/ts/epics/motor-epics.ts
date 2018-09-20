@@ -1,9 +1,8 @@
 import {ActionsObservable, StateObservable} from "redux-observable";
-import {OutputConfig, RootAction, RootState} from "../store";
+import {ConnectionStatus, OutputConfig, RootAction, RootState} from "../store";
 import {catchError, delay, expand, filter, map, switchMap} from "rxjs/operators";
 import {isActionOf} from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
-import {ConnectionStatus} from "../store";
 import {EMPTY, of} from "rxjs";
 import {SteeringConfig} from "../nxt-structure/motor-constants";
 import {MessageWrite} from "../nxt-structure/packets/direct/message-write";

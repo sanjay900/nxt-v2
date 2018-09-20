@@ -5,12 +5,16 @@ var __read = (this && this.__read) || function (o, n) {
     try {
         while ((n === void 0 || n-- > 0) && !(r = i.next()).done) ar.push(r.value);
     }
-    catch (error) { e = { error: error }; }
+    catch (error) {
+        e = {error: error};
+    }
     finally {
         try {
             if (r && !r.done && (m = i["return"])) m.call(i);
         }
-        finally { if (e) throw e.error; }
+        finally {
+            if (e) throw e.error;
+        }
     }
     return ar;
 };
@@ -19,13 +23,15 @@ var __spread = (this && this.__spread) || function () {
     return ar;
 };
 import 'mdn-polyfills/String.prototype.padEnd';
-import { Subject } from "rxjs";
-import { packetBuffer } from "../../bluetooth-events";
+import {Subject} from "rxjs";
+import {packetBuffer} from "../../bluetooth-events";
+
 var Packet = /** @class */ (function () {
     function Packet(_id) {
         this._id = _id;
         this.responseReceived = new Subject();
     }
+
     Object.defineProperty(Packet.prototype, "id", {
         get: function () {
             return this._id;
@@ -90,7 +96,7 @@ var Packet = /** @class */ (function () {
     Packet.S_WORD_LENGTH = 20;
     return Packet;
 }());
-export { Packet };
+export {Packet};
 export var TelegramType;
 (function (TelegramType) {
     TelegramType[TelegramType["DIRECT_COMMAND_RESPONSE"] = 0] = "DIRECT_COMMAND_RESPONSE";

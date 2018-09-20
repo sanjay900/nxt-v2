@@ -4,28 +4,28 @@ import {Packet} from "../packet";
 import {NXTFile} from "../../nxt-file";
 
 export class Read extends SystemPacket {
-  public file: NXTFile;
+    public file: NXTFile;
 
-  constructor() {
-    super(SystemCommand.READ);
-  }
+    constructor() {
+        super(SystemCommand.READ);
+    }
 
-  public static createPacket(file: NXTFile) {
-    let packet = new Read();
-    packet.file = file;
-    return packet;
-  }
+    public static createPacket(file: NXTFile) {
+        let packet = new Read();
+        packet.file = file;
+        return packet;
+    }
 
-  readPacket(data: number[]): void {
-    super.readPacket(data);
-    let length: number = Packet.readUWord(data);
-    this.file.readData(data.splice(0, length));
-  }
+    readPacket(data: number[]): void {
+        super.readPacket(data);
+        let length: number = Packet.readUWord(data);
+        this.file.readData(data.splice(0, length));
+    }
 
-  protected writePacketData(expectResponse: boolean, data: number[]): void {
-    super.writePacketData(expectResponse, data);
-    Packet.writeFileName(this.file.name, data);
-    data.push(this.file.handle);
-    Packet.writeWord(NXTFile.PACKET_SIZE, data);
-  }
+    protected writePacketData(expectResponse: boolean, data: number[]): void {
+        super.writePacketData(expectResponse, data);
+        Packet.writeFileName(this.file.name, data);
+        data.push(this.file.handle);
+        Packet.writeWord(NXTFile.PACKET_SIZE, data);
+    }
 }

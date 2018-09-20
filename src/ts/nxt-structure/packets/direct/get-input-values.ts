@@ -20,13 +20,13 @@ export class GetInputValues extends DirectPacket {
 
     public static createPacket(port: number) {
         let packet: GetInputValues = new GetInputValues();
-        packet.port = port-1;
+        packet.port = port - 1;
         return packet;
     }
 
     readPacket(data: number[]): void {
         super.readPacket(data);
-        this.port = data.shift()!+1;
+        this.port = data.shift()! + 1;
         this.valid = Packet.readBoolean(data);
         this.calibrated = Packet.readBoolean(data);
         this.type = data.shift()!;

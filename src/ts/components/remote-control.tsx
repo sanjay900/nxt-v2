@@ -2,9 +2,8 @@ import {Button, StyleSheet, View} from "react-native";
 import React from "react";
 import Joystick from "./joystick";
 import {connect} from 'react-redux';
-import {State} from "../store";
+import {Mode, State} from "../store";
 import {toggle} from "../actions/core-actions";
-import {Mode} from "../store";
 
 type Props = {
     currentMode: Mode,

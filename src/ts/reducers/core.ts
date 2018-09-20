@@ -1,7 +1,6 @@
 import {getType} from "typesafe-actions";
-import {Mode} from "../store";
+import {CoreAction, CoreState, Mode} from "../store";
 import * as coreActions from "../actions/core-actions";
-import {CoreAction, CoreState} from "../store";
 
 const initialState: CoreState = {
     mode: Mode.JOYSTICK

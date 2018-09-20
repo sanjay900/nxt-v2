@@ -2,8 +2,8 @@ import { Button, StyleSheet, View } from "react-native";
 import React from "react";
 import Joystick from "./joystick";
 import { connect } from 'react-redux';
-import { toggle } from "../actions/core-actions";
 import { Mode } from "../store";
+import { toggle } from "../actions/core-actions";
 var RemoteControl = function (_a) {
     var onSwapModeClick = _a.onSwapModeClick, currentMode = _a.currentMode;
     if (currentMode == Mode.JOYSTICK) {

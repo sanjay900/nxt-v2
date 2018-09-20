@@ -14,6 +14,7 @@ import {InputSensorMode, InputSensorType, SensorData, SensorType} from "./nxt-st
 import {NXTFile} from "./nxt-structure/nxt-file";
 
 export type CoreAction = ActionType<typeof coreActions>;
+
 export enum ConnectionStatus { CONNECTING, CONNECTED, DISCONNECTED }
 
 export type BluetoothState = {

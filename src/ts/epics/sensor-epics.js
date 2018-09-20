@@ -46,7 +46,8 @@ export var sensorConfig = function (action$) {
                 scaledValue: 0,
                 port: config.port
             },
-            dataHistory: []
+            dataHistory: [],
+            enabled: true
         };
         return writePacket(SetInputMode.createPacket(config.port, sensor.systemType, sensor.mode)).pipe(map(function () { return ({
             port: config.port,
@@ -92,12 +93,12 @@ function isUltrasonic(type) {
     return type == SensorType.ULTRASONIC_INCH || type == SensorType.ULTRASONIC_CM;
 }
 export function tickSensor(port, state$) {
-    var p = of(port).pipe(share());
+    var p = of(state$.value.device.inputs[port]).pipe(share());
     //Merge together the possibilities for each type of sensor tick
-    return merge(p.pipe(filter(function () { return state$.value.device.inputs[port].type == SensorType.NONE; }), map(function () { return ({ rawValue: 0, scaledValue: 0, port: port }); })), p.pipe(filter(function () { return isUltrasonic(state$.value.device.inputs[port].type); }), switchMap(function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), map(function (data) {
+    return merge(p.pipe(filter(function (sensor) { return sensor.type == SensorType.NONE || !sensor.enabled; }), map(function () { return ({ rawValue: 0, scaledValue: 0, port: port }); })), p.pipe(filter(function (sensor) { return isUltrasonic(sensor.type) && sensor.enabled; }), switchMap(function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), map(function (data) {
         var scale = state$.value.device.inputs[port].type == SensorType.ULTRASONIC_INCH ? CM_TO_INCH : 1;
         return { scaledValue: data.scaledValue * scale, rawValue: data.rawValue, port: port };
-    })), p.pipe(filter(function () { return state$.value.device.inputs[port].type != SensorType.NONE && !isUltrasonic(state$.value.device.inputs[port].type); }), switchMap(function () { return writePacket(GetInputValues.createPacket(port)); }), map(function (packet) { return ({
+    })), p.pipe(filter(function (sensor) { return sensor.type != SensorType.NONE && !isUltrasonic(sensor.type) && sensor.enabled; }), switchMap(function () { return writePacket(GetInputValues.createPacket(port)); }), map(function (packet) { return ({
         rawValue: packet.rawValue,
         scaledValue: packet.scaledValue,
         port: port

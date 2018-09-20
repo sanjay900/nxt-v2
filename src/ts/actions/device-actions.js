@@ -1,4 +1,8 @@
 import { createAction, createAsyncAction } from "typesafe-actions";
+export var disableSensors = createAction("disableSensors");
+export var enableSensors = createAction("enableSensors", function (resolve) {
+    return function (sensors) { return resolve(sensors); };
+});
 export var readPacket = createAction("readPacket", function (resolve) {
     return function (packet, type) { return resolve({ packet: packet, type: type }); };
 });

@@ -52,7 +52,8 @@ export const sensorConfig = (action$: ActionsObservable<RootAction>) =>
                     scaledValue: 0,
                     port: config.port
                 },
-                dataHistory: []
+                dataHistory: [],
+                enabled: true
             };
             return writePacket(SetInputMode.createPacket(config.port, sensor.systemType, sensor.mode)).pipe(map(() => ({
                 port: config.port,
@@ -135,15 +136,15 @@ function isUltrasonic(type: SensorType) {
 }
 
 export function tickSensor(port: number, state$: StateObservable<RootState>) {
-    let p = of(port).pipe(share());
+    let p = of(state$.value.device.inputs[port]).pipe(share());
     //Merge together the possibilities for each type of sensor tick
     return merge(
         p.pipe(
-            filter(() => state$.value.device.inputs[port].type == SensorType.NONE),
+            filter(sensor => sensor.type == SensorType.NONE || !sensor.enabled),
             map(() => ({rawValue: 0, scaledValue: 0, port}))
         ),
         p.pipe(
-            filter(() => isUltrasonic(state$.value.device.inputs[port].type)),
+            filter(sensor => isUltrasonic(sensor.type) && sensor.enabled),
             switchMap(() => readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port)),
             map(data => {
                 let scale = state$.value.device.inputs[port].type == SensorType.ULTRASONIC_INCH ? CM_TO_INCH : 1;
@@ -151,7 +152,7 @@ export function tickSensor(port: number, state$: StateObservable<RootState>) {
             })
         ),
         p.pipe(
-            filter(() => state$.value.device.inputs[port].type != SensorType.NONE && !isUltrasonic(state$.value.device.inputs[port].type)),
+            filter(sensor => sensor.type != SensorType.NONE && !isUltrasonic(sensor.type) && sensor.enabled),
             switchMap(() => writePacket(GetInputValues.createPacket(port))),
             map(packet => ({
                 rawValue: packet.rawValue,

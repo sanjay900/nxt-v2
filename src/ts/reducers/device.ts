@@ -28,7 +28,8 @@ const initialSensor: SystemSensor = {
         port: 0,
         rawValue: 0,
         scaledValue: 0
-    }
+    },
+    enabled: false
 };
 const initialOutput: SystemOutput = {
     mode: 0,
@@ -128,6 +129,18 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
 
         case getType(deviceActions.sensorConfig.request):
             return set(state, `inputs.${action.payload.port}.type`, action.payload.sensorType);
+        case getType(deviceActions.enableSensors):
+            let sensors = action.payload || [1,2,3,4];
+            for (let sensor of sensors) {
+                state = set(state, `inputs.${sensor}.enabled`, true);
+            }
+            return state;
+        case getType(deviceActions.disableSensors):
+            state = set(state, `inputs.1.enabled`, false);
+            state = set(state, `inputs.2.enabled`, false);
+            state = set(state, `inputs.3.enabled`, false);
+            state = set(state, `inputs.4.enabled`, false);
+            return state;
         case getType(deviceActions.sensorUpdate):
             console.log(action);
             return state

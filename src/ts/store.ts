@@ -57,6 +57,7 @@ export type SystemSensor = {
     mode: InputSensorMode,
     data: SensorData
     dataHistory: SensorData[],
+    enabled: boolean
 }
 export type OutputConfig = {
     targetAngle: number,

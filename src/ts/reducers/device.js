@@ -9,6 +9,16 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
+var __values = (this && this.__values) || function (o) {
+    var m = typeof Symbol === "function" && o[Symbol.iterator], i = 0;
+    if (m) return m.call(o);
+    return {
+        next: function () {
+            if (o && i >= o.length) o = void 0;
+            return { value: o && o[i++], done: !o };
+        }
+    };
+};
 import { MultiOutputPort, OutputRegulationMode, OutputRunState, SingleOutputPort, SteeringConfig } from "../nxt-structure/motor-constants";
 import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor-constants";
 import { SystemCommand } from "../nxt-structure/packets/system-command";
@@ -26,7 +36,8 @@ var initialSensor = {
         port: 0,
         rawValue: 0,
         scaledValue: 0
-    }
+    },
+    enabled: false
 };
 var initialOutput = {
     mode: 0,
@@ -80,6 +91,7 @@ var initialState = {
 };
 export var device = function (state, action) {
     if (state === void 0) { state = initialState; }
+    var e_1, _a;
     switch (action.type) {
         case getType(connectToDevice.success):
             return __assign({}, state, { info: __assign({}, state.info, { programToUpload: undefined }) });
@@ -121,6 +133,28 @@ export var device = function (state, action) {
             return __assign({}, state, { outputConfig: action.payload });
         case getType(deviceActions.sensorConfig.request):
             return set(state, "inputs." + action.payload.port + ".type", action.payload.sensorType);
+        case getType(deviceActions.enableSensors):
+            var sensors = action.payload || [1, 2, 3, 4];
+            try {
+                for (var sensors_1 = __values(sensors), sensors_1_1 = sensors_1.next(); !sensors_1_1.done; sensors_1_1 = sensors_1.next()) {
+                    var sensor = sensors_1_1.value;
+                    state = set(state, "inputs." + sensor + ".enabled", true);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (sensors_1_1 && !sensors_1_1.done && (_a = sensors_1.return)) _a.call(sensors_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return state;
+        case getType(deviceActions.disableSensors):
+            state = set(state, "inputs.1.enabled", false);
+            state = set(state, "inputs.2.enabled", false);
+            state = set(state, "inputs.3.enabled", false);
+            state = set(state, "inputs.4.enabled", false);
+            return state;
         case getType(deviceActions.sensorUpdate):
             console.log(action);
             return state;

@@ -7,13 +7,12 @@ import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 
 import * as bluetoothActions from '../actions/bluetooth-actions';
 import * as deviceActions from "../actions/device-actions";
-import {sensorConfig, writePacket} from "../actions/device-actions";
+import {writePacket} from "../actions/device-actions";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
 import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
 import {SteeringControl} from "../utils/Files";
 import {StartProgram} from "../nxt-structure/packets/direct/start-program";
-import {SensorType} from "../nxt-structure/sensor-constants";
 
 
 export const requestDevices: Epic<RootAction, RootAction, RootState> = (action$) =>
@@ -37,10 +36,6 @@ export const connectToDevice = (action$: ActionsObservable<RootAction>) =>
                 writePacket.request(GetDeviceInfo.createPacket()),
                 writePacket.request(GetFirmwareVersion.createPacket()),
                 writePacket.request(StartProgram.createPacket(SteeringControl)),
-                sensorConfig.request({sensorType: SensorType.ULTRASONIC_CM, port: 1}),
-                sensorConfig.request({sensorType: SensorType.LIGHT_ACTIVE, port: 2}),
-                sensorConfig.request({sensorType: SensorType.TOUCH, port: 3}),
-                sensorConfig.request({sensorType: SensorType.SOUND_DBA, port: 4}),
                 deviceActions.sensorHandler.request([1, 2, 3, 4]),
             ]
         ),

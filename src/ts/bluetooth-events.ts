@@ -1,16 +1,12 @@
 import BluetoothSerial from "react-native-bluetooth-serial";
 import {Store} from "redux";
 import {disconnect} from "./actions/bluetooth-actions";
-import {TelegramType} from "./nxt-structure/nxt-packet";
-import {Packet} from "./nxt-structure/packets/packet";
+import {Packet, TelegramType} from "./nxt-structure/packets/packet";
 import {Buffer} from "buffer";
 import {readPacket} from "./actions/device-actions";
 import {RootState} from "./store";
 import {SystemCommandResponse} from "./nxt-structure/packets/system-command-response";
 import {DirectCommandResponse} from "./nxt-structure/packets/direct-command-response";
-import {GetInputValues} from "./nxt-structure/packets/direct/get-input-values";
-import {SystemCommand} from "./nxt-structure/packets/system-command";
-import {DirectCommand} from "./nxt-structure/packets/direct-command";
 
 let buffer: number[] = [];
 export let packetBuffer: Packet[] = [];

@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import { Packet } from "../packet";
-import { TelegramType } from "../../nxt-packet";
+import { TelegramType } from "../packet";
 var DirectPacket = /** @class */ (function (_super) {
     __extends(DirectPacket, _super);
     function DirectPacket() {

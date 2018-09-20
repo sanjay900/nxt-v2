@@ -5,10 +5,10 @@ import {isActionOf} from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
 import {ConnectionStatus} from "../reducers/bluetooth";
 import {EMPTY, of} from "rxjs";
-import {SteeringConfig} from "../nxt-structure/motor/motor-constants";
+import {SteeringConfig} from "../nxt-structure/motor-constants";
 import {MessageWrite} from "../nxt-structure/packets/direct/message-write";
 import {OutputConfig, PacketError} from "../reducers/device";
-import {EmptyPacket} from "../nxt-structure/packets/EmptyPacket";
+import {EmptyPacket} from "../nxt-structure/packets/empty-packet";
 import {writePacket} from "./device-epics";
 
 const CONFIG_PACKET_ID = "B";

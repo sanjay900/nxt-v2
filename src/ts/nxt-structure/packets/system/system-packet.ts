@@ -1,6 +1,4 @@
-import {Packet} from "../packet";
-import {NXTFile} from "../../nxt-file";
-import {TelegramType} from "../../nxt-packet";
+import {Packet, TelegramType} from "../packet";
 
 export abstract class SystemPacket extends Packet {
   protected writePacketData(expectResponse: boolean, data: number[]) {

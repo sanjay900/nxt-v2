@@ -13,7 +13,7 @@ import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
 import {SteeringControl} from "../utils/Files";
 import {StartProgram} from "../nxt-structure/packets/direct/start-program";
-import {SensorType} from "../nxt-structure/sensor/sensor-constants";
+import {SensorType} from "../nxt-structure/sensor-constants";
 
 
 export const requestDevices: Epic<RootAction, RootAction, RootState> = (action$) =>

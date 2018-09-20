@@ -1,9 +1,9 @@
 import {ActionsObservable, StateObservable} from "redux-observable";
 import {RootAction, RootState} from "../store";
 import {EMPTY, merge, Observable, of} from "rxjs";
-import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor/sensor-constants";
+import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor-constants";
 import {catchError, delay, expand, filter, map, share, switchMap, tap} from "rxjs/operators";
-import {UltrasonicSensorRegister} from "../nxt-structure/sensor/i2c-register";
+import {UltrasonicSensorRegister} from "../nxt-structure/i2c-register";
 import {GetInputValues} from "../nxt-structure/packets/direct/get-input-values";
 import {LsWrite} from "../nxt-structure/packets/direct/ls-write";
 import {LsGetStatus} from "../nxt-structure/packets/direct/ls-get-status";
@@ -13,7 +13,7 @@ import {isActionOf} from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
 import {UltrasonicSensorCommand} from "../nxt-structure/ultrasonic-sensor-command";
 import {PacketError, SystemSensor} from "../reducers/device";
-import {EmptyPacket} from "../nxt-structure/packets/EmptyPacket";
+import {EmptyPacket} from "../nxt-structure/packets/empty-packet";
 import {ConnectionStatus} from "../reducers/bluetooth";
 import {SetInputMode} from "../nxt-structure/packets/direct/set-input-mode";
 

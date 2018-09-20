@@ -1,5 +1,5 @@
 import {Packet} from "../packet";
-import {InputSensorMode, InputSensorType} from "../../sensor/sensor-constants";
+import {InputSensorMode, InputSensorType} from "../../sensor-constants";
 import {DirectPacket} from "./direct-packet";
 import {DirectCommand} from "../direct-command";
 

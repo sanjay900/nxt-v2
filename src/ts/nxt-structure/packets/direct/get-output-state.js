@@ -24,7 +24,7 @@ var __values = (this && this.__values) || function (o) {
 import { Packet } from "../packet";
 import { DirectPacket } from "./direct-packet";
 import { DirectCommand } from "../direct-command";
-import { SystemOutputPortUtils } from "../../motor/motor-constants";
+import { SystemOutputPortUtils } from "../../motor-constants";
 var GetOutputState = /** @class */ (function (_super) {
     __extends(GetOutputState, _super);
     function GetOutputState() {

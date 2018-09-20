@@ -1,5 +1,5 @@
 import {Packet} from "../packet";
-import {TelegramType} from "../../nxt-packet";
+import {TelegramType} from "../packet";
 
 export abstract class DirectPacket extends Packet {
   protected writePacketData(expectResponse: boolean, data: number[]) {

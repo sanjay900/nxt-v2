@@ -20,7 +20,7 @@ var __spread = (this && this.__spread) || function () {
 };
 import BluetoothSerial from "react-native-bluetooth-serial";
 import { disconnect } from "./actions/bluetooth-actions";
-import { TelegramType } from "./nxt-structure/nxt-packet";
+import { TelegramType } from "./nxt-structure/packets/packet";
 import { Buffer } from "buffer";
 import { readPacket } from "./actions/device-actions";
 import { SystemCommandResponse } from "./nxt-structure/packets/system-command-response";

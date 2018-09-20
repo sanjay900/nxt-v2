@@ -1,7 +1,7 @@
-import {InputSensorMode} from "../../sensor/sensor-constants";
+import {InputSensorMode} from "../../sensor-constants";
 import {DirectPacket} from "./direct-packet";
 import {DirectCommand} from "../direct-command";
-import {InputSensorType} from "../../sensor/sensor-constants";
+import {InputSensorType} from "../../sensor-constants";
 
 export class SetInputMode extends DirectPacket {
   private port: number;

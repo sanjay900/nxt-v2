@@ -10,7 +10,7 @@ import { GetDeviceInfo } from "../nxt-structure/packets/system/get-device-info";
 import { GetFirmwareVersion } from "../nxt-structure/packets/system/get-firmware-version";
 import { SteeringControl } from "../utils/Files";
 import { StartProgram } from "../nxt-structure/packets/direct/start-program";
-import { SensorType } from "../nxt-structure/sensor/sensor-constants";
+import { SensorType } from "../nxt-structure/sensor-constants";
 export var requestDevices = function (action$) {
     return action$.pipe(filter(isActionOf(bluetoothActions.listDevices.request)), switchMap(function () {
         return from(ReactNativeBluetoothSerial.list()).pipe(map(bluetoothActions.listDevices.success), catchError(function (err) { return of(bluetoothActions.listDevices.failure(err)); }));

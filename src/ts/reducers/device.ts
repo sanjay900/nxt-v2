@@ -5,8 +5,8 @@ import {
     OutputRunState,
     SingleOutputPort,
     SteeringConfig
-} from "../nxt-structure/motor/motor-constants";
-import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor/sensor-constants";
+} from "../nxt-structure/motor-constants";
+import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor-constants";
 import {Packet} from "../nxt-structure/packets/packet";
 import {SystemCommand} from "../nxt-structure/packets/system-command";
 import {ActionType, getType} from "typesafe-actions";
@@ -19,7 +19,7 @@ import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
 import {NXTFile} from "../nxt-structure/nxt-file";
 import {BluetoothAction} from "./bluetooth";
 import {connectToDevice} from "../actions/bluetooth-actions";
-import {set, _delete, get} from "dot-prop-immutable";
+import {set} from "dot-prop-immutable";
 
 export type DeviceAction = ActionType<typeof deviceActions>;
 
@@ -172,6 +172,7 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
 
         case getType(deviceActions.sensorConfig.failure):
             console.log("config",action.payload.error,DirectCommand[action.payload.packet.id],SystemCommand[action.payload.packet.id]);
+            return {...state, lastMessage: action.payload.error.message};
         case getType(deviceActions.sensorHandler.failure):
             console.log("handler",action.payload.error,DirectCommand[action.payload.packet.id],SystemCommand[action.payload.packet.id]);
             return {...state, lastMessage: action.payload.error.message};

@@ -14,7 +14,7 @@ import { Actions } from "react-native-router-flux";
 import { DirectCommandResponse } from "../nxt-structure/packets/direct-command-response";
 import { Alert } from "react-native";
 import { fileList, SteeringControl } from "../utils/Files";
-import { EmptyPacket } from "../nxt-structure/packets/EmptyPacket";
+import { EmptyPacket } from "../nxt-structure/packets/empty-packet";
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
  * @param {Packet} packet the packet to write

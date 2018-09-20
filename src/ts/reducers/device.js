@@ -9,8 +9,8 @@ var __assign = (this && this.__assign) || function () {
     };
     return __assign.apply(this, arguments);
 };
-import { MultiOutputPort, OutputRegulationMode, OutputRunState, SingleOutputPort, SteeringConfig } from "../nxt-structure/motor/motor-constants";
-import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor/sensor-constants";
+import { MultiOutputPort, OutputRegulationMode, OutputRunState, SingleOutputPort, SteeringConfig } from "../nxt-structure/motor-constants";
+import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor-constants";
 import { SystemCommand } from "../nxt-structure/packets/system-command";
 import { getType } from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
@@ -96,6 +96,7 @@ export var device = function (state, action) {
             return __assign({}, state);
         case getType(deviceActions.sensorConfig.failure):
             console.log("config", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
+            return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.sensorHandler.failure):
             console.log("handler", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
             return __assign({}, state, { lastMessage: action.payload.error.message });

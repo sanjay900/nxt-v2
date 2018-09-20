@@ -1,17 +1,7 @@
 import * as bluetoothActions from '../actions/bluetooth-actions';
-import {ActionType, getType} from "typesafe-actions";
-import {Device} from "react-native-bluetooth-serial";
+import {getType} from "typesafe-actions";
+import {BluetoothAction, BluetoothState, ConnectionStatus} from "../store";
 
-export type BluetoothAction = ActionType<typeof bluetoothActions>;
-
-export enum ConnectionStatus { CONNECTING, CONNECTED, DISCONNECTED }
-
-export type BluetoothState = {
-    device?: Device,
-    list: Device[],
-    status: ConnectionStatus,
-    lastMessage?: string
-}
 const initialState: BluetoothState = {
     list: [],
     status: ConnectionStatus.DISCONNECTED

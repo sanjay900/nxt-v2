@@ -5,7 +5,7 @@ import {State} from "../store";
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import Toast from "@remobile/react-native-toast";
-import {ConnectionStatus} from "../reducers/bluetooth";
+import {ConnectionStatus} from "../store";
 
 const AnimatedIcon = Animated.createAnimatedComponent(Icon);
 const Colours: { [key: string]: string } = {

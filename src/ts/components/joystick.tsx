@@ -1,6 +1,6 @@
 import React, {Component} from "react";
 import {StyleSheet, View} from "react-native";
-import {Joystick as JoystickEvent} from "../reducers/device";
+import {Joystick as JoystickEvent} from "../store";
 import {
   PanGestureHandler,
   PanGestureHandlerGestureEvent,

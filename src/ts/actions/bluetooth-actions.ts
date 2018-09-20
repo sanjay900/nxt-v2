@@ -1,4 +1,4 @@
-import {ConnectionStatus} from '../reducers/bluetooth';
+import {ConnectionStatus} from '../store';
 import {createAction, createAsyncAction} from "typesafe-actions";
 import {Device} from "react-native-bluetooth-serial";
 

@@ -1,11 +1,8 @@
-import {ActionType, getType} from "typesafe-actions";
-import {Mode} from "./device";
+import {getType} from "typesafe-actions";
+import {Mode} from "../store";
 import * as coreActions from "../actions/core-actions";
+import {CoreAction, CoreState} from "../store";
 
-export type CoreAction = ActionType<typeof coreActions>;
-export type CoreState = {
-    mode: Mode
-}
 const initialState: CoreState = {
     mode: Mode.JOYSTICK
 };

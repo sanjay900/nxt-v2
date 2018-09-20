@@ -4,7 +4,7 @@ import {connectToDevice, disconnectFromDevice} from "../actions/bluetooth-action
 import {connect} from "react-redux";
 import {Device} from "react-native-bluetooth-serial";
 import {State} from "../store";
-import {ConnectionStatus} from "../reducers/bluetooth";
+import {ConnectionStatus} from "../store";
 import {writePacket} from "../actions/device-actions";
 import {StartProgram} from "../nxt-structure/packets/direct/start-program";
 

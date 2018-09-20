@@ -11,12 +11,7 @@ var __assign = (this && this.__assign) || function () {
 };
 import * as bluetoothActions from '../actions/bluetooth-actions';
 import { getType } from "typesafe-actions";
-export var ConnectionStatus;
-(function (ConnectionStatus) {
-    ConnectionStatus[ConnectionStatus["CONNECTING"] = 0] = "CONNECTING";
-    ConnectionStatus[ConnectionStatus["CONNECTED"] = 1] = "CONNECTED";
-    ConnectionStatus[ConnectionStatus["DISCONNECTED"] = 2] = "DISCONNECTED";
-})(ConnectionStatus || (ConnectionStatus = {}));
+import { ConnectionStatus } from "../store";
 var initialState = {
     list: [],
     status: ConnectionStatus.DISCONNECTED

@@ -2,7 +2,7 @@ import {StyleSheet, View} from "react-native";
 import React from "react";
 import {connect} from 'react-redux';
 import {State} from "../store";
-import {DeviceState} from "../reducers/device";
+import {DeviceState} from "../store";
 import {writePacket} from "../actions/device-actions";
 import {FormInput, FormLabel, Text} from "react-native-elements";
 import * as Progress from 'react-native-progress';

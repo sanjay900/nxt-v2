@@ -1,93 +1,24 @@
 import {
     MultiOutputPort,
-    OutputPort,
     OutputRegulationMode,
     OutputRunState,
     SingleOutputPort,
     SteeringConfig
 } from "../nxt-structure/motor-constants";
-import {InputSensorMode, InputSensorType, SensorData, SensorType} from "../nxt-structure/sensor-constants";
+import {InputSensorMode, InputSensorType, SensorType} from "../nxt-structure/sensor-constants";
 import {Packet} from "../nxt-structure/packets/packet";
 import {SystemCommand} from "../nxt-structure/packets/system-command";
-import {ActionType, getType} from "typesafe-actions";
+import {getType} from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
 import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
 import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
 import {DirectCommand} from "../nxt-structure/packets/direct-command";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
 import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
-import {NXTFile} from "../nxt-structure/nxt-file";
-import {BluetoothAction} from "./bluetooth";
+import {BluetoothAction, DeviceAction, DeviceState, SystemOutput, SystemSensor} from "../store";
 import {connectToDevice} from "../actions/bluetooth-actions";
 import {set} from "dot-prop-immutable";
 
-export type DeviceAction = ActionType<typeof deviceActions>;
-
-export type SystemOutput = {
-    mode: number,
-    regulationMode: OutputRegulationMode,
-    runState: OutputRunState,
-    data: OutputData
-    dataHistory: OutputData[]
-}
-export type OutputData = {
-    turnRatio: number,
-    tachoLimit: number,
-    tachoCount: number,
-    blockTachoCount: number,
-    rotationCount: number,
-    power: number
-}
-export type SystemSensor = {
-    type: SensorType,
-    systemType: InputSensorType,
-    mode: InputSensorMode,
-    data: SensorData
-    dataHistory: SensorData[],
-}
-export type OutputConfig = {
-    targetAngle: number,
-    power: number,
-    config: SteeringConfig,
-    invertSteering: false,
-    invertThrottle: false,
-    tankOutputs: {
-        leftPort: SingleOutputPort,
-        rightPort: SingleOutputPort,
-    }, frontOutputs: {
-        drivePort: OutputPort,
-        steeringPort: SingleOutputPort
-    }
-}
-
-export type DeviceState = {
-    info: {
-        currentProgramName: string,
-        deviceName: string,
-        btAddress: string,
-        btSignalStrength: number,
-        freeSpace: number,
-        batteryVoltage: number,
-        version: {
-            protocol: string,
-            firmware: string
-        },
-        currentFile?: NXTFile
-    },
-    outputs: {
-        A: SystemOutput,
-        B: SystemOutput,
-        C: SystemOutput
-    },
-    inputs: {
-        1: SystemSensor,
-        2: SystemSensor,
-        3: SystemSensor,
-        4: SystemSensor,
-        [key: number]: SystemSensor
-    }
-    outputConfig: OutputConfig
-}
 const initialSensor: SystemSensor = {
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
@@ -244,11 +175,3 @@ function processIncomingPacket(packet: Packet, state: DeviceState): any {
     return {};
 }
 
-export type Joystick = {
-    x: number,
-    y: number,
-    tapped: boolean,
-    name: string
-}
-
-export enum Mode { JOYSTICK, TILT }

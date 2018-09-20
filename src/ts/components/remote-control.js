@@ -3,7 +3,7 @@ import React from "react";
 import Joystick from "./joystick";
 import { connect } from 'react-redux';
 import { toggle } from "../actions/core-actions";
-import { Mode } from "../reducers/device";
+import { Mode } from "../store";
 var RemoteControl = function (_a) {
     var onSwapModeClick = _a.onSwapModeClick, currentMode = _a.currentMode;
     if (currentMode == Mode.JOYSTICK) {

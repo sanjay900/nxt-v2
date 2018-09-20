@@ -157,8 +157,3 @@ function processIncomingPacket(packet, state) {
     }
     return {};
 }
-export var Mode;
-(function (Mode) {
-    Mode[Mode["JOYSTICK"] = 0] = "JOYSTICK";
-    Mode[Mode["TILT"] = 1] = "TILT";
-})(Mode || (Mode = {}));

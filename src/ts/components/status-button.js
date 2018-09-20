@@ -16,7 +16,7 @@ import React from "react";
 import Icon from "react-native-vector-icons/FontAwesome5";
 import { connect } from "react-redux";
 import Toast from "@remobile/react-native-toast";
-import { ConnectionStatus } from "../reducers/bluetooth";
+import { ConnectionStatus } from "../store";
 var AnimatedIcon = Animated.createAnimatedComponent(Icon);
 var Colours = {
     connecting: "black",

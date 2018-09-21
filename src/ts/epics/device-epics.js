@@ -1,5 +1,5 @@
 import { isActionOf } from "typesafe-actions";
-import { catchError, concatMap, expand, filter, map, share, switchMap, tap } from "rxjs/operators";
+import { catchError, concatMap, expand, filter, map, share, switchMap, take, tap } from "rxjs/operators";
 import { EMPTY, from, merge, of } from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import { Buffer } from "buffer";
@@ -71,11 +71,11 @@ export var writeFile = function (action$) {
     return merge(actions.pipe(filter(function (data) { return !data.file.hasWritten(); }), map(writeFileProgress), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
         error: err,
         packet: EmptyPacket.createPacket()
-    })); })), actions.pipe(filter(function (data) { return data.file.hasWritten(); }), switchMap(function (packet) { return writePacket(Close.createPacket(packet.file)); }), switchMap(function (packet) {
+    })); })), actions.pipe(filter(function (data) { return data.file.hasWritten(); }), take(1), switchMap(function (packet) { return writePacket(Close.createPacket(packet.file)); }), switchMap(function (packet) {
         if (packet.file.autoStart) {
             return writePacket(StartProgram.createPacket(packet.file.name));
         }
-        return EMPTY;
+        return of();
     }), map(deviceActions.writeFile.success), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
         error: err,
         packet: EmptyPacket.createPacket()

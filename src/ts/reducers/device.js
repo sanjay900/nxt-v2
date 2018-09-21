@@ -99,20 +99,15 @@ export var device = function (state, action) {
             return __assign({}, state, processIncomingPacket(action.payload.packet, state));
         case getType(deviceActions.writeFileProgress):
             return __assign({}, state, { info: __assign({}, state.info, { currentFile: action.payload.packet.file }) });
-        case getType(deviceActions.writeFile.failure):
-            return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.writePacket.request):
             return __assign({}, state, processOutgoingPacket(action.payload, state));
         case getType(deviceActions.writePacket.success):
             return __assign({}, state);
         case getType(deviceActions.sensorConfig.failure):
-            console.log("config", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
-            return __assign({}, state, { lastMessage: action.payload.error.message });
-        case getType(deviceActions.sensorHandler.failure):
-            console.log("handler", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
-            return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.writePacket.failure):
-            console.log(action.payload.error);
+        case getType(deviceActions.sensorHandler.failure):
+        case getType(deviceActions.writeFile.failure):
+            console.log(action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
             return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.joystickMove):
             if (action.payload.name == "STEERING") {

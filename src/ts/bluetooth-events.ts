@@ -7,6 +7,8 @@ import {readPacket} from "./actions/device-actions";
 import {RootState} from "./store";
 import {SystemCommandResponse} from "./nxt-structure/packets/system-command-response";
 import {DirectCommandResponse} from "./nxt-structure/packets/direct-command-response";
+import {SystemCommand} from "./nxt-structure/packets/system-command";
+import {DirectCommand} from "./nxt-structure/packets/direct-command";
 
 let buffer: number[] = [];
 export let packetBuffer: Packet[] = [];
@@ -44,7 +46,6 @@ function parsePacket(data: number[], store: Store<RootState>) {
         //What we do here, is since it is a reply, we look for the packet that is being replied to, and
         //then update that packet with the response. We then check the status, and throw errors if required.
         let packetIndex: number = packetBuffer.findIndex(p => p.packetMatches(data));
-
         if (packetIndex != -1) {
             //discard the id, we matched it above anyways
             data.shift();
@@ -62,7 +63,7 @@ function parsePacket(data: number[], store: Store<RootState>) {
             }
         } else {
             console.log(data);
-            console.log(packetBuffer.map(s=>s.id));
+            console.log(packetBuffer.map(packet=>[SystemCommand[packet.id], DirectCommand[packet.id]]));
         }
     }
 }

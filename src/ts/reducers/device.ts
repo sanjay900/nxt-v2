@@ -93,8 +93,6 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             return {...state, ...processIncomingPacket(action.payload.packet, state)};
         case getType(deviceActions.writeFileProgress):
             return {...state, info: {...state.info, currentFile: action.payload.packet.file}};
-        case getType(deviceActions.writeFile.failure):
-            return {...state, lastMessage: action.payload.error.message};
         case getType(deviceActions.writePacket.request):
             return {...state, ...processOutgoingPacket(action.payload, state)};
 
@@ -102,13 +100,10 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             return {...state};
 
         case getType(deviceActions.sensorConfig.failure):
-            console.log("config", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
-            return {...state, lastMessage: action.payload.error.message};
-        case getType(deviceActions.sensorHandler.failure):
-            console.log("handler", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
-            return {...state, lastMessage: action.payload.error.message};
         case getType(deviceActions.writePacket.failure):
-            console.log(action.payload.error);
+        case getType(deviceActions.sensorHandler.failure):
+        case getType(deviceActions.writeFile.failure):
+            console.log(action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
             return {...state, lastMessage: action.payload.error.message};
 
         case getType(deviceActions.joystickMove):

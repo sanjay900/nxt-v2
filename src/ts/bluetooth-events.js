@@ -25,6 +25,8 @@ import { Buffer } from "buffer";
 import { readPacket } from "./actions/device-actions";
 import { SystemCommandResponse } from "./nxt-structure/packets/system-command-response";
 import { DirectCommandResponse } from "./nxt-structure/packets/direct-command-response";
+import { SystemCommand } from "./nxt-structure/packets/system-command";
+import { DirectCommand } from "./nxt-structure/packets/direct-command";
 var buffer = [];
 export var packetBuffer = [];
 export function initEvents(store) {
@@ -77,7 +79,7 @@ function parsePacket(data, store) {
         }
         else {
             console.log(data);
-            console.log(packetBuffer.map(function (s) { return s.id; }));
+            console.log(packetBuffer.map(function (packet) { return [SystemCommand[packet.id], DirectCommand[packet.id]]; }));
         }
     }
 }

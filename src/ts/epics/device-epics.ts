@@ -1,7 +1,7 @@
 import {ActionsObservable, StateObservable} from "redux-observable";
 import {isActionOf} from "typesafe-actions";
 import {RootAction, RootState} from "../store";
-import {catchError, concatMap, expand, filter, map, share, switchMap, tap} from "rxjs/operators";
+import {catchError, concatMap, delay, expand, filter, map, share, switchMap, take, tap} from "rxjs/operators";
 import {EMPTY, from, merge, Observable, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import {Buffer} from "buffer";
@@ -103,12 +103,13 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
         ),
         actions.pipe(
             filter(data => data.file.hasWritten()),
+            take(1),
             switchMap((packet: Write) => writePacket(Close.createPacket(packet.file))),
             switchMap((packet: Close) => {
                 if (packet.file.autoStart) {
                     return writePacket(StartProgram.createPacket(packet.file.name));
                 }
-                return EMPTY;
+                return of();
             }),
             map(deviceActions.writeFile.success),
             catchError((err: PacketError) => of(deviceActions.writeFile.failure(err))),

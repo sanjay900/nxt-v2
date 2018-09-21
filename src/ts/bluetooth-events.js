@@ -75,5 +75,9 @@ function parsePacket(data, store) {
                 packet.responseReceived.next(packet);
             }
         }
+        else {
+            console.log(data);
+            console.log(packetBuffer.map(function (s) { return s.id; }));
+        }
     }
 }

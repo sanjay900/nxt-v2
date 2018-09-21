@@ -56,6 +56,8 @@
 		34F2D265A00244CF863D90D5 /* libRCTBluetoothSerial.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D2506A5AC8BA4577A10EF866 /* libRCTBluetoothSerial.a */; };
 		5DB6E6ABB0534048A074DF3F /* libRCTToast.a in Frameworks */ = {isa = PBXBuildFile; fileRef = D8F3A77172A04C4DA8DF4002 /* libRCTToast.a */; };
 		696470BFF2F24D03A6D3E755 /* libRNFS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = B13EE61151434493B71D3818 /* libRNFS.a */; };
+		D16E6D9AFCD4409693262319 /* libRNSVG.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5CCD15F28A26433B93259B04 /* libRNSVG.a */; };
+		FD47B85D5B2F4F62A9799A4B /* libRNSVG-tvOS.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 54C99E15249043F9B3599D3E /* libRNSVG-tvOS.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -385,6 +387,9 @@
 		D8F3A77172A04C4DA8DF4002 /* libRCTToast.a */ = {isa = PBXFileReference; name = "libRCTToast.a"; path = "libRCTToast.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 		58B776976B6A4E038D7FAC2F /* RNFS.xcodeproj */ = {isa = PBXFileReference; name = "RNFS.xcodeproj"; path = "../node_modules/react-native-fs/RNFS.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
 		B13EE61151434493B71D3818 /* libRNFS.a */ = {isa = PBXFileReference; name = "libRNFS.a"; path = "libRNFS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		70B9FB1C288B4EB49868C591 /* RNSVG.xcodeproj */ = {isa = PBXFileReference; name = "RNSVG.xcodeproj"; path = "../node_modules/react-native-svg/ios/RNSVG.xcodeproj"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = wrapper.pb-project; explicitFileType = undefined; includeInIndex = 0; };
+		5CCD15F28A26433B93259B04 /* libRNSVG.a */ = {isa = PBXFileReference; name = "libRNSVG.a"; path = "libRNSVG.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
+		54C99E15249043F9B3599D3E /* libRNSVG-tvOS.a */ = {isa = PBXFileReference; name = "libRNSVG-tvOS.a"; path = "libRNSVG-tvOS.a"; sourceTree = "<group>"; fileEncoding = undefined; lastKnownFileType = archive.ar; explicitFileType = undefined; includeInIndex = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -418,6 +423,7 @@
 				34F2D265A00244CF863D90D5 /* libRCTBluetoothSerial.a in Frameworks */,
 				5DB6E6ABB0534048A074DF3F /* libRCTToast.a in Frameworks */,
 				696470BFF2F24D03A6D3E755 /* libRNFS.a in Frameworks */,
+				D16E6D9AFCD4409693262319 /* libRNSVG.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -433,6 +439,7 @@
 				2D02E4C61E0B4AEC006451C7 /* libRCTSettings-tvOS.a in Frameworks */,
 				2D02E4C71E0B4AEC006451C7 /* libRCTText-tvOS.a in Frameworks */,
 				2D02E4C81E0B4AEC006451C7 /* libRCTWebSocket-tvOS.a in Frameworks */,
+				FD47B85D5B2F4F62A9799A4B /* libRNSVG-tvOS.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -609,6 +616,7 @@
 				12A01CA72F3C410B8531C6F8 /* RCTBluetoothSerial.xcodeproj */,
 				29BF1482C6B64D4181D5DB1B /* RCTToast.xcodeproj */,
 				58B776976B6A4E038D7FAC2F /* RNFS.xcodeproj */,
+				70B9FB1C288B4EB49868C591 /* RNSVG.xcodeproj */,
 			);
 			name = Libraries;
 			sourceTree = "<group>";
@@ -1274,6 +1282,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1284,6 +1294,7 @@
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Debug;
@@ -1306,6 +1317,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1316,6 +1329,7 @@
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Release;
@@ -1344,6 +1358,7 @@
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Debug;
@@ -1371,6 +1386,7 @@
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Release;
@@ -1402,6 +1418,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1412,6 +1430,7 @@
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Debug;
@@ -1443,6 +1462,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1453,6 +1474,7 @@
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Release;
@@ -1483,6 +1505,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1493,6 +1517,7 @@
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Debug;
@@ -1523,6 +1548,8 @@
 					"$(inherited)",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
+					"\"$(SRCROOT)/$(TARGET_NAME)\"",
 				);
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
@@ -1533,6 +1560,7 @@
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/@remobile/react-native-toast/ios/RCTToast",
 					"$(SRCROOT)/../node_modules/react-native-fs/**",
+					"$(SRCROOT)/../node_modules/react-native-svg/ios/**",
 				);
 			};
 			name = Release;

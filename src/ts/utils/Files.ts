@@ -144,5 +144,5 @@ export type FileList = {
 }
 export const SteeringControl = "SteeringControl.rxe";
 export const fileList: FileList = {
-    SteeringControl: Array.from(new Buffer(file64, "base64"))
+    "SteeringControl.rxe": Array.from(new Buffer(file64, "base64"))
 };

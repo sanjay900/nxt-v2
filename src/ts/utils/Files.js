@@ -140,5 +140,5 @@ var file64 = "TWluZHN0b3Jtc05YVAAABTkCNgegBOEESwKWAgEAGQBWBSAALggGAAAABgEEAAoBCA
     "AAA+KRtgEQEmAC1I5QDZSz8APioqYAAAAAAvQCIA\n";
 export var SteeringControl = "SteeringControl.rxe";
 export var fileList = {
-    SteeringControl: Array.from(new Buffer(file64, "base64"))
+    "SteeringControl.rxe": Array.from(new Buffer(file64, "base64"))
 };

@@ -137,6 +137,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-svg')
     compile project(':react-native-fs')
     compile project(':@remobile_react-native-toast')
     compile project(':react-native-bluetooth-serial')

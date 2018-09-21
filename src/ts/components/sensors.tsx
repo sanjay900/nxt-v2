@@ -1,34 +1,38 @@
-import React, {Component} from "react";
-import {StyleSheet, Text, View} from "react-native";
+import React from "react";
+import {StyleSheet} from "react-native";
+import {Grid, LineChart} from 'react-native-svg-charts'
+import {DeviceState, State, SystemSensor} from "../store";
+import {connect} from "react-redux";
 
-export default class Sensors extends Component {
-
-    render() {
-        return (
-            <View style={styles.container}>
-                <Text style={styles.welcome}>
-                    Welcome to React Native
-                </Text>
-            </View>
-        );
-    }
+type Props = {
+    data: SystemSensor
 }
+
+const Sensors: React.SFC<Props> = ({deviceInfo}: Props) => {
+    return (
+        <LineChart
+            style={{ height: 200 }}
+            data={ [10,10,20,40,22,21,4] }
+            svg={{ stroke: 'rgb(134, 65, 244)' }}
+            contentInset={{ top: 20, bottom: 20 }}
+        >
+            <Grid/>
+        </LineChart>
+    );
+};
+const mapStateToProps = (state: State) => {
+    return {
+        deviceInfo: state.device
+    };
+};
+
+export default connect(mapStateToProps)(Sensors);
+
 
 const styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
-    },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10,
-    },
-    instructions: {
-        textAlign: 'center',
-        color: '#333333',
-        marginBottom: 5,
+        flex: 1
+    }, margin: {
+        marginLeft: 20,
     },
 });

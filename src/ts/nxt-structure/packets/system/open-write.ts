@@ -18,6 +18,7 @@ export class OpenWrite extends SystemPacket {
 
     readPacket(data: number[]): void {
         super.readPacket(data);
+        this.file.handle = data.shift()!;
     }
 
     protected writePacketData(expectResponse: boolean, data: number[]): void {

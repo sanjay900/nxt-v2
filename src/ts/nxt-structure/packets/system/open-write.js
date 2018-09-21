@@ -27,6 +27,7 @@ var OpenWrite = /** @class */ (function (_super) {
     };
     OpenWrite.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
+        this.file.handle = data.shift();
     };
     OpenWrite.prototype.writePacketData = function (expectResponse, data) {
         _super.prototype.writePacketData.call(this, expectResponse, data);

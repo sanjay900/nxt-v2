@@ -100,7 +100,6 @@ export var device = function (state, action) {
         case getType(deviceActions.writeFileProgress):
             return __assign({}, state, { info: __assign({}, state.info, { currentFile: action.payload.packet.file }) });
         case getType(deviceActions.writeFile.failure):
-            console.error(action.payload);
             return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.writePacket.request):
             return __assign({}, state, processOutgoingPacket(action.payload, state));
@@ -113,7 +112,7 @@ export var device = function (state, action) {
             console.log("handler", action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
             return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.writePacket.failure):
-            console.log(action.payload);
+            console.log(action.payload.error);
             return __assign({}, state, { lastMessage: action.payload.error.message });
         case getType(deviceActions.joystickMove):
             if (action.payload.name == "STEERING") {

@@ -1,8 +1,8 @@
 import {ActionsObservable, StateObservable} from "redux-observable";
 import {isActionOf} from "typesafe-actions";
 import {RootAction, RootState} from "../store";
-import {catchError, concatMap, delay, expand, filter, map, share, switchMap, take, tap} from "rxjs/operators";
-import {EMPTY, from, merge, Observable, of} from "rxjs";
+import {catchError, concatMap, expand, filter, map, share, switchMap, take, tap} from "rxjs/operators";
+import {EMPTY, from, merge, NEVER, Observable, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import {Buffer} from "buffer";
 
@@ -35,10 +35,10 @@ export function writePacket<T extends Packet>(packet: T): Observable<T> {
 
 export const startHandlers = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
     action$.pipe(
-        filter(isActionOf([deviceActions.writePacket.success,deviceActions.writeFile.success])),
         map(action => {
             return (isActionOf(deviceActions.writePacket.success)(action) && action.payload instanceof StartProgram && action.payload.programName) ||
-                (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name);
+                (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name) ||
+                NEVER;
         }),
         filter(name => name == SteeringControl),
         concatMap(() => [
@@ -111,7 +111,7 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
             switchMap((packet: Write) => writePacket(Close.createPacket(packet.file))),
             switchMap((packet: Close) => {
                 if (packet.file.autoStart) {
-                    return writePacket(StartProgram.createPacket(packet.file.name)).pipe(map(()=>packet.file));
+                    return writePacket(StartProgram.createPacket(packet.file.name)).pipe(map(() => packet.file));
                 }
                 return of(packet.file);
             }),

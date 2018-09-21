@@ -1,6 +1,6 @@
 import { isActionOf } from "typesafe-actions";
 import { catchError, concatMap, expand, filter, map, share, switchMap, take, tap } from "rxjs/operators";
-import { EMPTY, from, merge, of } from "rxjs";
+import { EMPTY, from, merge, NEVER, of } from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import { Buffer } from "buffer";
 import * as deviceActions from '../actions/device-actions';
@@ -24,9 +24,10 @@ export function writePacket(packet) {
     return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true)))).pipe(switchMap(function () { return packet.responseReceived; }), map(function () { return packet; }));
 }
 export var startHandlers = function (action$, state$) {
-    return action$.pipe(filter(isActionOf([deviceActions.writePacket.success, deviceActions.writeFile.success])), map(function (action) {
+    return action$.pipe(map(function (action) {
         return (isActionOf(deviceActions.writePacket.success)(action) && action.payload instanceof StartProgram && action.payload.programName) ||
-            (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name);
+            (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name) ||
+            NEVER;
     }), filter(function (name) { return name == SteeringControl; }), concatMap(function () { return [
         deviceActions.writeConfig.request(state$.value.device.outputConfig),
         startMotorHandler.request()

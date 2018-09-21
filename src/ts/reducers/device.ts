@@ -17,7 +17,7 @@ import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level
 import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
 import {BluetoothAction, DeviceAction, DeviceState, SystemOutput, SystemSensor} from "../store";
 import {connectToDevice} from "../actions/bluetooth-actions";
-import {set} from "dot-prop-immutable";
+import {get, set} from "dot-prop-immutable";
 
 const initialSensor: SystemSensor = {
     type: SensorType.NONE,
@@ -136,13 +136,16 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             }
             return state;
         case getType(deviceActions.disableSensors):
-            state = set(state, `inputs.1.enabled`, false);
-            state = set(state, `inputs.2.enabled`, false);
-            state = set(state, `inputs.3.enabled`, false);
-            state = set(state, `inputs.4.enabled`, false);
+            sensors = action.payload || [1, 2, 3, 4];
+            for (let sensor of sensors) {
+                state = set(state, `inputs.${sensor}.enabled`, false);
+                state = set(state, `inputs.${sensor}.dataHistory`, []);
+            }
             return state;
         case getType(deviceActions.sensorUpdate):
-            console.log(action);
+            let historyKey = `inputs.${action.payload.port}.dataHistory`;
+            state = set(state, `inputs.${action.payload.port}.data`, action.payload);
+            state = set(state, historyKey, get(state, historyKey).concat(action.payload));
             return state
     }
     return state;

@@ -1,14 +1,9 @@
-import {createAction, createAsyncAction} from "typesafe-actions";
-
+import { createAction, createAsyncAction } from "typesafe-actions";
 export var setDevice = createAction("setDevice", function (resolve) {
-    return function (device) {
-        return resolve(device);
-    };
+    return function (device) { return resolve(device); };
 });
 export var changeStatus = createAction("changeStatus", function (resolve) {
-    return function (status, message) {
-        return resolve({status: status, message: message});
-    };
+    return function (status, message) { return resolve({ status: status, message: message }); };
 });
 export var disconnect = createAction("disconnect");
 export var disconnectFromDevice = createAsyncAction('disconnectRequest', 'disconnectResponse', 'disconnectFailure')();

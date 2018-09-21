@@ -26,7 +26,7 @@ import { getType } from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
 import { DirectCommand } from "../nxt-structure/packets/direct-command";
 import { connectToDevice } from "../actions/bluetooth-actions";
-import { set } from "dot-prop-immutable";
+import { get, set } from "dot-prop-immutable";
 var initialSensor = {
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
@@ -91,7 +91,7 @@ var initialState = {
 };
 export var device = function (state, action) {
     if (state === void 0) { state = initialState; }
-    var e_1, _a;
+    var e_1, _a, e_2, _b;
     switch (action.type) {
         case getType(connectToDevice.success):
             return __assign({}, state, { info: __assign({}, state.info, { programToUpload: undefined }) });
@@ -150,13 +150,26 @@ export var device = function (state, action) {
             }
             return state;
         case getType(deviceActions.disableSensors):
-            state = set(state, "inputs.1.enabled", false);
-            state = set(state, "inputs.2.enabled", false);
-            state = set(state, "inputs.3.enabled", false);
-            state = set(state, "inputs.4.enabled", false);
+            sensors = action.payload || [1, 2, 3, 4];
+            try {
+                for (var sensors_2 = __values(sensors), sensors_2_1 = sensors_2.next(); !sensors_2_1.done; sensors_2_1 = sensors_2.next()) {
+                    var sensor = sensors_2_1.value;
+                    state = set(state, "inputs." + sensor + ".enabled", false);
+                    state = set(state, "inputs." + sensor + ".dataHistory", []);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (sensors_2_1 && !sensors_2_1.done && (_b = sensors_2.return)) _b.call(sensors_2);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
             return state;
         case getType(deviceActions.sensorUpdate):
-            console.log(action);
+            var historyKey = "inputs." + action.payload.port + ".dataHistory";
+            state = set(state, "inputs." + action.payload.port + ".data", action.payload);
+            state = set(state, historyKey, get(state, historyKey).concat(action.payload));
             return state;
     }
     return state;

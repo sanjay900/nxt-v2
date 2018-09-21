@@ -8,7 +8,9 @@ import {PacketError} from "../reducers/device";
 import {SensorData, SensorType} from "../nxt-structure/sensor-constants";
 import {Joystick, OutputConfig, SystemSensor} from "../store";
 
-export const disableSensors = createAction("disableSensors");
+export const disableSensors = createAction("disableSensors", resolve => {
+    return (sensors?: number[]) => resolve(sensors);
+});
 export const enableSensors = createAction("enableSensors", resolve => {
     return (sensors?: number[]) => resolve(sensors);
 });

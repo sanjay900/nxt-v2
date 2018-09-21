@@ -65,6 +65,7 @@ function parsePacket(data, store) {
             var packet = packetBuffer.splice(packetIndex, 1)[0];
             packet.readPacket(data);
             store.dispatch(readPacket(packet, packet.id));
+            console.log([SystemCommand[packet.id], DirectCommand[packet.id], packet.status]);
             if (packet.status != 0) {
                 if (SystemCommandResponse[packet.status]) {
                     packet.responseReceived.error({ error: new Error(SystemCommandResponse[packet.status]), packet: packet });

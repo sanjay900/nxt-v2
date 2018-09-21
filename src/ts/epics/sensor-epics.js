@@ -95,7 +95,7 @@ function isUltrasonic(type) {
 export function tickSensor(port, state$) {
     var p = of(state$.value.device.inputs[port]).pipe(share());
     //Merge together the possibilities for each type of sensor tick
-    return merge(p.pipe(filter(function (sensor) { return sensor.type == SensorType.NONE || !sensor.enabled; }), map(function () { return ({ rawValue: 0, scaledValue: 0, port: port }); })), p.pipe(filter(function (sensor) { return isUltrasonic(sensor.type) && sensor.enabled; }), switchMap(function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), map(function (data) {
+    return merge(p.pipe(filter(function (sensor) { return isUltrasonic(sensor.type) && sensor.enabled; }), switchMap(function () { return readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port); }), map(function (data) {
         var scale = state$.value.device.inputs[port].type == SensorType.ULTRASONIC_INCH ? CM_TO_INCH : 1;
         return { scaledValue: data.scaledValue * scale, rawValue: data.rawValue, port: port };
     })), p.pipe(filter(function (sensor) { return sensor.type != SensorType.NONE && !isUltrasonic(sensor.type) && sensor.enabled; }), switchMap(function () { return writePacket(GetInputValues.createPacket(port)); }), map(function (packet) { return ({

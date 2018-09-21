@@ -24,10 +24,10 @@ export function writePacket(packet) {
     return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true)))).pipe(switchMap(function () { return packet.responseReceived; }), map(function () { return packet; }));
 }
 export var startHandlers = function (action$, state$) {
-    return action$.pipe(filter(isActionOf(deviceActions.writePacket.success)), filter(function (_a) {
-        var packet = _a.payload;
-        return packet instanceof StartProgram && packet.programName == SteeringControl;
-    }), concatMap(function () { return [
+    return action$.pipe(filter(isActionOf([deviceActions.writePacket.success, deviceActions.writeFile.success])), map(function (action) {
+        return (isActionOf(deviceActions.writePacket.success)(action) && action.payload instanceof StartProgram && action.payload.programName) ||
+            (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name);
+    }), filter(function (name) { return name == SteeringControl; }), concatMap(function () { return [
         deviceActions.writeConfig.request(state$.value.device.outputConfig),
         startMotorHandler.request()
     ]; }));
@@ -73,9 +73,9 @@ export var writeFile = function (action$) {
         packet: EmptyPacket.createPacket()
     })); })), actions.pipe(filter(function (data) { return data.file.hasWritten(); }), take(1), switchMap(function (packet) { return writePacket(Close.createPacket(packet.file)); }), switchMap(function (packet) {
         if (packet.file.autoStart) {
-            return writePacket(StartProgram.createPacket(packet.file.name));
+            return writePacket(StartProgram.createPacket(packet.file.name)).pipe(map(function () { return packet.file; }));
         }
-        return of();
+        return of(packet.file);
     }), map(deviceActions.writeFile.success), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
         error: err,
         packet: EmptyPacket.createPacket()

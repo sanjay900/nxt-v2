@@ -35,8 +35,12 @@ export function writePacket<T extends Packet>(packet: T): Observable<T> {
 
 export const startHandlers = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
     action$.pipe(
-        filter(isActionOf(deviceActions.writePacket.success)),
-        filter(({payload: packet}) => packet instanceof StartProgram && packet.programName == SteeringControl),
+        filter(isActionOf([deviceActions.writePacket.success,deviceActions.writeFile.success])),
+        map(action => {
+            return (isActionOf(deviceActions.writePacket.success)(action) && action.payload instanceof StartProgram && action.payload.programName) ||
+                (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name);
+        }),
+        filter(name => name == SteeringControl),
         concatMap(() => [
                 deviceActions.writeConfig.request(state$.value.device.outputConfig),
                 startMotorHandler.request()
@@ -107,9 +111,9 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
             switchMap((packet: Write) => writePacket(Close.createPacket(packet.file))),
             switchMap((packet: Close) => {
                 if (packet.file.autoStart) {
-                    return writePacket(StartProgram.createPacket(packet.file.name));
+                    return writePacket(StartProgram.createPacket(packet.file.name)).pipe(map(()=>packet.file));
                 }
-                return of();
+                return of(packet.file);
             }),
             map(deviceActions.writeFile.success),
             catchError((err: PacketError) => of(deviceActions.writeFile.failure(err))),

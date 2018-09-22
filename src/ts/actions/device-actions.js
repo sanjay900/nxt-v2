@@ -9,6 +9,7 @@ export var readPacket = createAction("readPacket", function (resolve) {
     return function (packet, type) { return resolve({ packet: packet, type: type }); };
 });
 export var writeConfig = createAsyncAction('writeConfigRequest', 'writeConfigResponse', 'writeConfigFailure')();
+export var playSound = createAsyncAction('playSoundRequest', 'playSoundResponse', 'playSoundFailure')();
 export var sensorHandler = createAsyncAction('sensorHandlerRequest', 'sensorHandlerResponse', 'sensorHandlerFailure')();
 export var sensorUpdate = createAction("sensorUpdate", function (resolve) {
     return function (sensorData) { return resolve(sensorData); };

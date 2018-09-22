@@ -1,15 +1,14 @@
 import React, {Component} from "react";
 import {StyleSheet, Text, View} from "react-native";
+import {Button, Card} from "react-native-material-ui";
 
 export default class MotorStatus extends Component {
 
     render() {
         return (
-            <View style={styles.container}>
-                <Text style={styles.welcome}>
-                    Welcome to React Native
-                </Text>
-            </View>
+            <Card>
+                <Text>Hello world!</Text>
+            </Card>
         );
     }
 }

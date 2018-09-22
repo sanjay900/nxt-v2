@@ -23,6 +23,11 @@ export const writeConfig = createAsyncAction(
     'writeConfigResponse',
     'writeConfigFailure'
 )<OutputConfig, void, PacketError>();
+export const playSound = createAsyncAction(
+    'playSoundRequest',
+    'playSoundResponse',
+    'playSoundFailure'
+)<number[], void, PacketError>();
 export const sensorHandler = createAsyncAction(
     'sensorHandlerRequest',
     'sensorHandlerResponse',

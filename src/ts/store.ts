@@ -12,6 +12,7 @@ import {
 import * as deviceActions from "./actions/device-actions";
 import {InputSensorMode, InputSensorType, SensorData, SensorType} from "./nxt-structure/sensor-constants";
 import {NXTFile} from "./nxt-structure/nxt-file";
+import {Packet} from "./nxt-structure/packets/packet";
 
 export type CoreAction = ActionType<typeof coreActions>;
 
@@ -112,3 +113,4 @@ export type State = {
 export type BluetoothAction = ActionType<typeof bluetoothActions>;
 export type RootAction = BluetoothAction | CoreAction | DeviceAction;
 export type RootState = { core: CoreState, bluetooth: BluetoothState, device: DeviceState }
+export let packetBuffer: Packet[] = [];

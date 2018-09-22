@@ -12,6 +12,8 @@
     "@remobile/react-native-toast": "https://github.com/sanjay900/react-native-toast",
     "@types/node": "^10.9.4",
     "@types/react-native-fs": "^2.8.2",
+    "@types/react-native-material-textfield": "^0.12.2",
+    "@types/react-native-material-ui": "^1.31.0",
     "@types/react-native-popup-dialog": "^1.0.1",
     "@types/react-native-svg-charts": "^5.0.1",
     "@types/react-native-vector-icons": "^4.6.3",
@@ -34,6 +36,10 @@
     "react-native-elements": "^0.19.1",
     "react-native-fs": "^2.11.15",
     "react-native-gesture-handler": "^1.0.7",
+    "react-native-material-textfield": "^0.12.0",
+    "react-native-material-ui": "^1.30.1",
+    "react-native-memes": "git+https://github.com/sanjay900/react-audio-streamer.git",
+    "react-native-paper": "^2.0.1",
     "react-native-popup-dialog": "^0.15.0",
     "react-native-progress": "^3.5.0",
     "react-native-router-flux": "^4.0.1",
@@ -77,5 +83,10 @@
   },
   "jest": {
     "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./fonts"
+    ]
   }
 }

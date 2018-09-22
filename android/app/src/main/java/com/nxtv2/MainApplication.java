@@ -3,6 +3,7 @@ package com.nxtv2;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.reactlibrary.RNMemesPackage;
 import com.horcrux.svg.SvgPackage;
 import com.rnfs.RNFSPackage;
 import com.remobile.toast.RCTToastPackage;
@@ -29,6 +30,7 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
+            new RNMemesPackage(),
             new SvgPackage(),
             new RNFSPackage(),
             new RCTToastPackage(),

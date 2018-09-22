@@ -54,7 +54,7 @@ var NXTFile = /** @class */ (function () {
         this.writtenBytes = this.size - this.data.length;
         return ret;
     };
-    NXTFile.PACKET_SIZE = 64;
+    NXTFile.PACKET_SIZE = 8096;
     return NXTFile;
 }());
 export { NXTFile };

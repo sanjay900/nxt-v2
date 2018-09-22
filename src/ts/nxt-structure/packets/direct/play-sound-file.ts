@@ -4,7 +4,7 @@ import {DirectPacket} from "./direct-packet";
 
 export class PlaySoundFile extends DirectPacket {
     private loop: boolean;
-    private soundFileName: string;
+    public soundFileName: string;
 
     constructor() {
         super(DirectCommand.PLAY_SOUND_FILE);

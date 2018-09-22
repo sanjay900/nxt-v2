@@ -4,10 +4,10 @@ import {SystemCommand} from "./system-command";
 import {DirectCommand} from "./direct-command";
 import 'mdn-polyfills/String.prototype.padEnd';
 import {Subject} from "rxjs";
-import {packetBuffer} from "../../bluetooth-events";
+import {packetBuffer} from "../../store";
 
 export abstract class Packet {
-    static FILE_NAME_LENGTH: number = 20;
+    static FILE_NAME_LENGTH: number = 19;
     static S_WORD_LENGTH: number = 20;
     public status: DirectCommandResponse | SystemCommandResponse;
     public responseReceived: Subject<Packet> = new Subject();
@@ -64,8 +64,7 @@ export abstract class Packet {
     }
 
     protected static writeFileName(fileName: string, data: number[]) {
-        fileName.padEnd(Packet.FILE_NAME_LENGTH, '\0');
-        this.writeAsciiz(fileName, data);
+        this.writeAsciiz(fileName.padEnd(Packet.FILE_NAME_LENGTH, '\0'), data);
     }
 
     public readPacket(data: number[]) {

@@ -20,7 +20,7 @@ var __spread = (this && this.__spread) || function () {
 };
 import 'mdn-polyfills/String.prototype.padEnd';
 import { Subject } from "rxjs";
-import { packetBuffer } from "../../bluetooth-events";
+import { packetBuffer } from "../../store";
 var Packet = /** @class */ (function () {
     function Packet(_id) {
         this._id = _id;
@@ -68,8 +68,7 @@ var Packet = /** @class */ (function () {
         data.push(0);
     };
     Packet.writeFileName = function (fileName, data) {
-        fileName.padEnd(Packet.FILE_NAME_LENGTH, '\0');
-        this.writeAsciiz(fileName, data);
+        this.writeAsciiz(fileName.padEnd(Packet.FILE_NAME_LENGTH, '\0'), data);
     };
     Packet.prototype.readPacket = function (data) {
         this.status = data.shift();
@@ -86,7 +85,7 @@ var Packet = /** @class */ (function () {
     Packet.prototype.packetMatches = function (data) {
         return data[0] == this.id;
     };
-    Packet.FILE_NAME_LENGTH = 20;
+    Packet.FILE_NAME_LENGTH = 19;
     Packet.S_WORD_LENGTH = 20;
     return Packet;
 }());

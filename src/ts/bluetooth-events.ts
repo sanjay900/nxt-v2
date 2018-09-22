@@ -4,16 +4,15 @@ import {disconnect} from "./actions/bluetooth-actions";
 import {Packet, TelegramType} from "./nxt-structure/packets/packet";
 import {Buffer} from "buffer";
 import {readPacket} from "./actions/device-actions";
-import {RootState} from "./store";
+import {packetBuffer, RootState} from "./store";
 import {SystemCommandResponse} from "./nxt-structure/packets/system-command-response";
 import {DirectCommandResponse} from "./nxt-structure/packets/direct-command-response";
 import {SystemCommand} from "./nxt-structure/packets/system-command";
 import {DirectCommand} from "./nxt-structure/packets/direct-command";
 
 let buffer: number[] = [];
-export let packetBuffer: Packet[] = [];
 
-export function initEvents(store: Store) {
+export function initEvents(store: Store<RootState>) {
     BluetoothSerial.on('bluetoothEnabled', () => {
 
     });
@@ -64,7 +63,7 @@ function parsePacket(data: number[], store: Store<RootState>) {
             }
         } else {
             console.log(data);
-            console.log(packetBuffer.map(packet=>[SystemCommand[packet.id], DirectCommand[packet.id]]));
+            console.log(packetBuffer.map(packet => [SystemCommand[packet.id], DirectCommand[packet.id]]));
         }
     }
 }

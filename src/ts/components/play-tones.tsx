@@ -46,7 +46,7 @@ const PlayTones: React.SFC<Props> = ({playNote}: Props) => {
     let keyboard = pianoKeys.map((key) => {
         return <TouchableOpacity onPress={() => playNote(key.whiteKeyId)}
                                  key={key.whiteKeyId}
-                                 style={[styles.whiteKey, {height: Dimensions.get('window').height}]}>
+                                 style={styles.whiteKey}>
             <View/>
         </TouchableOpacity>;
     });

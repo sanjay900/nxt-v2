@@ -1,5 +1,5 @@
 import React from "react";
-import { Dimensions, StyleSheet, TouchableOpacity, View } from "react-native";
+import { StyleSheet, TouchableOpacity, View } from "react-native";
 import { ScrollView } from "react-native-gesture-handler";
 import { connect } from "react-redux";
 import { writePacket } from "../actions/device-actions";
@@ -39,7 +39,7 @@ var pianoKeys = [
 var PlayTones = function (_a) {
     var playNote = _a.playNote;
     var keyboard = pianoKeys.map(function (key) {
-        return <TouchableOpacity onPress={function () { return playNote(key.whiteKeyId); }} key={key.whiteKeyId} style={[styles.whiteKey, { height: Dimensions.get('window').height }]}>
+        return <TouchableOpacity onPress={function () { return playNote(key.whiteKeyId); }} key={key.whiteKeyId} style={styles.whiteKey}>
             <View />
         </TouchableOpacity>;
     });

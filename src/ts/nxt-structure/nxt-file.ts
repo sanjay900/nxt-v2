@@ -1,5 +1,5 @@
 export class NXTFile {
-    public static PACKET_SIZE: number = 64;
+    public static PACKET_SIZE: number = 8096;
     public handle: number;
     private writtenBytes: number = 0;
     public mode: NXTFileMode;

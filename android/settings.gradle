@@ -1,4 +1,6 @@
 rootProject.name = 'nxtv2'
+include ':react-native-memes'
+project(':react-native-memes').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-memes/android')
 include ':react-native-svg'
 project(':react-native-svg').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-svg/android')
 include ':react-native-fs'

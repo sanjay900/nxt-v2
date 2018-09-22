@@ -12,18 +12,17 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import React, { Component } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { StyleSheet, Text } from "react-native";
+import { Card } from "react-native-material-ui";
 var MotorStatus = /** @class */ (function (_super) {
     __extends(MotorStatus, _super);
     function MotorStatus() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     MotorStatus.prototype.render = function () {
-        return (<View style={styles.container}>
-                <Text style={styles.welcome}>
-                    Welcome to React Native
-                </Text>
-            </View>);
+        return (<Card>
+                <Text>Hello world!</Text>
+            </Card>);
     };
     return MotorStatus;
 }(Component));

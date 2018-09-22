@@ -48,6 +48,8 @@ export const startHandlers = (action$: ActionsObservable<RootAction>, state$: St
         )
     );
 
+
+
 export const sendPacket = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(deviceActions.writePacket.request)),

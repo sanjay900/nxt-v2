@@ -23,12 +23,12 @@ import { disconnect } from "./actions/bluetooth-actions";
 import { TelegramType } from "./nxt-structure/packets/packet";
 import { Buffer } from "buffer";
 import { readPacket } from "./actions/device-actions";
+import { packetBuffer } from "./store";
 import { SystemCommandResponse } from "./nxt-structure/packets/system-command-response";
 import { DirectCommandResponse } from "./nxt-structure/packets/direct-command-response";
 import { SystemCommand } from "./nxt-structure/packets/system-command";
 import { DirectCommand } from "./nxt-structure/packets/direct-command";
 var buffer = [];
-export var packetBuffer = [];
 export function initEvents(store) {
     BluetoothSerial.on('bluetoothEnabled', function () {
     });

@@ -59,7 +59,7 @@ export class GetOutputState extends DirectPacket {
         data.push(this.port);
     }
     toOutputData(): OutputData {
-        let {port, power, mode, rotationCount, tachoLimit, turnRatio, tachoCount, blockTachoCount} = this;
-        return {port, power, mode, rotationCount, tachoLimit, turnRatio, tachoCount, blockTachoCount};
+        let {port, power, rotationCount, tachoLimit, turnRatio, tachoCount, blockTachoCount} = this;
+        return {port, power, rotationCount, tachoLimit, turnRatio, tachoCount, blockTachoCount};
     }
 }

@@ -42,7 +42,7 @@ export var motorHandler = function (action$, state$) {
     })); }));
 };
 export var motorListener = function (action$, state$) {
-    return action$.pipe(filter(isActionOf(motorActions.startMotorListener.request)), switchMap(function () { return [SystemOutputPort.A, SystemOutputPort.B, SystemOutputPort.C]; }), map(function (port) { return ({ port: port }); }), expand(function (port) {
+    return action$.pipe(filter(isActionOf(motorActions.startMotorListener.request)), switchMap(function () { return [SystemOutputPort.A, SystemOutputPort.B, SystemOutputPort.C]; }), map(function (port) { return (initialOutput(port).data); }), expand(function (port) {
         var state = state$.value;
         if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
             return EMPTY;

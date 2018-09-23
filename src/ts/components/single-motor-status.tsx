@@ -6,7 +6,7 @@ import {connect} from "react-redux";
 import {Dispatch} from "redux";
 import {disableMotorListener, enableMotorListener} from "../actions/motor-actions";
 import {Card} from "react-native-material-ui";
-import {SystemOutputPort} from "../nxt-structure/motor-constants";
+import {OutputRegulationMode, OutputRunState, printMode, SystemOutputPort} from "../nxt-structure/motor-constants";
 import {FormLabel, Text} from "react-native-elements";
 import {Utils} from "../utils/utils";
 
@@ -17,7 +17,7 @@ type Props = {
     stopListeningToMotorState: (output: SystemOutputPort[]) => {}
 }
 
-const DEFAULT_DATA = [10,10,10,10];
+const DEFAULT_DATA = [0];
 
 class SingleMotorStatus extends React.Component<Props> {
     componentDidMount() {
@@ -32,30 +32,39 @@ class SingleMotorStatus extends React.Component<Props> {
         let motor = this.props.deviceInfo.outputs[SystemOutputPort[this.props.output]];
         let charts = Object
             .keys(motor.data)
-            .filter(s => s != "port")
+            .filter(s => s != "port" && s != "mode")
             .map((key) => SingleMotorStatus.renderChart(
                 Utils.formatCamelTitle(key),
                 motor.data[key],
                 motor.dataHistory.map(data => data[key])
                 )
             );
+
         return (
             <ScrollView>
+                <Card>
+                    <View style={{marginBottom: 10}}>
+                        <FormLabel>Mode</FormLabel>
+                        <Text style={styles.margin}>{printMode(motor.mode)}</Text>
+                        <FormLabel>Regulation Mode</FormLabel>
+                        <Text style={styles.margin}>{Utils.formatTitle(OutputRegulationMode[motor.regulationMode])}</Text>
+                        <FormLabel>Run State</FormLabel>
+                        <Text style={styles.margin}>{Utils.formatTitle(OutputRunState[motor.runState])}</Text>
+                    </View>
+                </Card>
                 {charts}
             </ScrollView>
         );
     }
 
     static renderChart(title: string, data: number, dataHistory: number[]) {
-        var props: any = {};
+        let props: any = {};
         if (dataHistory.length == 0) {
             dataHistory = DEFAULT_DATA;
         }
         if (dataHistory.every( v => v === dataHistory[0] )) {
             props.yMax = dataHistory[0]+10;
             props.yMin = dataHistory[0]-10;
-            props.gridMax = dataHistory[0]+10;
-            props.gridMin = dataHistory[0]-10;
         }
         return (
             <Card key={title}>

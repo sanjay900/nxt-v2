@@ -34,6 +34,21 @@ export enum SingleOutputPort {
     C = "3"
 }
 
+export function printMode(mode: number) {
+    let ret: string[] = [];
+    if (mode & OutputMode.MOTOR_ON) {
+        ret.push("Motor On");
+    }
+    if (mode & OutputMode.BRAKE) {
+        ret.push("Brake");
+    }
+    if (mode & OutputMode.BRAKE) {
+        ret.push("Regulated");
+    }
+    if (ret.length == 0) return "No modes set";
+    return ret.join(", ");
+}
+
 export type OutputPort = SingleOutputPort | MultiOutputPort;
 
 export class SystemOutputPortUtils {

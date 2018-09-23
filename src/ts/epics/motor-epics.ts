@@ -54,7 +54,7 @@ export const motorListener = (action$: ActionsObservable<RootAction>, state$: St
     action$.pipe(
         filter(isActionOf(motorActions.startMotorListener.request)),
         switchMap(() => [SystemOutputPort.A, SystemOutputPort.B, SystemOutputPort.C]),
-        map(port => ({port})),
+        map(port => (initialOutput(port).data)),
         expand(port => {
             let state = state$.value;
             if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {

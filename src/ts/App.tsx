@@ -1,5 +1,5 @@
 import React from 'react';
-import {Modal, Router, Scene, Tabs} from "react-native-router-flux";
+import {Actions, Modal, Router, Scene, Tabs} from "react-native-router-flux";
 import TabIcon from "./components/tab-icon";
 import RemoteControl from "./components/remote-control";
 import AboutDevice from "./components/about-device";
@@ -13,13 +13,25 @@ import SingleMotorStatus from "./components/single-motor-status";
 import {Provider} from 'react-redux';
 import {Store} from 'redux';
 import {StyleSheet, View} from "react-native";
+import {pageChange} from "./actions/core-actions";
 
 type Props = { store: Store };
 const App: React.SFC<Props> = ({store}: Props) => {
     return (
         <Provider store={store}>
             <View style={styles.container}>
-                <Router right={() => <StatusButton/>}>
+                <Router right={() => <StatusButton/>} onStateChange={(stateData: any)=>{
+                    //I need a way to trigger redux changes, without over complicating things by linking to redux correctly. The below code
+                    //pulls out parameters passed to each page, and passes them along to a pageChange action.
+                    let scene = Actions.currentScene.replace("_","");
+                    let sceneData = stateData["routes"].find((s: any)=>s.routeName == scene) || stateData["routes"][0]["routes"].find((s: any)=>s.routeName == scene);
+                    if (sceneData && sceneData["routes"]) {
+                        sceneData = sceneData["routes"][0] || sceneData;
+                    }
+                    if (sceneData) {
+                        store.dispatch(pageChange(sceneData.params))
+                    }
+                }}>
                     <Modal hideNavBar>
                         <Tabs key="root">
                             <Scene key="remote-control" component={RemoteControl} title="Remote Control"

@@ -24,18 +24,15 @@ var Motors = /** @class */ (function (_super) {
     function Motors() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    Motors.prototype.componentDidMount = function () {
-        this.props.listenToMotorState();
-    };
-    Motors.prototype.componentWillUnmount = function () {
-        this.props.stopListeningToMotorState();
-    };
     Motors.prototype.render = function () {
         return (<View>
                 {Object.values(this.props.deviceInfo.outputs).map(Motors.renderMotor)}
             </View>);
     };
     Motors.renderMotor = function (output) {
+        if (!output.data) {
+            return <View key="no data"/>;
+        }
         return (<Card key={SystemOutputPort[output.data.port]}>
                 <View>
                     <Text h4 style={styles.title}>Motor {SystemOutputPort[output.data.port]}</Text>

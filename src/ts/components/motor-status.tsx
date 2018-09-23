@@ -16,14 +16,6 @@ type Props = {
 }
 
 class Motors extends React.Component<Props> {
-    componentDidMount() {
-        this.props.listenToMotorState();
-    }
-
-    componentWillUnmount() {
-        this.props.stopListeningToMotorState();
-    }
-
     render() {
         return (
             <View>
@@ -33,6 +25,9 @@ class Motors extends React.Component<Props> {
     }
 
     static renderMotor(output: SystemOutput) {
+        if (!output.data) {
+            return <View key="no data"/>;
+        }
         return (
             <Card key={SystemOutputPort[output.data.port]}>
                 <View>

@@ -29,6 +29,7 @@ import * as sensorActions from "../actions/sensor-actions";
 import { DirectCommand } from "../nxt-structure/packets/direct-command";
 import { connectToDevice } from "../actions/bluetooth-actions";
 import { get, set } from "dot-prop-immutable";
+import * as coreActions from "../actions/core-actions";
 var initialSensor = {
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
@@ -95,7 +96,7 @@ var initialState = {
 };
 export var device = function (state, action) {
     if (state === void 0) { state = initialState; }
-    var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
+    var e_1, _a, e_2, _b, e_3, _c, e_4, _d, e_5, _e, e_6, _f, e_7, _g, e_8, _h, e_9, _j, e_10, _k;
     switch (action.type) {
         case getType(connectToDevice.success):
             return __assign({}, state, { info: __assign({}, state.info, { programToUpload: undefined }) });
@@ -209,6 +210,105 @@ export var device = function (state, action) {
             state = set(state, "inputs." + action.payload.port + ".data", action.payload);
             state = set(state, historyKey, get(state, historyKey).concat(action.payload));
             return state;
+        case getType(coreActions.pageChange):
+            switch (action.payload.scene) {
+                case "motor-info-expanded":
+                    var port = SystemOutputPort[action.payload.params.output];
+                    try {
+                        for (var _l = __values(["A", "B", "C"]), _m = _l.next(); !_m.done; _m = _l.next()) {
+                            var output = _m.value;
+                            state = set(state, "outputs." + output + ".listening", false);
+                            state = set(state, "outputs." + output + ".dataHistory", []);
+                        }
+                    }
+                    catch (e_5_1) { e_5 = { error: e_5_1 }; }
+                    finally {
+                        try {
+                            if (_m && !_m.done && (_e = _l.return)) _e.call(_l);
+                        }
+                        finally { if (e_5) throw e_5.error; }
+                    }
+                    state = set(state, "outputs." + port + ".listening", true);
+                    break;
+                case "sensor-info-expanded":
+                    try {
+                        for (var _o = __values([1, 2, 3, 4]), _p = _o.next(); !_p.done; _p = _o.next()) {
+                            var sensor = _p.value;
+                            state = set(state, "inputs." + sensor + ".enabled", false);
+                            state = set(state, "inputs." + sensor + ".dataHistory", []);
+                        }
+                    }
+                    catch (e_6_1) { e_6 = { error: e_6_1 }; }
+                    finally {
+                        try {
+                            if (_p && !_p.done && (_f = _o.return)) _f.call(_o);
+                        }
+                        finally { if (e_6) throw e_6.error; }
+                    }
+                    state = set(state, "outputs." + action.payload.params.sensor + ".listening", true);
+                    break;
+                case "motor-info":
+                    try {
+                        for (var _q = __values(["A", "B", "C"]), _r = _q.next(); !_r.done; _r = _q.next()) {
+                            var output = _r.value;
+                            state = set(state, "outputs." + output + ".listening", true);
+                            state = set(state, "outputs." + output + ".dataHistory", []);
+                        }
+                    }
+                    catch (e_7_1) { e_7 = { error: e_7_1 }; }
+                    finally {
+                        try {
+                            if (_r && !_r.done && (_g = _q.return)) _g.call(_q);
+                        }
+                        finally { if (e_7) throw e_7.error; }
+                    }
+                    break;
+                case "sensor-info":
+                    try {
+                        for (var _s = __values(action.payload.params), _t = _s.next(); !_t.done; _t = _s.next()) {
+                            var sensor = _t.value;
+                            state = set(state, "inputs." + sensor + ".enabled", true);
+                            state = set(state, "inputs." + sensor + ".dataHistory", []);
+                        }
+                    }
+                    catch (e_8_1) { e_8 = { error: e_8_1 }; }
+                    finally {
+                        try {
+                            if (_t && !_t.done && (_h = _s.return)) _h.call(_s);
+                        }
+                        finally { if (e_8) throw e_8.error; }
+                    }
+                    break;
+                default:
+                    try {
+                        for (var _u = __values([1, 2, 3, 4]), _v = _u.next(); !_v.done; _v = _u.next()) {
+                            var sensor = _v.value;
+                            state = set(state, "inputs." + sensor + ".enabled", false);
+                            state = set(state, "inputs." + sensor + ".dataHistory", []);
+                        }
+                    }
+                    catch (e_9_1) { e_9 = { error: e_9_1 }; }
+                    finally {
+                        try {
+                            if (_v && !_v.done && (_j = _u.return)) _j.call(_u);
+                        }
+                        finally { if (e_9) throw e_9.error; }
+                    }
+                    try {
+                        for (var _w = __values(["A", "B", "C"]), _x = _w.next(); !_x.done; _x = _w.next()) {
+                            var output = _x.value;
+                            state = set(state, "outputs." + output + ".listening", false);
+                            state = set(state, "outputs." + output + ".dataHistory", []);
+                        }
+                    }
+                    catch (e_10_1) { e_10 = { error: e_10_1 }; }
+                    finally {
+                        try {
+                            if (_x && !_x.done && (_k = _w.return)) _k.call(_w);
+                        }
+                        finally { if (e_10) throw e_10.error; }
+                    }
+            }
     }
     return state;
 };

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Modal, Router, Scene, Tabs } from "react-native-router-flux";
+import { Actions, Modal, Router, Scene, Tabs } from "react-native-router-flux";
 import TabIcon from "./components/tab-icon";
 import RemoteControl from "./components/remote-control";
 import AboutDevice from "./components/about-device";
@@ -12,11 +12,23 @@ import Settings from "./components/settings";
 import SingleMotorStatus from "./components/single-motor-status";
 import { Provider } from 'react-redux';
 import { StyleSheet, View } from "react-native";
+import { pageChange } from "./actions/core-actions";
 var App = function (_a) {
     var store = _a.store;
     return (<Provider store={store}>
             <View style={styles.container}>
-                <Router right={function () { return <StatusButton />; }}>
+                <Router right={function () { return <StatusButton />; }} onStateChange={function (stateData) {
+        //I need a way to trigger redux changes, without over complicating things by linking to redux correctly. The below code
+        //pulls out parameters passed to each page, and passes them along to a pageChange action.
+        var scene = Actions.currentScene.replace("_", "");
+        var sceneData = stateData["routes"].find(function (s) { return s.routeName == scene; }) || stateData["routes"][0]["routes"].find(function (s) { return s.routeName == scene; });
+        if (sceneData && sceneData["routes"]) {
+            sceneData = sceneData["routes"][0] || sceneData;
+        }
+        if (sceneData) {
+            store.dispatch(pageChange(sceneData.params));
+        }
+    }}>
                     <Modal hideNavBar>
                         <Tabs key="root">
                             <Scene key="remote-control" component={RemoteControl} title="Remote Control" iconType="fontawesome5" icon={TabIcon} iconName="gamepad"/>

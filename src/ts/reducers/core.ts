@@ -12,7 +12,7 @@ export function core(state: CoreState = initialState, action: CoreAction) {
             return {
                 ...state,
                 mode: state.mode == Mode.JOYSTICK ? Mode.TILT : Mode.JOYSTICK
-            }
+            };
     }
     return state;
 }

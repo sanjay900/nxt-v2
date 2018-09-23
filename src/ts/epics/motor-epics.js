@@ -48,9 +48,9 @@ export var motorListener = function (action$, state$) {
             return EMPTY;
         }
         if (!state.device.outputs[SystemOutputPort[port.port]].listening) {
-            return of(initialOutput(port.port).data).pipe(delay(100));
+            return of(initialOutput(port.port).data).pipe(delay(0));
         }
-        return of(port).pipe(delay(10), switchMap(function () { return writePacket(GetOutputState.createPacket(port.port)); }), map(function (packet) { return (packet.toOutputData()); }));
+        return of(port).pipe(switchMap(function () { return writePacket(GetOutputState.createPacket(port.port)); }), map(function (packet) { return (packet.toOutputData()); }));
     }), map(motorActions.motorUpdate), catchError(function (err) { return of(motorActions.startMotorListener.failure(err)); }), catchError(function (err) { return of(motorActions.startMotorListener.failure({
         error: err,
         packet: EmptyPacket.createPacket()

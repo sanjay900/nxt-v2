@@ -1,7 +1,7 @@
 import React from "react";
 import {StyleSheet} from "react-native";
 import {Grid, LineChart} from 'react-native-svg-charts'
-import {DeviceState, State, SystemSensor} from "../store";
+import {DeviceState, State} from "../store";
 import {connect} from "react-redux";
 
 type Props = {

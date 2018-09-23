@@ -18,17 +18,10 @@ import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-v
 import {DirectCommand} from "../nxt-structure/packets/direct-command";
 import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
 import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
-import {
-    BluetoothAction,
-    DeviceAction,
-    DeviceState,
-    MotorAction,
-    SensorAction,
-    SystemOutput,
-    SystemSensor
-} from "../store";
+import {DeviceState, RootAction, SystemOutput, SystemSensor} from "../store";
 import {connectToDevice} from "../actions/bluetooth-actions";
 import {get, set} from "dot-prop-immutable";
+import * as coreActions from "../actions/core-actions";
 
 const initialSensor: SystemSensor = {
     type: SensorType.NONE,
@@ -42,7 +35,7 @@ const initialSensor: SystemSensor = {
     },
     enabled: false
 };
-export const initialOutput: (port: SystemOutputPort)=>SystemOutput = (port: SystemOutputPort)=> ({
+export const initialOutput: (port: SystemOutputPort) => SystemOutput = (port: SystemOutputPort) => ({
     mode: 0,
     regulationMode: OutputRegulationMode.IDLE,
     runState: OutputRunState.IDLE,
@@ -98,7 +91,7 @@ export type PacketError = {
     error: Error,
     packet: Packet
 }
-export const device = (state: DeviceState = initialState, action: DeviceAction | BluetoothAction | MotorAction | SensorAction) => {
+export const device = (state: DeviceState = initialState, action: RootAction) => {
     switch (action.type) {
         case getType(connectToDevice.success):
             return {...state, info: {...state.info, programToUpload: undefined}};
@@ -113,7 +106,7 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             return {...state};
 
         case getType(motorActions.enableMotorListener):
-            let motors = action.payload || [SystemOutputPort.A,SystemOutputPort.B,SystemOutputPort.C];
+            let motors = action.payload || [SystemOutputPort.A, SystemOutputPort.B, SystemOutputPort.C];
             let motorLabels = motors.map(s => SystemOutputPort[s]);
             for (let sensor of motorLabels) {
                 state = set(state, `outputs.${sensor}.listening`, true);
@@ -121,7 +114,7 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             return state;
 
         case getType(motorActions.disableMotorListener):
-            motors = action.payload || [SystemOutputPort.A,SystemOutputPort.B,SystemOutputPort.C];
+            motors = action.payload || [SystemOutputPort.A, SystemOutputPort.B, SystemOutputPort.C];
             motorLabels = motors.map(s => SystemOutputPort[s]);
             for (let sensor of motorLabels) {
                 state = set(state, `outputs.${sensor}.listening`, false);
@@ -176,7 +169,47 @@ export const device = (state: DeviceState = initialState, action: DeviceAction |
             historyKey = `inputs.${action.payload.port}.dataHistory`;
             state = set(state, `inputs.${action.payload.port}.data`, action.payload);
             state = set(state, historyKey, get(state, historyKey).concat(action.payload));
-            return state
+            return state;
+
+        case getType(coreActions.pageChange):
+            switch (action.payload.scene) {
+                case "motor-info-expanded":
+                    let port = SystemOutputPort[action.payload.params.output];
+                    for (let output of ["A", "B", "C"]) {
+                        state = set(state, `outputs.${output}.listening`, false);
+                        state = set(state, `outputs.${output}.dataHistory`, []);
+                    }
+                    state = set(state, `outputs.${port}.listening`, true);
+                    break;
+                case "sensor-info-expanded":
+                    for (let sensor of [1, 2, 3, 4]) {
+                        state = set(state, `inputs.${sensor}.enabled`, false);
+                        state = set(state, `inputs.${sensor}.dataHistory`, []);
+                    }
+                    state = set(state, `outputs.${action.payload.params.sensor}.listening`, true);
+                    break;
+                case "motor-info":
+                    for (let output of ["A", "B", "C"]) {
+                        state = set(state, `outputs.${output}.listening`, true);
+                        state = set(state, `outputs.${output}.dataHistory`, []);
+                    }
+                    break;
+                case "sensor-info":
+                    for (let sensor of action.payload.params) {
+                        state = set(state, `inputs.${sensor}.enabled`, true);
+                        state = set(state, `inputs.${sensor}.dataHistory`, []);
+                    }
+                    break;
+                default:
+                    for (let sensor of [1, 2, 3, 4]) {
+                        state = set(state, `inputs.${sensor}.enabled`, false);
+                        state = set(state, `inputs.${sensor}.dataHistory`, []);
+                    }
+                    for (let output of ["A", "B", "C"]) {
+                        state = set(state, `outputs.${output}.listening`, false);
+                        state = set(state, `outputs.${output}.dataHistory`, []);
+                    }
+            }
     }
     return state;
 };

@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, Picker, StyleSheet, View} from "react-native";
+import {Button, Picker, ScrollView, StyleSheet, View} from "react-native";
 import {DeviceState, State, SystemSensor} from "../store";
 import {connect} from "react-redux";
 import {Card} from "react-native-material-ui";
@@ -16,16 +16,13 @@ type Props = {
 class Sensors extends React.Component<Props> {
     render() {
         return (
-            <View>
+            <ScrollView>
                 {Object.values(this.props.deviceInfo.inputs).map(this.renderSensor.bind(this))}
-            </View>
+            </ScrollView>
         );
     }
 
     renderSensor(sensor: SystemSensor) {
-        if (!sensor.data) {
-            return <View key="no data"/>;
-        }
         let types = Object.values(SensorType).map((type: string) => <Picker.Item key={type} label={type}
                                                                                  value={type}/>);
 

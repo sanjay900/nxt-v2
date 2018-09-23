@@ -12,7 +12,7 @@ import {writePacket} from "./device-epics";
 import {isActionOf} from "typesafe-actions";
 import * as sensorActions from "../actions/sensor-actions";
 import {UltrasonicSensorCommand} from "../nxt-structure/ultrasonic-sensor-command";
-import {PacketError} from "../reducers/device";
+import {initialSensor, PacketError} from "../reducers/device";
 import {EmptyPacket} from "../nxt-structure/packets/empty-packet";
 import {SetInputMode} from "../nxt-structure/packets/direct/set-input-mode";
 
@@ -35,30 +35,33 @@ export const TYPE_TO_TYPE: Map<SensorType, InputSensorType> = new Map<SensorType
     [SensorType.ULTRASONIC_INCH, InputSensorType.LOW_SPEED_9V],
     [SensorType.ULTRASONIC_CM, InputSensorType.LOW_SPEED_9V],
 ]);
+
+function writeConfigPacket(config: { port: number, sensorType: SensorType }) {
+    let sensor: SystemSensor = {
+        type: config.sensorType,
+        systemType: TYPE_TO_TYPE.get(config.sensorType)!,
+        mode: TYPE_TO_MODE.get(config.sensorType)!,
+        data: {
+            rawValue: 0,
+            scaledValue: 0,
+            port: config.port
+        },
+        dataHistory: [],
+        enabled: true
+    };
+    return writePacket(SetInputMode.createPacket(config.port, sensor.systemType, sensor.mode)).pipe(map(() => ({
+        port: config.port,
+        sensorType: sensor
+    })));
+}
+
 export const sensorConfig = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
         filter(isActionOf(sensorActions.sensorConfig.request)),
         switchMap(({payload: config}: { payload: { port: number, sensorType: SensorType } }) => {
             return of(config);
         }),
-        switchMap(config => {
-            let sensor: SystemSensor = {
-                type: config.sensorType,
-                systemType: TYPE_TO_TYPE.get(config.sensorType)!,
-                mode: TYPE_TO_MODE.get(config.sensorType)!,
-                data: {
-                    rawValue: 0,
-                    scaledValue: 0,
-                    port: config.port
-                },
-                dataHistory: [],
-                enabled: true
-            };
-            return writePacket(SetInputMode.createPacket(config.port, sensor.systemType, sensor.mode)).pipe(map(() => ({
-                port: config.port,
-                sensorType: sensor
-            })));
-        }),
+        switchMap(writeConfigPacket),
         switchMap(config => {
             if (config.sensorType.type == SensorType.ULTRASONIC_CM || config.sensorType.type == SensorType.ULTRASONIC_INCH) {
                 return writePacket(
@@ -82,14 +85,15 @@ export const sensorHandler = (action$: ActionsObservable<RootAction>, state$: St
     action$.pipe(
         filter(isActionOf(sensorActions.sensorHandler.request)),
         switchMap(() => [1, 2, 3, 4]),
-        map(port => ({port})),
+        map(port => ({port, sensorType: state$.value.device.inputs[port].type})),
+        switchMap((port)=>writeConfigPacket(port).pipe(map(({port})=>initialSensor(port).data))),
         expand(port => {
             let state = state$.value;
             if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
                 return EMPTY;
             }
             return of(port).pipe(
-                delay(100),
+                delay(0),
                 switchMap(() => tickSensor(port.port, state$)),
                 catchError(() => {
                         //Digital sensors return errors to tell you you cannot read from them, so instead of passing those errors to the user,
@@ -139,7 +143,7 @@ export function tickSensor(port: number, state$: StateObservable<RootState>) {
     //Merge together the possibilities for each type of sensor tick
     return merge(
         p.pipe(
-            filter(sensor => sensor.type == SensorType.NONE),
+            filter(sensor => sensor.type == SensorType.NONE || !sensor.enabled),
             map(() => ({rawValue: -1, scaledValue: -1, port: port}))
         ),
         p.pipe(

@@ -23,7 +23,7 @@ import {connectToDevice} from "../actions/bluetooth-actions";
 import {get, set} from "dot-prop-immutable";
 import * as coreActions from "../actions/core-actions";
 
-const initialSensor: (port: number) => SystemSensor = (port: number) => ({
+export const initialSensor: (port: number) => SystemSensor = (port: number) => ({
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
     mode: InputSensorMode.RAW,
@@ -180,26 +180,26 @@ export const device = (state: DeviceState = initialState, action: RootAction) =>
                         state = set(state, `outputs.${output}.dataHistory`, []);
                     }
                     state = set(state, `outputs.${port}.listening`, true);
-                    break;
+                    return state;
                 case "sensor-info-expanded":
                     for (let sensor of [1, 2, 3, 4]) {
                         state = set(state, `inputs.${sensor}.enabled`, false);
                         state = set(state, `inputs.${sensor}.dataHistory`, []);
                     }
-                    state = set(state, `outputs.${action.payload.params.sensor}.listening`, true);
-                    break;
+                    state = set(state, `inputs.${action.payload.params.sensor}.enabled`, true);
+                    return state;
                 case "motor-info":
                     for (let output of ["A", "B", "C"]) {
                         state = set(state, `outputs.${output}.listening`, true);
                         state = set(state, `outputs.${output}.dataHistory`, []);
                     }
-                    break;
+                    return state;
                 case "sensor-info":
                     for (let sensor of [1, 2, 3, 4]) {
                         state = set(state, `inputs.${sensor}.enabled`, true);
                         state = set(state, `inputs.${sensor}.dataHistory`, []);
                     }
-                    break;
+                    return state;
                 default:
                     for (let sensor of [1, 2, 3, 4]) {
                         state = set(state, `inputs.${sensor}.enabled`, false);
@@ -209,6 +209,7 @@ export const device = (state: DeviceState = initialState, action: RootAction) =>
                         state = set(state, `outputs.${output}.listening`, false);
                         state = set(state, `outputs.${output}.dataHistory`, []);
                     }
+                    return state;
             }
     }
     return state;

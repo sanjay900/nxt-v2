@@ -30,7 +30,7 @@ import { DirectCommand } from "../nxt-structure/packets/direct-command";
 import { connectToDevice } from "../actions/bluetooth-actions";
 import { get, set } from "dot-prop-immutable";
 import * as coreActions from "../actions/core-actions";
-var initialSensor = function (port) { return ({
+export var initialSensor = function (port) { return ({
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
     mode: InputSensorMode.RAW,
@@ -229,7 +229,7 @@ export var device = function (state, action) {
                         finally { if (e_5) throw e_5.error; }
                     }
                     state = set(state, "outputs." + port + ".listening", true);
-                    break;
+                    return state;
                 case "sensor-info-expanded":
                     try {
                         for (var _o = __values([1, 2, 3, 4]), _p = _o.next(); !_p.done; _p = _o.next()) {
@@ -245,8 +245,8 @@ export var device = function (state, action) {
                         }
                         finally { if (e_6) throw e_6.error; }
                     }
-                    state = set(state, "outputs." + action.payload.params.sensor + ".listening", true);
-                    break;
+                    state = set(state, "inputs." + action.payload.params.sensor + ".enabled", true);
+                    return state;
                 case "motor-info":
                     try {
                         for (var _q = __values(["A", "B", "C"]), _r = _q.next(); !_r.done; _r = _q.next()) {
@@ -262,7 +262,7 @@ export var device = function (state, action) {
                         }
                         finally { if (e_7) throw e_7.error; }
                     }
-                    break;
+                    return state;
                 case "sensor-info":
                     try {
                         for (var _s = __values([1, 2, 3, 4]), _t = _s.next(); !_t.done; _t = _s.next()) {
@@ -278,7 +278,7 @@ export var device = function (state, action) {
                         }
                         finally { if (e_8) throw e_8.error; }
                     }
-                    break;
+                    return state;
                 default:
                     try {
                         for (var _u = __values([1, 2, 3, 4]), _v = _u.next(); !_v.done; _v = _u.next()) {
@@ -308,6 +308,7 @@ export var device = function (state, action) {
                         }
                         finally { if (e_10) throw e_10.error; }
                     }
+                    return state;
             }
     }
     return state;

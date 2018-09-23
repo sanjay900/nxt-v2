@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import React from "react";
-import { Button, Picker, StyleSheet, View } from "react-native";
+import { Button, Picker, ScrollView, StyleSheet, View } from "react-native";
 import { connect } from "react-redux";
 import { Card } from "react-native-material-ui";
 import { FormLabel, Text } from "react-native-elements";
@@ -25,15 +25,12 @@ var Sensors = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Sensors.prototype.render = function () {
-        return (<View>
+        return (<ScrollView>
                 {Object.values(this.props.deviceInfo.inputs).map(this.renderSensor.bind(this))}
-            </View>);
+            </ScrollView>);
     };
     Sensors.prototype.renderSensor = function (sensor) {
         var _this = this;
-        if (!sensor.data) {
-            return <View key="no data"/>;
-        }
         var types = Object.values(SensorType).map(function (type) { return <Picker.Item key={type} label={type} value={type}/>; });
         return (<Card key={sensor.data.port}>
                 <View>

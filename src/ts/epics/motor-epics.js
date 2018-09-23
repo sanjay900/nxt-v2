@@ -50,7 +50,7 @@ export var motorListener = function (action$, state$) {
         if (!state.device.outputs[SystemOutputPort[port.port]].listening) {
             return of(initialOutput(port.port).data).pipe(delay(100));
         }
-        return of(port).pipe(delay(10), switchMap(function () { return writePacket(GetOutputState.createPacket(port.port)); }));
+        return of(port).pipe(delay(10), switchMap(function () { return writePacket(GetOutputState.createPacket(port.port)); }), map(function (packet) { return (packet.toOutputData()); }));
     }), map(motorActions.motorUpdate), catchError(function (err) { return of(motorActions.startMotorListener.failure(err)); }), catchError(function (err) { return of(motorActions.startMotorListener.failure({
         error: err,
         packet: EmptyPacket.createPacket()

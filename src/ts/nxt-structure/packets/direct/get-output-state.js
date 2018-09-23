@@ -70,6 +70,10 @@ var GetOutputState = /** @class */ (function (_super) {
         _super.prototype.writePacketData.call(this, expectResponse, data);
         data.push(this.port);
     };
+    GetOutputState.prototype.toOutputData = function () {
+        var _a = this, port = _a.port, power = _a.power, mode = _a.mode, rotationCount = _a.rotationCount, tachoLimit = _a.tachoLimit, turnRatio = _a.turnRatio, tachoCount = _a.tachoCount, blockTachoCount = _a.blockTachoCount;
+        return { port: port, power: power, mode: mode, rotationCount: rotationCount, tachoLimit: tachoLimit, turnRatio: turnRatio, tachoCount: tachoCount, blockTachoCount: blockTachoCount };
+    };
     return GetOutputState;
 }(DirectPacket));
 export { GetOutputState };

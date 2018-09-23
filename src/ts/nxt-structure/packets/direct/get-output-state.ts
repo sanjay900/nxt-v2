@@ -8,6 +8,7 @@ import {
     SystemOutputPort,
     SystemOutputPortUtils
 } from "../../motor-constants";
+import {OutputData} from "../../../store";
 
 export class GetOutputState extends DirectPacket {
     public port: SystemOutputPort;
@@ -56,5 +57,9 @@ export class GetOutputState extends DirectPacket {
     protected writePacketData(expectResponse: boolean, data: number[]): void {
         super.writePacketData(expectResponse, data);
         data.push(this.port);
+    }
+    toOutputData(): OutputData {
+        let {port, power, mode, rotationCount, tachoLimit, turnRatio, tachoCount, blockTachoCount} = this;
+        return {port, power, mode, rotationCount, tachoLimit, turnRatio, tachoCount, blockTachoCount};
     }
 }

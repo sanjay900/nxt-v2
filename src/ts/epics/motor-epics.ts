@@ -65,7 +65,8 @@ export const motorListener = (action$: ActionsObservable<RootAction>, state$: St
             }
             return of(port).pipe(
                 delay(10),
-                switchMap(() => writePacket(GetOutputState.createPacket(port.port)))
+                switchMap(() => writePacket(GetOutputState.createPacket(port.port))),
+                map(packet => (packet.toOutputData()))
             );
         }),
         map(motorActions.motorUpdate),

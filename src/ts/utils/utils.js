@@ -7,6 +7,9 @@ var Utils = /** @class */ (function () {
             .replace(/\w\S*/g, function (txt) { return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase(); })
             .replace(/ /g, delimiter);
     };
+    Utils.formatCamelTitle = function (string) {
+        return this.formatTitle(string.replace(/([A-Z])/g, " $1"));
+    };
     return Utils;
 }());
 export { Utils };

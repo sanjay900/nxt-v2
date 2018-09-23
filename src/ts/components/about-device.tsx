@@ -3,7 +3,7 @@ import React from "react";
 import {connect} from 'react-redux';
 import {DeviceState, State} from "../store";
 import {writePacket} from "../actions/device-actions";
-import {FormInput, FormLabel, Text} from "react-native-elements";
+import {FormLabel, Text} from "react-native-elements";
 import * as Progress from 'react-native-progress';
 import {SetBrickName} from "../nxt-structure/packets/system/set-brick-name";
 import {TextField} from "react-native-material-textfield";

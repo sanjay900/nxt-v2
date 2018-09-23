@@ -9,6 +9,7 @@ import UploadFile from "./components/upload-file";
 import MotorStatus from "./components/motor-status";
 import StatusButton from "./components/status-button";
 import Settings from "./components/settings";
+import SingleMotorStatus from "./components/single-motor-status";
 import { Provider } from 'react-redux';
 import { StyleSheet, View } from "react-native";
 var App = function (_a) {
@@ -26,6 +27,7 @@ var App = function (_a) {
                             <Scene key="settings" component={Settings} title="Settings" icon={TabIcon} iconType="fontawesome5" iconName="cog"/>
                         </Tabs>
                         <Scene key="status" title="Uploading file" component={UploadFile} hideNavBar={false}/>
+                        <Scene key="motor-info-expanded" component={SingleMotorStatus} hideNavBar={false}/>
                     </Modal>
                 </Router>
             </View>

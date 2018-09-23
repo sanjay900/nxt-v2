@@ -56,7 +56,8 @@ export type OutputData = {
     blockTachoCount: number,
     rotationCount: number,
     power: number,
-    port: SystemOutputPort
+    port: SystemOutputPort,
+    [key: string]: any
 }
 export type SystemSensor = {
     type: SensorType,

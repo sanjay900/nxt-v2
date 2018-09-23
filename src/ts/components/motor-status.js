@@ -12,11 +12,13 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import React from "react";
-import { StyleSheet } from "react-native";
-import { Grid, LineChart } from 'react-native-svg-charts';
+import { Button, StyleSheet, View } from "react-native";
 import { connect } from "react-redux";
 import { disableMotorListener, enableMotorListener } from "../actions/motor-actions";
 import { Card } from "react-native-material-ui";
+import { FormLabel, Text } from "react-native-elements";
+import { SystemOutputPort } from "../nxt-structure/motor-constants";
+import { Actions } from "react-native-router-flux";
 var Motors = /** @class */ (function (_super) {
     __extends(Motors, _super);
     function Motors() {
@@ -29,10 +31,25 @@ var Motors = /** @class */ (function (_super) {
         this.props.stopListeningToMotorState();
     };
     Motors.prototype.render = function () {
-        return (<Card>
-                <LineChart style={{ height: 200 }} data={this.props.deviceInfo.outputs.B.dataHistory.map(function (s) { return s.rotationCount; })} svg={{ stroke: 'rgb(134, 65, 244)' }} contentInset={{ top: 20, bottom: 20 }}>
-                    <Grid />
-                </LineChart>
+        return (<View>
+                {Object.values(this.props.deviceInfo.outputs).map(Motors.renderMotor)}
+            </View>);
+    };
+    Motors.renderMotor = function (output) {
+        return (<Card key={SystemOutputPort[output.data.port]}>
+                <View>
+                    <Text h4 style={styles.title}>Motor {SystemOutputPort[output.data.port]}</Text>
+                    <FormLabel>Power</FormLabel>
+                    <Text style={styles.margin}>{output.data.power}</Text>
+                    <FormLabel>Rotation Count</FormLabel>
+                    <Text style={styles.margin}>{output.data.rotationCount}</Text>
+                    <View style={styles.button}>
+                        <Button title="More information" onPress={function () { return Actions.push("motor-info-expanded", {
+            output: output.data.port,
+            title: "Motor " + SystemOutputPort[output.data.port] + " Information"
+        }); }}/>
+                    </View>
+                </View>
             </Card>);
     };
     return Motors;
@@ -54,5 +71,11 @@ var styles = StyleSheet.create({
         flex: 1
     }, margin: {
         marginLeft: 20,
-    },
+    }, button: {
+        marginTop: 20
+    }, title: {
+        marginTop: 10,
+        marginLeft: 20,
+        marginBottom: 0
+    }
 });

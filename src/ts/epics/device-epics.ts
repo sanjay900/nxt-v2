@@ -1,7 +1,7 @@
-import {ActionsObservable} from "redux-observable";
+import {ActionsObservable, StateObservable} from "redux-observable";
 import {isActionOf} from "typesafe-actions";
-import {RootAction} from "../store";
-import {catchError, expand, filter, map, share, switchMap, take, tap} from "rxjs/operators";
+import {ConnectionStatus, RootAction, RootState} from "../store";
+import {catchError, delay, expand, filter, map, share, switchMap, take, tap} from "rxjs/operators";
 import {EMPTY, from, merge, Observable, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import {Buffer} from "buffer";
@@ -19,6 +19,10 @@ import {DirectCommandResponse} from "../nxt-structure/packets/direct-command-res
 import {Alert} from "react-native";
 import {fileList, SteeringControl} from "../utils/Files";
 import {EmptyPacket} from "../nxt-structure/packets/empty-packet";
+import {GetBatteryLevel} from "../nxt-structure/packets/direct/get-battery-level";
+import {GetDeviceInfo} from "../nxt-structure/packets/system/get-device-info";
+import {GetFirmwareVersion} from "../nxt-structure/packets/system/get-firmware-version";
+import {GetCurrentProgramName} from "../nxt-structure/packets/direct/get-current-program-name";
 
 /**
  * Write a packet to the device, and return an observer that will wait for the packet to be written
@@ -31,7 +35,6 @@ export function writePacket<T extends Packet>(packet: T): Observable<T> {
         map(() => packet)
     );
 }
-
 
 
 export const sendPacket = (action$: ActionsObservable<RootAction>) =>
@@ -59,6 +62,24 @@ export const sendPacket = (action$: ActionsObservable<RootAction>) =>
             packet: EmptyPacket.createPacket()
         })))
     );
+export const pollInfo = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
+    action$.pipe(
+        filter(isActionOf(deviceActions.startInfoListener.request)),
+        expand(() => {
+            if (state$.value.bluetooth.status != ConnectionStatus.CONNECTED) {
+                return EMPTY;
+            }
+            return (of("test").pipe(delay(100)))
+        }),
+        filter(()=>state$.value.device.info.pollInfo),
+        switchMap(() => [
+            deviceActions.writePacket.request(GetBatteryLevel.createPacket()),
+            deviceActions.writePacket.request(GetDeviceInfo.createPacket()),
+            deviceActions.writePacket.request(GetCurrentProgramName.createPacket()),
+            deviceActions.writePacket.request(GetFirmwareVersion.createPacket()),
+        ])
+    )
+;
 
 export const writeFile = (action$: ActionsObservable<RootAction>) => {
     //Baiscally, we handle writing a file here. We send out a openwrite, wait for it to respond and then

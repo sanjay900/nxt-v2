@@ -22,6 +22,7 @@ import {DeviceState, RootAction, SystemOutput, SystemSensor} from "../store";
 import {connectToDevice} from "../actions/bluetooth-actions";
 import {get, set} from "dot-prop-immutable";
 import * as coreActions from "../actions/core-actions";
+import {GetCurrentProgramName} from "../nxt-structure/packets/direct/get-current-program-name";
 
 export const initialSensor: (port: number) => SystemSensor = (port: number) => ({
     type: SensorType.NONE,
@@ -63,6 +64,7 @@ const initialState: DeviceState = {
             protocol: "0.0",
             firmware: "0.0"
         },
+        pollInfo: false
     }, outputs: {
         A: {...initialOutput(SystemOutputPort.A)},
         B: {...initialOutput(SystemOutputPort.B)},
@@ -172,6 +174,11 @@ export const device = (state: DeviceState = initialState, action: RootAction) =>
             return state;
 
         case getType(coreActions.pageChange):
+            if (action.payload.scene == "about-device") {
+                state = set(state, "info.pollInfo", true);
+                return state;
+            }
+            state = set(state, "info.pollInfo", false);
             switch (action.payload.scene) {
                 case "motor-info-expanded":
                     let port = SystemOutputPort[action.payload.params.output];
@@ -219,9 +226,7 @@ function processOutgoingPacket(packet: Packet, state: DeviceState): any {
     switch (packet.id) {
         case SystemCommand.SET_BRICK_NAME:
             let {name: deviceName} = packet as SetBrickName;
-            return {
-                info: {...state.info, deviceName}
-            };
+            return set(state, "info.deviceName", deviceName);
     }
     return {};
 }
@@ -236,21 +241,15 @@ function processIncomingPacket(packet: Packet, state: DeviceState): any {
 
         case SystemCommand.GET_FIRMWARE_VERSION:
             let {firmwareVersion: firmware, protocolVersion: protocol} = packet as GetFirmwareVersion;
-            return {
-                info: {
-                    ...state.info,
-                    version: {firmware, protocol}
-                }
-            };
+            return set(state, "info.version", {firmware, protocol});
 
         case DirectCommand.GET_BATTERY_LEVEL:
             let {voltage} = packet as GetBatteryLevel;
-            return {
-                info: {
-                    ...state.info,
-                    batteryVoltage: voltage
-                }
-            };
+            return set(state, "info.batteryVoltage", voltage);
+
+        case DirectCommand.GET_CURRENT_PROGRAM_NAME:
+            let {programName} = packet as GetCurrentProgramName;
+            return set(state, "info.currentProgramName", programName);
     }
     return {};
 }

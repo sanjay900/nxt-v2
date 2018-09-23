@@ -57,7 +57,11 @@ var Packet = /** @class */ (function () {
     Packet.readAsciiz = function (data, size) {
         var message = "";
         for (var i = 0; i < size; i++) {
-            message += String.fromCharCode(data.shift());
+            var next = data.shift();
+            //Skip null terminators
+            if (next != 0) {
+                message += String.fromCharCode(next);
+            }
         }
         return message;
     };

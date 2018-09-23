@@ -19,6 +19,9 @@ var GetCurrentProgramName = /** @class */ (function (_super) {
     function GetCurrentProgramName() {
         return _super.call(this, DirectCommand.GET_CURRENT_PROGRAM_NAME) || this;
     }
+    GetCurrentProgramName.createPacket = function () {
+        return new GetCurrentProgramName();
+    };
     GetCurrentProgramName.prototype.readPacket = function (data) {
         _super.prototype.readPacket.call(this, data);
         this.programName = Packet.readAsciiz(data, Packet.FILE_NAME_LENGTH);

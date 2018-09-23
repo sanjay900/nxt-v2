@@ -14,6 +14,10 @@ type Props = {
 }
 
 const AboutDevice: React.SFC<Props> = ({deviceInfo, setName}: Props) => {
+    let progName = deviceInfo.info.currentProgramName;
+    if (progName.length == 0) {
+        progName = "None";
+    }
     return (
         <View style={styles.container}>
             <TextField label="Device Name" value={deviceInfo.info.deviceName} onChangeText={setName} containerStyle={styles.input}/>
@@ -25,10 +29,10 @@ const AboutDevice: React.SFC<Props> = ({deviceInfo, setName}: Props) => {
             <Text style={styles.margin}>{deviceInfo.info.batteryVoltage} mV / {9 * 1000} mV</Text>
             <Progress.Bar progress={deviceInfo.info.batteryVoltage / (9 * 1000)} style={styles.margin}/>
             <FormLabel>Currently Executing Program</FormLabel>
-            <Text style={styles.margin}>{deviceInfo.info.currentProgramName}</Text>
+            <Text style={styles.margin}>{progName}</Text>
             <FormLabel>Free Space</FormLabel>
-            <Text style={styles.margin}>{deviceInfo.info.freeSpace}B/{256 * 100000}B</Text>
-            <Progress.Bar progress={deviceInfo.info.freeSpace / (256 * 100000)} style={styles.margin}/>
+            <Text style={styles.margin}>{(deviceInfo.info.freeSpace/1024).toFixed(2)} KB / 256 KB</Text>
+            <Progress.Bar progress={deviceInfo.info.freeSpace / (256 * 1024)} style={styles.margin}/>
         </View>
     );
 };

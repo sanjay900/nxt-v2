@@ -51,7 +51,11 @@ export abstract class Packet {
     protected static readAsciiz(data: number[], size: number): string {
         let message: string = "";
         for (let i = 0; i < size; i++) {
-            message += String.fromCharCode(data.shift()!);
+            let next = data.shift()!;
+            //Skip null terminators
+            if (next != 0) {
+                message += String.fromCharCode(next);
+            }
         }
         return message;
     }

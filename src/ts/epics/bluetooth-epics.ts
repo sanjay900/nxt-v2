@@ -40,6 +40,7 @@ export const connectToDevice = (action$: ActionsObservable<RootAction>) =>
                 writePacket.request(StartProgram.createPacket(SteeringControl)),
                 sensorActions.sensorHandler.request(),
                 motorActions.startMotorListener.request(),
+                deviceActions.startInfoListener.request()
             ]
         ),
         catchError(err => of(bluetoothActions.connectToDevice.failure(err)))

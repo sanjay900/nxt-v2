@@ -16,3 +16,4 @@ export var joystickRelease = createAction("joystickTouch", function (resolve) {
 export var joystickTouch = createAction("joystickRelease", function (resolve) {
     return function (joystick) { return resolve(joystick); };
 });
+export var startInfoListener = createAsyncAction('startInfoListenerRequest', 'startInfoListenerResponse', 'startInfoListenerFailure')();

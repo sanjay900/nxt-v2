@@ -93,7 +93,8 @@ export type DeviceState = {
             protocol: string,
             firmware: string
         },
-        currentFile?: NXTFile
+        currentFile?: NXTFile,
+        pollInfo: boolean
     },
     outputs: {
         A: SystemOutput,

@@ -9,6 +9,9 @@ export class GetCurrentProgramName extends DirectPacket {
         super(DirectCommand.GET_CURRENT_PROGRAM_NAME);
     }
 
+    static createPacket() {
+        return new GetCurrentProgramName();
+    }
 
     readPacket(data: number[]): void {
         super.readPacket(data);

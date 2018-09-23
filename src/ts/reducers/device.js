@@ -70,6 +70,7 @@ var initialState = {
             protocol: "0.0",
             firmware: "0.0"
         },
+        pollInfo: false
     }, outputs: {
         A: __assign({}, initialOutput(SystemOutputPort.A)),
         B: __assign({}, initialOutput(SystemOutputPort.B)),
@@ -211,6 +212,11 @@ export var device = function (state, action) {
             state = set(state, historyKey, get(state, historyKey).concat(action.payload));
             return state;
         case getType(coreActions.pageChange):
+            if (action.payload.scene == "about-device") {
+                state = set(state, "info.pollInfo", true);
+                return state;
+            }
+            state = set(state, "info.pollInfo", false);
             switch (action.payload.scene) {
                 case "motor-info-expanded":
                     var port = SystemOutputPort[action.payload.params.output];
@@ -317,9 +323,7 @@ function processOutgoingPacket(packet, state) {
     switch (packet.id) {
         case SystemCommand.SET_BRICK_NAME:
             var deviceName = packet.name;
-            return {
-                info: __assign({}, state.info, { deviceName: deviceName })
-            };
+            return set(state, "info.deviceName", deviceName);
     }
     return {};
 }
@@ -332,14 +336,13 @@ function processIncomingPacket(packet, state) {
             };
         case SystemCommand.GET_FIRMWARE_VERSION:
             var _b = packet, firmware = _b.firmwareVersion, protocol = _b.protocolVersion;
-            return {
-                info: __assign({}, state.info, { version: { firmware: firmware, protocol: protocol } })
-            };
+            return set(state, "info.version", { firmware: firmware, protocol: protocol });
         case DirectCommand.GET_BATTERY_LEVEL:
             var voltage = packet.voltage;
-            return {
-                info: __assign({}, state.info, { batteryVoltage: voltage })
-            };
+            return set(state, "info.batteryVoltage", voltage);
+        case DirectCommand.GET_CURRENT_PROGRAM_NAME:
+            var programName = packet.programName;
+            return set(state, "info.currentProgramName", programName);
     }
     return {};
 }

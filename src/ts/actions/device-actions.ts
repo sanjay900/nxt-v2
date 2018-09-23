@@ -36,3 +36,9 @@ export const joystickRelease = createAction("joystickTouch", resolve => {
 export const joystickTouch = createAction("joystickRelease", resolve => {
     return (joystick: string) => resolve(joystick);
 });
+
+export const startInfoListener = createAsyncAction(
+    'startInfoListenerRequest',
+    'startInfoListenerResponse',
+    'startInfoListenerFailure'
+)<void, void, PacketError>();

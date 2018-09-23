@@ -139,6 +139,10 @@ export function tickSensor(port: number, state$: StateObservable<RootState>) {
     //Merge together the possibilities for each type of sensor tick
     return merge(
         p.pipe(
+            filter(sensor => sensor.type == SensorType.NONE),
+            map(() => ({rawValue: -1, scaledValue: -1, port: port}))
+        ),
+        p.pipe(
             filter(sensor => isUltrasonic(sensor.type) && sensor.enabled),
             switchMap(() => readI2CRegister(UltrasonicSensorRegister.MEASUREMENT_BYTE_0, port)),
             map(data => {
@@ -155,5 +159,6 @@ export function tickSensor(port: number, state$: StateObservable<RootState>) {
                 port: port
             })),
         )
-    );
+    )
+        ;
 }

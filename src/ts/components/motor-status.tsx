@@ -2,8 +2,6 @@ import React from "react";
 import {Button, StyleSheet, View} from "react-native";
 import {DeviceState, State, SystemOutput} from "../store";
 import {connect} from "react-redux";
-import {Dispatch} from "redux";
-import {disableMotorListener, enableMotorListener} from "../actions/motor-actions";
 import {Card} from "react-native-material-ui";
 import {FormLabel, Text} from "react-native-elements";
 import {SystemOutputPort} from "../nxt-structure/motor-constants";
@@ -11,8 +9,6 @@ import {Actions} from "react-native-router-flux";
 
 type Props = {
     deviceInfo: DeviceState,
-    listenToMotorState: () => {},
-    stopListeningToMotorState: () => {}
 }
 
 class Motors extends React.Component<Props> {
@@ -54,14 +50,7 @@ const mapStateToProps = (state: State) => {
     };
 };
 
-const mapPropsToDispatch = (dispatch: Dispatch) => {
-    return {
-        listenToMotorState: () => dispatch(enableMotorListener()),
-        stopListeningToMotorState: () => dispatch(disableMotorListener())
-    }
-};
-
-export default connect(mapStateToProps, mapPropsToDispatch)(Motors);
+export default connect(mapStateToProps)(Motors);
 
 
 const styles = StyleSheet.create({

@@ -10,6 +10,7 @@ import MotorStatus from "./components/motor-status";
 import StatusButton from "./components/status-button";
 import Settings from "./components/settings";
 import SingleMotorStatus from "./components/single-motor-status";
+import SingleSensorStatus from "./components/single-sensor-status";
 import { Provider } from 'react-redux';
 import { StyleSheet, View } from "react-native";
 import { pageChange } from "./actions/core-actions";
@@ -40,6 +41,7 @@ var App = function (_a) {
                         </Tabs>
                         <Scene key="status" title="Uploading file" component={UploadFile} hideNavBar={false}/>
                         <Scene key="motor-info-expanded" component={SingleMotorStatus} hideNavBar={false}/>
+                        <Scene key="sensor-info-expanded" component={SingleSensorStatus} hideNavBar={false}/>
                     </Modal>
                 </Router>
             </View>

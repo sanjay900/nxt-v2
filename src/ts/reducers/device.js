@@ -30,18 +30,18 @@ import { DirectCommand } from "../nxt-structure/packets/direct-command";
 import { connectToDevice } from "../actions/bluetooth-actions";
 import { get, set } from "dot-prop-immutable";
 import * as coreActions from "../actions/core-actions";
-var initialSensor = {
+var initialSensor = function (port) { return ({
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
     mode: InputSensorMode.RAW,
     dataHistory: [],
     data: {
-        port: 0,
+        port: port,
         rawValue: 0,
         scaledValue: 0
     },
     enabled: false
-};
+}); };
 export var initialOutput = function (port) { return ({
     mode: 0,
     regulationMode: OutputRegulationMode.IDLE,
@@ -75,10 +75,10 @@ var initialState = {
         B: __assign({}, initialOutput(SystemOutputPort.B)),
         C: __assign({}, initialOutput(SystemOutputPort.C))
     }, inputs: {
-        1: __assign({}, initialSensor),
-        2: __assign({}, initialSensor),
-        3: __assign({}, initialSensor),
-        4: __assign({}, initialSensor)
+        1: __assign({}, initialSensor(1)),
+        2: __assign({}, initialSensor(2)),
+        3: __assign({}, initialSensor(3)),
+        4: __assign({}, initialSensor(4))
     }, outputConfig: {
         invertSteering: false,
         invertThrottle: false,
@@ -265,7 +265,7 @@ export var device = function (state, action) {
                     break;
                 case "sensor-info":
                     try {
-                        for (var _s = __values(action.payload.params), _t = _s.next(); !_t.done; _t = _s.next()) {
+                        for (var _s = __values([1, 2, 3, 4]), _t = _s.next(); !_t.done; _t = _s.next()) {
                             var sensor = _t.value;
                             state = set(state, "inputs." + sensor + ".enabled", true);
                             state = set(state, "inputs." + sensor + ".dataHistory", []);

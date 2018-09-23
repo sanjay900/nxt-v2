@@ -23,18 +23,18 @@ import {connectToDevice} from "../actions/bluetooth-actions";
 import {get, set} from "dot-prop-immutable";
 import * as coreActions from "../actions/core-actions";
 
-const initialSensor: SystemSensor = {
+const initialSensor: (port: number) => SystemSensor = (port: number) => ({
     type: SensorType.NONE,
     systemType: InputSensorType.NO_SENSOR,
     mode: InputSensorMode.RAW,
     dataHistory: [],
     data: {
-        port: 0,
+        port: port,
         rawValue: 0,
         scaledValue: 0
     },
     enabled: false
-};
+});
 export const initialOutput: (port: SystemOutputPort) => SystemOutput = (port: SystemOutputPort) => ({
     mode: 0,
     regulationMode: OutputRegulationMode.IDLE,
@@ -68,10 +68,10 @@ const initialState: DeviceState = {
         B: {...initialOutput(SystemOutputPort.B)},
         C: {...initialOutput(SystemOutputPort.C)}
     }, inputs: {
-        1: {...initialSensor},
-        2: {...initialSensor},
-        3: {...initialSensor},
-        4: {...initialSensor}
+        1: {...initialSensor(1)},
+        2: {...initialSensor(2)},
+        3: {...initialSensor(3)},
+        4: {...initialSensor(4)}
     }, outputConfig: {
         invertSteering: false,
         invertThrottle: false,
@@ -195,7 +195,7 @@ export const device = (state: DeviceState = initialState, action: RootAction) =>
                     }
                     break;
                 case "sensor-info":
-                    for (let sensor of action.payload.params) {
+                    for (let sensor of [1, 2, 3, 4]) {
                         state = set(state, `inputs.${sensor}.enabled`, true);
                         state = set(state, `inputs.${sensor}.dataHistory`, []);
                     }

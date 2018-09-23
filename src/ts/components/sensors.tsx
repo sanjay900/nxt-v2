@@ -1,32 +1,70 @@
 import React from "react";
-import {StyleSheet} from "react-native";
-import {Grid, LineChart} from 'react-native-svg-charts'
-import {DeviceState, State} from "../store";
+import {Button, Picker, StyleSheet, View} from "react-native";
+import {DeviceState, State, SystemSensor} from "../store";
 import {connect} from "react-redux";
+import {Card} from "react-native-material-ui";
+import {FormLabel, Text} from "react-native-elements";
+import {Actions} from "react-native-router-flux";
+import {SensorType} from "../nxt-structure/sensor-constants";
+import {sensorConfig} from "../actions/sensor-actions";
 
 type Props = {
-    deviceInfo: DeviceState
+    deviceInfo: DeviceState,
+    setSensorType: (sensorType: SensorType, sensor: number) => {}
 }
 
-const Sensors: React.SFC<Props> = ({deviceInfo}: Props) => {
-    return (
-        <LineChart
-            style={{ height: 200 }}
-            data={ deviceInfo.outputs.A.dataHistory.map(s => s.rotationCount) }
-            svg={{ stroke: 'rgb(134, 65, 244)' }}
-            contentInset={{ top: 20, bottom: 20 }}
-        >
-            <Grid/>
-        </LineChart>
-    );
-};
+class Sensors extends React.Component<Props> {
+    render() {
+        return (
+            <View>
+                {Object.values(this.props.deviceInfo.inputs).map(this.renderSensor.bind(this))}
+            </View>
+        );
+    }
+
+    renderSensor(sensor: SystemSensor) {
+        if (!sensor.data) {
+            return <View key="no data"/>;
+        }
+        let types = Object.values(SensorType).map((type: string) => <Picker.Item key={type} label={type}
+                                                                                 value={type}/>);
+
+        return (
+            <Card key={sensor.data.port}>
+                <View>
+                    <Text h4 style={styles.title}>Sensor {sensor.data.port}</Text>
+                    <FormLabel>Type</FormLabel>
+                    <Picker
+                        selectedValue={sensor.type}
+                        style={styles.picker}
+                        onValueChange={value => this.props.setSensorType(value, sensor.data.port)}>
+                        {types}
+                    </Picker>
+                    <FormLabel>Value</FormLabel>
+                    <Text style={styles.margin}>{sensor.data.scaledValue}</Text>
+                    <View style={styles.button}>
+                        <Button title="More information" onPress={() => Actions.push("sensor-info-expanded", {
+                            sensor: sensor.data.port,
+                            title: `Sensor ${sensor.data.port} Information`
+                        })}/>
+                    </View>
+                </View>
+            </Card>
+        )
+    }
+}
+
 const mapStateToProps = (state: State) => {
     return {
         deviceInfo: state.device
     };
 };
-
-export default connect(mapStateToProps)(Sensors);
+const mapDispatchToProps = (dispatch: Function) => ({
+    setSensorType: (sensorType: SensorType, sensor: number) => dispatch(sensorConfig.request({
+        port: sensor, sensorType
+    }))
+});
+export default connect(mapStateToProps, mapDispatchToProps)(Sensors);
 
 
 const styles = StyleSheet.create({
@@ -34,5 +72,16 @@ const styles = StyleSheet.create({
         flex: 1
     }, margin: {
         marginLeft: 20,
-    },
+    }, button: {
+        marginTop: 20
+    }, title: {
+        marginTop: 10,
+        marginLeft: 20,
+        marginBottom: 0
+    }, picker: {
+        height: 50,
+        marginLeft: 11,
+        marginRight: 11,
+    }
+
 });

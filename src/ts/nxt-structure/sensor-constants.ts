@@ -1,3 +1,5 @@
+import {SystemOutputPort} from "./motor-constants";
+
 export enum InputSensorMode {
     RAW = 0x00,
     BOOLEAN = 0x20,
@@ -28,7 +30,8 @@ export enum InputSensorType {
 export type SensorData = {
     rawValue: number,
     scaledValue: number,
-    port: number;
+    port: number,
+    [key: string]: number
 }
 
 export enum SensorType {

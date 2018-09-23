@@ -14,7 +14,6 @@ var __extends = (this && this.__extends) || (function () {
 import React from "react";
 import { Button, StyleSheet, View } from "react-native";
 import { connect } from "react-redux";
-import { disableMotorListener, enableMotorListener } from "../actions/motor-actions";
 import { Card } from "react-native-material-ui";
 import { FormLabel, Text } from "react-native-elements";
 import { SystemOutputPort } from "../nxt-structure/motor-constants";
@@ -56,13 +55,7 @@ var mapStateToProps = function (state) {
         deviceInfo: state.device
     };
 };
-var mapPropsToDispatch = function (dispatch) {
-    return {
-        listenToMotorState: function () { return dispatch(enableMotorListener()); },
-        stopListeningToMotorState: function () { return dispatch(disableMotorListener()); }
-    };
-};
-export default connect(mapStateToProps, mapPropsToDispatch)(Motors);
+export default connect(mapStateToProps)(Motors);
 var styles = StyleSheet.create({
     container: {
         flex: 1

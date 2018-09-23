@@ -4,28 +4,27 @@ import {Grid, LineChart} from 'react-native-svg-charts'
 import {DeviceState, State} from "../store";
 import {connect} from "react-redux";
 import {Card} from "react-native-material-ui";
-import {OutputRegulationMode, OutputRunState, printMode, SystemOutputPort} from "../nxt-structure/motor-constants";
 import {FormLabel, Text} from "react-native-elements";
 import {Utils} from "../utils/utils";
 
 type Props = {
     deviceInfo: DeviceState,
-    output: SystemOutputPort,
+    sensor: number,
 }
 
 const DEFAULT_DATA = [0];
 
-class SingleMotorStatus extends React.Component<Props> {
+class SingleSensorStatus extends React.Component<Props> {
 
     render() {
-        let motor = this.props.deviceInfo.outputs[SystemOutputPort[this.props.output]];
+        let sensor = this.props.deviceInfo.inputs[this.props.sensor];
         let charts = Object
-            .keys(motor.data)
-            .filter(s => s != "port" && s != "mode")
-            .map((key) => SingleMotorStatus.renderChart(
+            .keys(sensor.data)
+            .filter(s => s != "port")
+            .map((key) => SingleSensorStatus.renderChart(
                 Utils.formatCamelTitle(key),
-                motor.data[key],
-                motor.dataHistory.map(data => data[key])
+                sensor.data[key],
+                sensor.dataHistory.map(data => data[key])
                 )
             );
 
@@ -33,13 +32,8 @@ class SingleMotorStatus extends React.Component<Props> {
             <ScrollView>
                 <Card>
                     <View style={{marginBottom: 10}}>
-                        <FormLabel>Mode</FormLabel>
-                        <Text style={styles.margin}>{printMode(motor.mode)}</Text>
-                        <FormLabel>Regulation Mode</FormLabel>
-                        <Text
-                            style={styles.margin}>{Utils.formatTitle(OutputRegulationMode[motor.regulationMode])}</Text>
-                        <FormLabel>Run State</FormLabel>
-                        <Text style={styles.margin}>{Utils.formatTitle(OutputRunState[motor.runState])}</Text>
+                        <FormLabel>Type</FormLabel>
+                        <Text style={styles.margin}>{sensor.type}</Text>
                     </View>
                 </Card>
                 {charts}
@@ -82,7 +76,7 @@ const mapStateToProps = (state: State) => {
     };
 };
 
-export default connect(mapStateToProps)(SingleMotorStatus);
+export default connect(mapStateToProps)(SingleSensorStatus);
 
 
 const styles = StyleSheet.create({

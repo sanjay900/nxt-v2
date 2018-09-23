@@ -11,32 +11,48 @@ var __extends = (this && this.__extends) || (function () {
         d.prototype = b === null ? Object.create(b) : (__.prototype = b.prototype, new __());
     };
 })();
-import React, { Component } from "react";
-import { StyleSheet, Text } from "react-native";
+import React from "react";
+import { StyleSheet } from "react-native";
+import { Grid, LineChart } from 'react-native-svg-charts';
+import { connect } from "react-redux";
+import { disableMotorListener, enableMotorListener } from "../actions/motor-actions";
 import { Card } from "react-native-material-ui";
-var MotorStatus = /** @class */ (function (_super) {
-    __extends(MotorStatus, _super);
-    function MotorStatus() {
+var Motors = /** @class */ (function (_super) {
+    __extends(Motors, _super);
+    function Motors() {
         return _super !== null && _super.apply(this, arguments) || this;
     }
-    MotorStatus.prototype.render = function () {
+    Motors.prototype.componentDidMount = function () {
+        this.props.listenToMotorState();
+    };
+    Motors.prototype.componentWillUnmount = function () {
+        this.props.stopListeningToMotorState();
+    };
+    Motors.prototype.render = function () {
         return (<Card>
-                <Text>Hello world!</Text>
+                <LineChart style={{ height: 200 }} data={this.props.deviceInfo.outputs.B.dataHistory.map(function (s) { return s.rotationCount; })} svg={{ stroke: 'rgb(134, 65, 244)' }} contentInset={{ top: 20, bottom: 20 }}>
+                    <Grid />
+                </LineChart>
             </Card>);
     };
-    return MotorStatus;
-}(Component));
-export default MotorStatus;
+    return Motors;
+}(React.Component));
+var mapStateToProps = function (state) {
+    return {
+        deviceInfo: state.device
+    };
+};
+var mapPropsToDispatch = function (dispatch) {
+    return {
+        listenToMotorState: function () { return dispatch(enableMotorListener()); },
+        stopListeningToMotorState: function () { return dispatch(disableMotorListener()); }
+    };
+};
+export default connect(mapStateToProps, mapPropsToDispatch)(Motors);
 var styles = StyleSheet.create({
     container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        backgroundColor: '#F5FCFF',
+        flex: 1
+    }, margin: {
+        marginLeft: 20,
     },
-    welcome: {
-        fontSize: 20,
-        textAlign: 'center',
-        margin: 10,
-    }
 });

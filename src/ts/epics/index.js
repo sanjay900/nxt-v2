@@ -23,12 +23,14 @@ import * as bluetooth from './bluetooth-epics';
 import * as device from "./device-epics";
 import * as sensor from "./sensor-epics";
 import * as motor from "./motor-epics";
+import { startHandlers } from "./motor-epics";
 export var epics = combineEpics.apply(void 0, __spread(Object.values(bluetooth), [
     device.sendPacket,
-    device.startHandlers,
+    startHandlers,
     device.writeFile,
     sensor.sensorConfig,
     sensor.sensorHandler,
     motor.writeConfig,
-    motor.motorHandler
+    motor.motorHandler,
+    motor.motorListener
 ]));

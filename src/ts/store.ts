@@ -2,12 +2,15 @@ import {Device} from "react-native-bluetooth-serial";
 import {ActionType} from "typesafe-actions";
 import * as coreActions from "./actions/core-actions";
 import * as bluetoothActions from "./actions/bluetooth-actions";
+import * as motorActions from "./actions/sensor-actions";
+import * as sensorActions from "./actions/motor-actions";
 import {
     OutputPort,
     OutputRegulationMode,
     OutputRunState,
     SingleOutputPort,
-    SteeringConfig
+    SteeringConfig,
+    SystemOutputPort
 } from "./nxt-structure/motor-constants";
 import * as deviceActions from "./actions/device-actions";
 import {InputSensorMode, InputSensorType, SensorData, SensorType} from "./nxt-structure/sensor-constants";
@@ -43,7 +46,8 @@ export type SystemOutput = {
     regulationMode: OutputRegulationMode,
     runState: OutputRunState,
     data: OutputData
-    dataHistory: OutputData[]
+    dataHistory: OutputData[],
+    listening: false
 }
 export type OutputData = {
     turnRatio: number,
@@ -51,7 +55,8 @@ export type OutputData = {
     tachoCount: number,
     blockTachoCount: number,
     rotationCount: number,
-    power: number
+    power: number,
+    port: SystemOutputPort
 }
 export type SystemSensor = {
     type: SensorType,
@@ -92,7 +97,8 @@ export type DeviceState = {
     outputs: {
         A: SystemOutput,
         B: SystemOutput,
-        C: SystemOutput
+        C: SystemOutput,
+        [key: string]: SystemOutput
     },
     inputs: {
         1: SystemSensor,
@@ -111,6 +117,8 @@ export type State = {
 
 
 export type BluetoothAction = ActionType<typeof bluetoothActions>;
-export type RootAction = BluetoothAction | CoreAction | DeviceAction;
+export type MotorAction = ActionType<typeof motorActions>;
+export type SensorAction = ActionType<typeof sensorActions>;
+export type RootAction = BluetoothAction | CoreAction | DeviceAction | MotorAction | SensorAction;
 export type RootState = { core: CoreState, bluetooth: BluetoothState, device: DeviceState }
 export let packetBuffer: Packet[] = [];

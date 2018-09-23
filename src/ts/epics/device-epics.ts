@@ -1,13 +1,12 @@
-import {ActionsObservable, StateObservable} from "redux-observable";
+import {ActionsObservable} from "redux-observable";
 import {isActionOf} from "typesafe-actions";
-import {RootAction, RootState} from "../store";
-import {catchError, concatMap, expand, filter, map, share, switchMap, take, tap} from "rxjs/operators";
-import {EMPTY, from, merge, NEVER, Observable, of} from "rxjs";
+import {RootAction} from "../store";
+import {catchError, expand, filter, map, share, switchMap, take, tap} from "rxjs/operators";
+import {EMPTY, from, merge, Observable, of} from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import {Buffer} from "buffer";
 
 import * as deviceActions from '../actions/device-actions';
-import {startMotorHandler, writeFileProgress} from '../actions/device-actions';
 import {Packet} from "../nxt-structure/packets/packet";
 import {NXTFile} from "../nxt-structure/nxt-file";
 import {Write} from "../nxt-structure/packets/system/write";
@@ -33,21 +32,6 @@ export function writePacket<T extends Packet>(packet: T): Observable<T> {
     );
 }
 
-export const startHandlers = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
-    action$.pipe(
-        map(action => {
-            return (isActionOf(deviceActions.writePacket.success)(action) && action.payload instanceof StartProgram && action.payload.programName) ||
-                (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name) ||
-                NEVER;
-        }),
-        filter(name => name == SteeringControl),
-        concatMap(() => [
-                deviceActions.writeConfig.request(state$.value.device.outputConfig),
-                startMotorHandler.request()
-            ]
-        )
-    );
-
 
 
 export const sendPacket = (action$: ActionsObservable<RootAction>) =>
@@ -70,7 +54,7 @@ export const sendPacket = (action$: ActionsObservable<RootAction>) =>
             }
             return of(deviceActions.writePacket.failure(err))
         }),
-        catchError((err: Error) => of(deviceActions.writeConfig.failure({
+        catchError((err: Error) => of(deviceActions.writePacket.failure({
             error: err,
             packet: EmptyPacket.createPacket()
         })))
@@ -100,9 +84,9 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
     return merge(
         actions.pipe(
             filter(data => !data.file.hasWritten()),
-            map(writeFileProgress),
+            map(deviceActions.writeFileProgress),
             catchError((err: PacketError) => of(deviceActions.writeFile.failure(err))),
-            catchError((err: Error) => of(deviceActions.writeConfig.failure({
+            catchError((err: Error) => of(deviceActions.writeFile.failure({
                 error: err,
                 packet: EmptyPacket.createPacket()
             })))
@@ -119,7 +103,7 @@ export const writeFile = (action$: ActionsObservable<RootAction>) => {
             }),
             map(deviceActions.writeFile.success),
             catchError((err: PacketError) => of(deviceActions.writeFile.failure(err))),
-            catchError((err: Error) => of(deviceActions.writeConfig.failure({
+            catchError((err: Error) => of(deviceActions.writeFile.failure({
                 error: err,
                 packet: EmptyPacket.createPacket()
             })))

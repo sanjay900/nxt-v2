@@ -5,14 +5,14 @@ import {DeviceState, State, SystemSensor} from "../store";
 import {connect} from "react-redux";
 
 type Props = {
-    data: SystemSensor
+    deviceInfo: DeviceState
 }
 
 const Sensors: React.SFC<Props> = ({deviceInfo}: Props) => {
     return (
         <LineChart
             style={{ height: 200 }}
-            data={ [10,10,20,40,22,21,4] }
+            data={ deviceInfo.outputs.A.dataHistory.map(s => s.rotationCount) }
             svg={{ stroke: 'rgb(134, 65, 244)' }}
             contentInset={{ top: 20, bottom: 20 }}
         >

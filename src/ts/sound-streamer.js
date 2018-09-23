@@ -33,6 +33,8 @@ import { Close } from "./nxt-structure/packets/system/close";
 import { PlaySoundFile } from "./nxt-structure/packets/direct/play-sound-file";
 import { Delete } from "./nxt-structure/packets/system/delete";
 var abuffer = [];
+var EIGHT_BIT_PCM_CODEC = 0x100;
+var IMA_ADPCM_CODEC = 0x101;
 function listenToAudio(store) {
     //We need permission to record audio
     PermissionsAndroid.request(PermissionsAndroid.PERMISSIONS.RECORD_AUDIO).then(function () {
@@ -44,10 +46,14 @@ function listenToAudio(store) {
             abuffer.push.apply(abuffer, __spread(audio));
         });
         var size = 8096;
+        var sampleRate = 16000;
+        var codec = EIGHT_BIT_PCM_CODEC;
+        var loop = 0; //We do not want to loop
         of(size).pipe(expand(function (data) {
             return merge(of(data).pipe(filter(function () { return abuffer.length >= size; }), switchMap(function () {
-                var saudio = __spread([0x01, 0x00, size, size >> 8, 16000, 16000 >> 8, 0, 0], abuffer.splice(0, size));
-                var file = new NXTFile("Test" + Math.floor(Math.random() * 100) + ".rso", saudio);
+                //Prepend the pcm data with the RSO header (https://wiki.multimedia.cx/index.php?title=RSO)
+                var audio_data = __spread([codec, codec >> 8, size, size >> 8, sampleRate, sampleRate >> 8, loop, loop >> 8], abuffer.splice(0, size));
+                var file = new NXTFile("Test" + Math.floor(Math.random() * 100) + ".rso", audio_data);
                 return writePacket(OpenWrite.createPacket(file));
             }), map(function (packet) { return Write.createPacket(packet.file); }), expand(function (packet) {
                 if (packet.file.hasWritten()) {
@@ -56,8 +62,9 @@ function listenToAudio(store) {
                 else {
                     return writePacket(packet);
                 }
-            }), filter(function (data) { return data.file.hasWritten(); }), take(1), switchMap(function (packet) { return writePacket(Close.createPacket(packet.file)); }), switchMap(function (packet) { return writePacket(PlaySoundFile.createPacket(false, packet.file.name)); }), switchMap(function (packet) { return writePacket(Delete.createPacket(new NXTFile(packet.soundFileName))); }), catchError(function (err) { return of(err); })), of(data).pipe(filter(function () { return abuffer.length < size; }), delay(100)));
-        })).subscribe(function (s) { return console.log(s); });
+            }), filter(function (data) { return data.file.hasWritten(); }), take(1), switchMap(function (packet) { return writePacket(Close.createPacket(packet.file)); }), switchMap(function (packet) { return writePacket(PlaySoundFile.createPacket(false, packet.file.name)); }), switchMap(function (packet) { return writePacket(Delete.createPacket(new NXTFile(packet.soundFileName))); }), catchError(of)), of(data).pipe(filter(function () { return abuffer.length < size; }), delay(100)));
+        })).subscribe(ignore);
         NativeModules.RNMemes.beginRecording();
     });
 }
+function ignore() { }

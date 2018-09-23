@@ -9,7 +9,7 @@ import { LsGetStatus } from "../nxt-structure/packets/direct/ls-get-status";
 import { LsRead } from "../nxt-structure/packets/direct/ls-read";
 import { writePacket } from "./device-epics";
 import { isActionOf } from "typesafe-actions";
-import * as deviceActions from "../actions/device-actions";
+import * as sensorActions from "../actions/sensor-actions";
 import { UltrasonicSensorCommand } from "../nxt-structure/ultrasonic-sensor-command";
 import { EmptyPacket } from "../nxt-structure/packets/empty-packet";
 import { SetInputMode } from "../nxt-structure/packets/direct/set-input-mode";
@@ -33,7 +33,7 @@ export var TYPE_TO_TYPE = new Map([
     [SensorType.ULTRASONIC_CM, InputSensorType.LOW_SPEED_9V],
 ]);
 export var sensorConfig = function (action$) {
-    return action$.pipe(filter(isActionOf(deviceActions.sensorConfig.request)), switchMap(function (_a) {
+    return action$.pipe(filter(isActionOf(sensorActions.sensorConfig.request)), switchMap(function (_a) {
         var config = _a.payload;
         return of(config);
     }), switchMap(function (config) {
@@ -60,13 +60,13 @@ export var sensorConfig = function (action$) {
         else {
             return of(config);
         }
-    }), map(deviceActions.sensorConfig.success), catchError(function (err) { return of(deviceActions.sensorConfig.failure(err)); }), catchError(function (err) { return of(deviceActions.sensorConfig.failure({
+    }), map(sensorActions.sensorConfig.success), catchError(function (err) { return of(sensorActions.sensorConfig.failure(err)); }), catchError(function (err) { return of(sensorActions.sensorConfig.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); }));
 };
 export var sensorHandler = function (action$, state$) {
-    return action$.pipe(filter(isActionOf(deviceActions.sensorHandler.request)), switchMap(function (ports) { return ports.payload; }), map(function (port) { return ({ port: port }); }), expand(function (port) {
+    return action$.pipe(filter(isActionOf(sensorActions.sensorHandler.request)), switchMap(function () { return [1, 2, 3, 4]; }), map(function (port) { return ({ port: port }); }), expand(function (port) {
         var state = state$.value;
         if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
             return EMPTY;
@@ -78,7 +78,7 @@ export var sensorHandler = function (action$, state$) {
         }));
     }), filter(function (data) { return data.rawValue >= 0; }), 
     //Unwrap the observable returned by tickSensor
-    map(deviceActions.sensorUpdate), catchError(function (err) { return of(deviceActions.sensorHandler.failure(err)); }), catchError(function (err) { return of(deviceActions.sensorHandler.failure({
+    map(sensorActions.sensorUpdate), catchError(function (err) { return of(sensorActions.sensorHandler.failure(err)); }), catchError(function (err) { return of(sensorActions.sensorHandler.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); }));

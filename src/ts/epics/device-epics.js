@@ -1,10 +1,9 @@
 import { isActionOf } from "typesafe-actions";
-import { catchError, concatMap, expand, filter, map, share, switchMap, take, tap } from "rxjs/operators";
-import { EMPTY, from, merge, NEVER, of } from "rxjs";
+import { catchError, expand, filter, map, share, switchMap, take, tap } from "rxjs/operators";
+import { EMPTY, from, merge, of } from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import { Buffer } from "buffer";
 import * as deviceActions from '../actions/device-actions';
-import { startMotorHandler, writeFileProgress } from '../actions/device-actions';
 import { NXTFile } from "../nxt-structure/nxt-file";
 import { Write } from "../nxt-structure/packets/system/write";
 import { Close } from "../nxt-structure/packets/system/close";
@@ -23,16 +22,6 @@ import { EmptyPacket } from "../nxt-structure/packets/empty-packet";
 export function writePacket(packet) {
     return from(ReactNativeBluetoothSerial.write(Buffer.from(packet.writePacket(true)))).pipe(switchMap(function () { return packet.responseReceived; }), map(function () { return packet; }));
 }
-export var startHandlers = function (action$, state$) {
-    return action$.pipe(map(function (action) {
-        return (isActionOf(deviceActions.writePacket.success)(action) && action.payload instanceof StartProgram && action.payload.programName) ||
-            (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name) ||
-            NEVER;
-    }), filter(function (name) { return name == SteeringControl; }), concatMap(function () { return [
-        deviceActions.writeConfig.request(state$.value.device.outputConfig),
-        startMotorHandler.request()
-    ]; }));
-};
 export var sendPacket = function (action$) {
     return action$.pipe(filter(isActionOf(deviceActions.writePacket.request)), switchMap(function (action) { return writePacket(action.payload); }), map(deviceActions.writePacket.success), catchError(function (err) {
         //If the user asks to start a program, and it is missing on the device, we get an out_of_range error.
@@ -49,7 +38,7 @@ export var sendPacket = function (action$) {
             }
         }
         return of(deviceActions.writePacket.failure(err));
-    }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
+    }), catchError(function (err) { return of(deviceActions.writePacket.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); }));
@@ -69,7 +58,7 @@ export var writeFile = function (action$) {
     }), share());
     //We have one branch dealing with updating about the current progress, and another that handles tasks required after
     //the file is written.
-    return merge(actions.pipe(filter(function (data) { return !data.file.hasWritten(); }), map(writeFileProgress), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
+    return merge(actions.pipe(filter(function (data) { return !data.file.hasWritten(); }), map(deviceActions.writeFileProgress), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeFile.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); })), actions.pipe(filter(function (data) { return data.file.hasWritten(); }), take(1), switchMap(function (packet) { return writePacket(Close.createPacket(packet.file)); }), switchMap(function (packet) {
@@ -77,7 +66,7 @@ export var writeFile = function (action$) {
             return writePacket(StartProgram.createPacket(packet.file.name)).pipe(map(function () { return packet.file; }));
         }
         return of(packet.file);
-    }), map(deviceActions.writeFile.success), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeConfig.failure({
+    }), map(deviceActions.writeFile.success), catchError(function (err) { return of(deviceActions.writeFile.failure(err)); }), catchError(function (err) { return of(deviceActions.writeFile.failure({
         error: err,
         packet: EmptyPacket.createPacket()
     })); })));

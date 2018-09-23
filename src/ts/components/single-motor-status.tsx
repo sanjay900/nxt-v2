@@ -9,6 +9,7 @@ import {Card} from "react-native-material-ui";
 
 type Props = {
     deviceInfo: DeviceState,
+    motor: string,
     listenToMotorState: () => {},
     stopListeningToMotorState: () => {}
 }

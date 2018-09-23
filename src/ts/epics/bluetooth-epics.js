@@ -3,7 +3,8 @@ import { catchError, concatMap, filter, map, switchMap } from "rxjs/operators";
 import { from, of } from "rxjs";
 import ReactNativeBluetoothSerial from "react-native-bluetooth-serial";
 import * as bluetoothActions from '../actions/bluetooth-actions';
-import * as deviceActions from "../actions/device-actions";
+import * as sensorActions from "../actions/sensor-actions";
+import * as motorActions from "../actions/motor-actions";
 import { writePacket } from "../actions/device-actions";
 import { GetBatteryLevel } from "../nxt-structure/packets/direct/get-battery-level";
 import { GetDeviceInfo } from "../nxt-structure/packets/system/get-device-info";
@@ -22,7 +23,8 @@ export var connectToDevice = function (action$) {
         writePacket.request(GetDeviceInfo.createPacket()),
         writePacket.request(GetFirmwareVersion.createPacket()),
         writePacket.request(StartProgram.createPacket(SteeringControl)),
-        deviceActions.sensorHandler.request([1, 2, 3, 4]),
+        sensorActions.sensorHandler.request(),
+        motorActions.startMotorListener.request(),
     ]; }), catchError(function (err) { return of(bluetoothActions.connectToDevice.failure(err)); }));
 };
 export var disconnectFromDevice = function (action$) {

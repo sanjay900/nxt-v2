@@ -10,7 +10,7 @@ import {LsGetStatus} from "../nxt-structure/packets/direct/ls-get-status";
 import {LsRead} from "../nxt-structure/packets/direct/ls-read";
 import {writePacket} from "./device-epics";
 import {isActionOf} from "typesafe-actions";
-import * as deviceActions from "../actions/device-actions";
+import * as sensorActions from "../actions/sensor-actions";
 import {UltrasonicSensorCommand} from "../nxt-structure/ultrasonic-sensor-command";
 import {PacketError} from "../reducers/device";
 import {EmptyPacket} from "../nxt-structure/packets/empty-packet";
@@ -37,7 +37,7 @@ export const TYPE_TO_TYPE: Map<SensorType, InputSensorType> = new Map<SensorType
 ]);
 export const sensorConfig = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
-        filter(isActionOf(deviceActions.sensorConfig.request)),
+        filter(isActionOf(sensorActions.sensorConfig.request)),
         switchMap(({payload: config}: { payload: { port: number, sensorType: SensorType } }) => {
             return of(config);
         }),
@@ -71,17 +71,17 @@ export const sensorConfig = (action$: ActionsObservable<RootAction>) =>
                 return of(config)
             }
         }),
-        map(deviceActions.sensorConfig.success),
-        catchError((err: PacketError) => of(deviceActions.sensorConfig.failure(err))),
-        catchError((err: Error) => of(deviceActions.sensorConfig.failure({
+        map(sensorActions.sensorConfig.success),
+        catchError((err: PacketError) => of(sensorActions.sensorConfig.failure(err))),
+        catchError((err: Error) => of(sensorActions.sensorConfig.failure({
             error: err,
             packet: EmptyPacket.createPacket()
         }))),
     );
 export const sensorHandler = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
     action$.pipe(
-        filter(isActionOf(deviceActions.sensorHandler.request)),
-        switchMap(ports => ports.payload),
+        filter(isActionOf(sensorActions.sensorHandler.request)),
+        switchMap(() => [1, 2, 3, 4]),
         map(port => ({port})),
         expand(port => {
             let state = state$.value;
@@ -101,9 +101,9 @@ export const sensorHandler = (action$: ActionsObservable<RootAction>, state$: St
         }),
         filter(data => data.rawValue >= 0),
         //Unwrap the observable returned by tickSensor
-        map(deviceActions.sensorUpdate),
-        catchError((err: PacketError) => of(deviceActions.sensorHandler.failure(err))),
-        catchError((err: Error) => of(deviceActions.sensorHandler.failure({
+        map(sensorActions.sensorUpdate),
+        catchError((err: PacketError) => of(sensorActions.sensorHandler.failure(err))),
+        catchError((err: Error) => of(sensorActions.sensorHandler.failure({
             error: err,
             packet: EmptyPacket.createPacket()
         }))),

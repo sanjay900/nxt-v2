@@ -1,21 +1,25 @@
 import {ActionsObservable, StateObservable} from "redux-observable";
 import {ConnectionStatus, OutputConfig, RootAction, RootState} from "../store";
-import {catchError, delay, expand, filter, map, switchMap} from "rxjs/operators";
+import {catchError, concatMap, delay, expand, filter, map, switchMap} from "rxjs/operators";
 import {isActionOf} from "typesafe-actions";
-import * as deviceActions from "../actions/device-actions";
-import {EMPTY, of} from "rxjs";
-import {SteeringConfig} from "../nxt-structure/motor-constants";
+import * as motorActions from "../actions/motor-actions";
+import {EMPTY, NEVER, of} from "rxjs";
+import {SteeringConfig, SystemOutputPort} from "../nxt-structure/motor-constants";
 import {MessageWrite} from "../nxt-structure/packets/direct/message-write";
-import {PacketError} from "../reducers/device";
+import {initialOutput, PacketError} from "../reducers/device";
 import {EmptyPacket} from "../nxt-structure/packets/empty-packet";
 import {writePacket} from "./device-epics";
+import {GetOutputState} from "../nxt-structure/packets/direct/get-output-state";
+import * as deviceActions from "../actions/device-actions";
+import {StartProgram} from "../nxt-structure/packets/direct/start-program";
+import {SteeringControl} from "../utils/Files";
 
 const CONFIG_PACKET_ID = "B";
 const DRIVE_PACKET_ID = "A";
 const PACKET_MAILBOX = 0;
 export const motorHandler = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
     action$.pipe(
-        filter(isActionOf(deviceActions.startMotorHandler.request)),
+        filter(isActionOf(motorActions.startMotorHandler.request)),
         map(() => state$.value.device.outputConfig),
         expand(prevOut => {
             let state = state$.value;
@@ -38,16 +42,43 @@ export const motorHandler = (action$: ActionsObservable<RootAction>, state$: Sta
             }
             return of(out).pipe(delay(100));
         }),
-        map(deviceActions.startMotorHandler.success),
-        catchError((err: PacketError) => of(deviceActions.startMotorHandler.failure(err))),
-        catchError((err: Error) => of(deviceActions.startMotorHandler.failure({
+        map(motorActions.startMotorHandler.success),
+        catchError((err: PacketError) => of(motorActions.startMotorHandler.failure(err))),
+        catchError((err: Error) => of(motorActions.startMotorHandler.failure({
             error: err,
             packet: EmptyPacket.createPacket()
         }))),
     );
+
+export const motorListener = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
+    action$.pipe(
+        filter(isActionOf(motorActions.startMotorListener.request)),
+        switchMap(() => [SystemOutputPort.A, SystemOutputPort.B, SystemOutputPort.C]),
+        map(port => ({port})),
+        expand(port => {
+            let state = state$.value;
+            if (state.bluetooth.status == ConnectionStatus.DISCONNECTED) {
+                return EMPTY;
+            }
+            if (!state.device.outputs[SystemOutputPort[port.port]].listening) {
+                return of(initialOutput(port.port).data).pipe(delay(100));
+            }
+            return of(port).pipe(
+                delay(10),
+                switchMap(() => writePacket(GetOutputState.createPacket(port.port)))
+            );
+        }),
+        map(motorActions.motorUpdate),
+        catchError((err: PacketError) => of(motorActions.startMotorListener.failure(err))),
+        catchError((err: Error) => of(motorActions.startMotorListener.failure({
+            error: err,
+            packet: EmptyPacket.createPacket()
+        }))),
+    );
+
 export const writeConfig = (action$: ActionsObservable<RootAction>) =>
     action$.pipe(
-        filter(isActionOf(deviceActions.writeConfig.request)),
+        filter(isActionOf(motorActions.writeConfig.request)),
         switchMap(({payload: config}: { payload: OutputConfig }) => {
             if (config.config == SteeringConfig.FRONT_STEERING) {
                 return writePacket(MessageWrite.createPacket(
@@ -67,9 +98,9 @@ export const writeConfig = (action$: ActionsObservable<RootAction>) =>
                 ));
             }
         }),
-        map(deviceActions.writeConfig.success),
-        catchError((err: PacketError) => of(deviceActions.writeConfig.failure(err))),
-        catchError((err: Error) => of(deviceActions.writeConfig.failure({
+        map(motorActions.writeConfig.success),
+        catchError((err: PacketError) => of(motorActions.writeConfig.failure(err))),
+        catchError((err: Error) => of(motorActions.writeConfig.failure({
             error: err,
             packet: EmptyPacket.createPacket()
         })))
@@ -80,3 +111,18 @@ function numberToNXT(number: number) {
     number = Math.abs(number);
     return start + Array(Math.max(3 - String(number).length + 1, 0)).join('0') + number;
 }
+
+export const startHandlers = (action$: ActionsObservable<RootAction>, state$: StateObservable<RootState>) =>
+    action$.pipe(
+        map(action => {
+            return (isActionOf(deviceActions.writePacket.success)(action) && action.payload instanceof StartProgram && action.payload.programName) ||
+                (isActionOf(deviceActions.writeFile.success)(action) && action.payload.name) ||
+                NEVER;
+        }),
+        filter(name => name == SteeringControl),
+        concatMap(() => [
+                motorActions.writeConfig.request(state$.value.device.outputConfig),
+                motorActions.startMotorHandler.request()
+            ]
+        )
+    );

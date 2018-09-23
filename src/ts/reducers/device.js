@@ -19,11 +19,13 @@ var __values = (this && this.__values) || function (o) {
         }
     };
 };
-import { MultiOutputPort, OutputRegulationMode, OutputRunState, SingleOutputPort, SteeringConfig } from "../nxt-structure/motor-constants";
+import { MultiOutputPort, OutputRegulationMode, OutputRunState, SingleOutputPort, SteeringConfig, SystemOutputPort } from "../nxt-structure/motor-constants";
 import { InputSensorMode, InputSensorType, SensorType } from "../nxt-structure/sensor-constants";
 import { SystemCommand } from "../nxt-structure/packets/system-command";
 import { getType } from "typesafe-actions";
 import * as deviceActions from "../actions/device-actions";
+import * as motorActions from "../actions/motor-actions";
+import * as sensorActions from "../actions/sensor-actions";
 import { DirectCommand } from "../nxt-structure/packets/direct-command";
 import { connectToDevice } from "../actions/bluetooth-actions";
 import { get, set } from "dot-prop-immutable";
@@ -39,7 +41,7 @@ var initialSensor = {
     },
     enabled: false
 };
-var initialOutput = {
+export var initialOutput = function (port) { return ({
     mode: 0,
     regulationMode: OutputRegulationMode.IDLE,
     runState: OutputRunState.IDLE,
@@ -49,10 +51,12 @@ var initialOutput = {
         rotationCount: 0,
         tachoCount: 0,
         turnRatio: 0,
-        tachoLimit: 0
+        tachoLimit: 0,
+        port: port
     },
-    dataHistory: []
-};
+    dataHistory: [],
+    listening: false
+}); };
 var initialState = {
     info: {
         currentProgramName: "None",
@@ -66,9 +70,9 @@ var initialState = {
             firmware: "0.0"
         },
     }, outputs: {
-        A: __assign({}, initialOutput),
-        B: __assign({}, initialOutput),
-        C: __assign({}, initialOutput)
+        A: __assign({}, initialOutput(SystemOutputPort.A)),
+        B: __assign({}, initialOutput(SystemOutputPort.B)),
+        C: __assign({}, initialOutput(SystemOutputPort.C))
     }, inputs: {
         1: __assign({}, initialSensor),
         2: __assign({}, initialSensor),
@@ -91,7 +95,7 @@ var initialState = {
 };
 export var device = function (state, action) {
     if (state === void 0) { state = initialState; }
-    var e_1, _a, e_2, _b;
+    var e_1, _a, e_2, _b, e_3, _c, e_4, _d;
     switch (action.type) {
         case getType(connectToDevice.success):
             return __assign({}, state, { info: __assign({}, state.info, { programToUpload: undefined }) });
@@ -103,12 +107,52 @@ export var device = function (state, action) {
             return __assign({}, state, processOutgoingPacket(action.payload, state));
         case getType(deviceActions.writePacket.success):
             return __assign({}, state);
-        case getType(deviceActions.sensorConfig.failure):
+        case getType(motorActions.enableMotorListener):
+            var motors = action.payload || [SystemOutputPort.A, SystemOutputPort.B, SystemOutputPort.C];
+            var motorLabels = motors.map(function (s) { return SystemOutputPort[s]; });
+            try {
+                for (var motorLabels_1 = __values(motorLabels), motorLabels_1_1 = motorLabels_1.next(); !motorLabels_1_1.done; motorLabels_1_1 = motorLabels_1.next()) {
+                    var sensor = motorLabels_1_1.value;
+                    state = set(state, "outputs." + sensor + ".listening", true);
+                }
+            }
+            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            finally {
+                try {
+                    if (motorLabels_1_1 && !motorLabels_1_1.done && (_a = motorLabels_1.return)) _a.call(motorLabels_1);
+                }
+                finally { if (e_1) throw e_1.error; }
+            }
+            return state;
+        case getType(motorActions.disableMotorListener):
+            motors = action.payload || [SystemOutputPort.A, SystemOutputPort.B, SystemOutputPort.C];
+            motorLabels = motors.map(function (s) { return SystemOutputPort[s]; });
+            try {
+                for (var motorLabels_2 = __values(motorLabels), motorLabels_2_1 = motorLabels_2.next(); !motorLabels_2_1.done; motorLabels_2_1 = motorLabels_2.next()) {
+                    var sensor = motorLabels_2_1.value;
+                    state = set(state, "outputs." + sensor + ".listening", false);
+                }
+            }
+            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            finally {
+                try {
+                    if (motorLabels_2_1 && !motorLabels_2_1.done && (_b = motorLabels_2.return)) _b.call(motorLabels_2);
+                }
+                finally { if (e_2) throw e_2.error; }
+            }
+            return state;
+        case getType(sensorActions.sensorConfig.failure):
         case getType(deviceActions.writePacket.failure):
-        case getType(deviceActions.sensorHandler.failure):
+        case getType(sensorActions.sensorHandler.failure):
+        case getType(motorActions.startMotorHandler.failure):
         case getType(deviceActions.writeFile.failure):
-            console.log(action.payload.error, DirectCommand[action.payload.packet.id], SystemCommand[action.payload.packet.id]);
             return __assign({}, state, { lastMessage: action.payload.error.message });
+        case getType(motorActions.motorUpdate):
+            var portId = SystemOutputPort[action.payload.port];
+            var historyKey = "outputs." + portId + ".dataHistory";
+            state = set(state, "outputs." + portId + ".data", action.payload);
+            state = set(state, historyKey, get(state, historyKey).concat(action.payload));
+            return state;
         case getType(deviceActions.joystickMove):
             if (action.payload.name == "STEERING") {
                 return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { targetAngle: action.payload.x * 41 }) });
@@ -123,11 +167,11 @@ export var device = function (state, action) {
             else {
                 return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { power: 0 }) });
             }
-        case getType(deviceActions.writeConfig.request):
+        case getType(motorActions.writeConfig.request):
             return __assign({}, state, { outputConfig: action.payload });
-        case getType(deviceActions.sensorConfig.request):
+        case getType(sensorActions.sensorConfig.request):
             return set(state, "inputs." + action.payload.port + ".type", action.payload.sensorType);
-        case getType(deviceActions.enableSensors):
+        case getType(sensorActions.enableSensors):
             var sensors = action.payload || [1, 2, 3, 4];
             try {
                 for (var sensors_1 = __values(sensors), sensors_1_1 = sensors_1.next(); !sensors_1_1.done; sensors_1_1 = sensors_1.next()) {
@@ -135,15 +179,15 @@ export var device = function (state, action) {
                     state = set(state, "inputs." + sensor + ".enabled", true);
                 }
             }
-            catch (e_1_1) { e_1 = { error: e_1_1 }; }
+            catch (e_3_1) { e_3 = { error: e_3_1 }; }
             finally {
                 try {
-                    if (sensors_1_1 && !sensors_1_1.done && (_a = sensors_1.return)) _a.call(sensors_1);
+                    if (sensors_1_1 && !sensors_1_1.done && (_c = sensors_1.return)) _c.call(sensors_1);
                 }
-                finally { if (e_1) throw e_1.error; }
+                finally { if (e_3) throw e_3.error; }
             }
             return state;
-        case getType(deviceActions.disableSensors):
+        case getType(sensorActions.disableSensors):
             sensors = action.payload || [1, 2, 3, 4];
             try {
                 for (var sensors_2 = __values(sensors), sensors_2_1 = sensors_2.next(); !sensors_2_1.done; sensors_2_1 = sensors_2.next()) {
@@ -152,16 +196,16 @@ export var device = function (state, action) {
                     state = set(state, "inputs." + sensor + ".dataHistory", []);
                 }
             }
-            catch (e_2_1) { e_2 = { error: e_2_1 }; }
+            catch (e_4_1) { e_4 = { error: e_4_1 }; }
             finally {
                 try {
-                    if (sensors_2_1 && !sensors_2_1.done && (_b = sensors_2.return)) _b.call(sensors_2);
+                    if (sensors_2_1 && !sensors_2_1.done && (_d = sensors_2.return)) _d.call(sensors_2);
                 }
-                finally { if (e_2) throw e_2.error; }
+                finally { if (e_4) throw e_4.error; }
             }
             return state;
-        case getType(deviceActions.sensorUpdate):
-            var historyKey = "inputs." + action.payload.port + ".dataHistory";
+        case getType(sensorActions.sensorUpdate):
+            historyKey = "inputs." + action.payload.port + ".dataHistory";
             state = set(state, "inputs." + action.payload.port + ".data", action.payload);
             state = set(state, historyKey, get(state, historyKey).concat(action.payload));
             return state;

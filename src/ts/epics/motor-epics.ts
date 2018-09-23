@@ -108,6 +108,7 @@ export const writeConfig = (action$: ActionsObservable<RootAction>) =>
 
 function numberToNXT(number: number) {
     let start = number < 0 ? "-" : "0";
+    number = Math.round(number);
     number = Math.abs(number);
     return start + Array(Math.max(3 - String(number).length + 1, 0)).join('0') + number;
 }

@@ -1,5 +1,5 @@
 import React from "react";
-import {Button, StyleSheet, View} from "react-native";
+import {Button, ScrollView, StyleSheet, View} from "react-native";
 import {DeviceState, State, SystemOutput} from "../store";
 import {connect} from "react-redux";
 import {Card} from "react-native-material-ui";
@@ -14,9 +14,9 @@ type Props = {
 class Motors extends React.Component<Props> {
     render() {
         return (
-            <View>
+            <ScrollView>
                 {Object.values(this.props.deviceInfo.outputs).map(Motors.renderMotor)}
-            </View>
+            </ScrollView>
         );
     }
 

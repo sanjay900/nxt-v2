@@ -36,8 +36,7 @@ class SingleMotorStatus extends React.Component<Props> {
                         <FormLabel>Mode</FormLabel>
                         <Text style={styles.margin}>{printMode(motor.mode)}</Text>
                         <FormLabel>Regulation Mode</FormLabel>
-                        <Text
-                            style={styles.margin}>{Utils.formatTitle(OutputRegulationMode[motor.regulationMode])}</Text>
+                        <Text style={styles.margin}>{Utils.formatTitle(OutputRegulationMode[motor.regulationMode])}</Text>
                         <FormLabel>Run State</FormLabel>
                         <Text style={styles.margin}>{Utils.formatTitle(OutputRunState[motor.runState])}</Text>
                     </View>

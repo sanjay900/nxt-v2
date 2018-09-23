@@ -160,7 +160,7 @@ export var device = function (state, action) {
                 return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { targetAngle: action.payload.x * 41 }) });
             }
             else {
-                return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { power: action.payload.y * 41 }) });
+                return __assign({}, state, { outputConfig: __assign({}, state.outputConfig, { power: action.payload.y * 100 }) });
             }
         case getType(deviceActions.joystickRelease):
             if (action.payload == "STEERING") {

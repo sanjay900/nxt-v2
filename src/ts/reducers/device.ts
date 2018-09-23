@@ -141,7 +141,7 @@ export const device = (state: DeviceState = initialState, action: RootAction) =>
             if (action.payload.name == "STEERING") {
                 return {...state, outputConfig: {...state.outputConfig, targetAngle: action.payload.x * 41}}
             } else {
-                return {...state, outputConfig: {...state.outputConfig, power: action.payload.y * 41}}
+                return {...state, outputConfig: {...state.outputConfig, power: action.payload.y * 100}}
             }
         case getType(deviceActions.joystickRelease):
             if (action.payload == "STEERING") {

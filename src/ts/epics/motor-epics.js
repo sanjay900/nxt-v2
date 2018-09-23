@@ -78,6 +78,7 @@ export var writeConfig = function (action$) {
 };
 function numberToNXT(number) {
     var start = number < 0 ? "-" : "0";
+    number = Math.round(number);
     number = Math.abs(number);
     return start + Array(Math.max(3 - String(number).length + 1, 0)).join('0') + number;
 }

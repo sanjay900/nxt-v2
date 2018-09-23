@@ -12,7 +12,7 @@ var __extends = (this && this.__extends) || (function () {
     };
 })();
 import React from "react";
-import { Button, StyleSheet, View } from "react-native";
+import { Button, ScrollView, StyleSheet, View } from "react-native";
 import { connect } from "react-redux";
 import { Card } from "react-native-material-ui";
 import { FormLabel, Text } from "react-native-elements";
@@ -24,9 +24,9 @@ var Motors = /** @class */ (function (_super) {
         return _super !== null && _super.apply(this, arguments) || this;
     }
     Motors.prototype.render = function () {
-        return (<View>
+        return (<ScrollView>
                 {Object.values(this.props.deviceInfo.outputs).map(Motors.renderMotor)}
-            </View>);
+            </ScrollView>);
     };
     Motors.renderMotor = function (output) {
         if (!output.data) {
